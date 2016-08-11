@@ -1,6 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-var qbws = require('qbws');
+//var qbws = require('qbws');
 // var path = require('path');
 // var favicon = require('serve-favicon');
 // var logger = require('morgan');
@@ -8,7 +8,7 @@ var qbws = require('qbws');
 // var routes = require('./routes/index');
 // var users = require('./routes/users');
 
-qbws.run();
+//qbws.run() //soap server is listening on port 8000
 
 var app = express();
 
@@ -34,6 +34,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.post('/newbill', function(req, res) {
   var foo = req.body;
+
+
 })
 
 app.post('/newinvoice', function(req, res) {
@@ -42,6 +44,7 @@ app.post('/newinvoice', function(req, res) {
 
 app.get('/', function(req, res) {
   console.log("Someone's accessing root");
+  console.log(qbws.authenticate());
 })
 
 ////////////////////////////////////
