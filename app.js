@@ -1,6 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-var qbws = require('qbws');
+//var qbws = require('qbws');
 // var path = require('path');
 // var favicon = require('serve-favicon');
 // var logger = require('morgan');
@@ -35,7 +35,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.post('/newbill', function(req, res) {
   //var foo = req.body;
   res.send("hello, qbws doesnt works");
-  qbws.run()
+  //qbws.run()
   res.send("hello, qbws works");
 })
 
