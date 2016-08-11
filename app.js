@@ -34,7 +34,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get('/newbill', function(req, res) {
   //var foo = req.body;
-  qbws.run()
+  res.send("hey, qbws works??");
 })
 
 app.post('/newinvoice', function(req, res) {
