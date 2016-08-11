@@ -1,6 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-//var qbws = require('qbws');
+var qbws = require('qbws');
 // var path = require('path');
 // var favicon = require('serve-favicon');
 // var logger = require('morgan');
