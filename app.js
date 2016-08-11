@@ -34,8 +34,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.post('/newbill', function(req, res) {
   var foo = req.body;
-
-
 })
 
 app.post('/newinvoice', function(req, res) {
@@ -44,7 +42,7 @@ app.post('/newinvoice', function(req, res) {
 
 app.get('/', function(req, res) {
   console.log("Someone's accessing root");
-  console.log(qbws.authenticate());
+
 })
 
 ////////////////////////////////////
