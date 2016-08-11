@@ -34,6 +34,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.post('/newbill', function(req, res) {
   //var foo = req.body;
+  res.send("hello, qbws doesnt works");
   qbws.run()
   res.send("hello, qbws works");
 })
