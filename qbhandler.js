@@ -9,10 +9,16 @@ app.set('port', (process.env.PORT || 6000));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.post('/', function(req, res) {
-	var billData = req.body;
+// app.post('/', function(req, res) {
+// 	var billData = req.body;
 
-	qbws.run();
+// 	qbws.run();
+// })
+
+app.get('/', function(req, res) {
+	var msg = 
+
+	console.log(msg);
 })
 
 app.listen(app.get('port'), function() {
