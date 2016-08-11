@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // 	qbws.run();
 // })
 
-app.get('/', function(req, res) {
+app.get('/info', function(req, res) {
 	res.send(qbws.run());
 })
 
