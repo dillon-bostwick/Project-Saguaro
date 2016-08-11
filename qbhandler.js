@@ -4,20 +4,12 @@ var qbws = require('qbws');
 
 var app = express();
 
+qbws.run();
+
 app.set('port', (process.env.PORT || 6000));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-
-// app.post('/', function(req, res) {
-// 	var billData = req.body;
-
-// 	qbws.run();
-// })
-
-app.get('/info', function(req, res) {
-	res.send(qbws.run());
-})
 
 app.listen(app.get('port'), function() {
   console.log('qbhandler is running on port', app.get('port'));
