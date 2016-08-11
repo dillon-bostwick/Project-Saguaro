@@ -7,12 +7,9 @@ var qbws = require('qbws');
 // var cookieParser = require('cookie-parser');
 // var routes = require('./routes/index');
 // var users = require('./routes/users');
-
-//qbws.run() //soap server is listening on port 8000
-
 var app = express();
 
-//app.set('port', (process.env.PORT || 5000));
+app.set('port', (process.env.PORT || 5000));
 
 qbws.run()
 
@@ -50,8 +47,8 @@ app.get('/', function(req, res) {
 
 ////////////////////////////////////
 
-// app.listen(app.get('port'), function() {
-//   console.log('Node app is running on port', app.get('port'));
-// });
+app.listen(app.get('port'), function() {
+  console.log('Node app is running on port', app.get('port'));
+});
 
 //module.exports = app;
