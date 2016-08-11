@@ -42,7 +42,7 @@ app.post('/newinvoice', function(req, res) {
 
 app.get('/', function(req, res) {
   console.log("Someone's accessing root");
-
+  res.send("hello");
 })
 
 ////////////////////////////////////
