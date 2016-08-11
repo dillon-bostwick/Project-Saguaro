@@ -11,8 +11,6 @@ var app = express();
 
 app.set('port', (process.env.PORT || 5000));
 
-qbws.run()
-
 // view engine setup
 //app.set('views', path.join(__dirname, 'views'));
 
@@ -30,15 +28,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 ////////////////////////////////////
 //ROUTES////////////////////////////
 ////////////////////////////////////
-
-app.get('/newbill', function(req, res) {
-  //var foo = req.body;
-  res.send("hey, qbws works??");
-})
-
-app.post('/newinvoice', function(req, res) {
-  var invoice = req.body;
-})
 
 app.get('/', function(req, res) {
   console.log("Someone's accessing root");
