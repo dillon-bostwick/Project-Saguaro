@@ -32,7 +32,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 //ROUTES////////////////////////////
 ////////////////////////////////////
 
-app.post('/newbill', function(req, res) {
+app.get('/newbill', function(req, res) {
   //var foo = req.body;
   qbws.run()
 })
