@@ -16,9 +16,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // })
 
 app.get('/', function(req, res) {
-	var msg = 
-
-	console.log(msg);
+	res.send(qbws.run());
 })
 
 app.listen(app.get('port'), function() {
