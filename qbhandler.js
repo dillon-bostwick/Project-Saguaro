@@ -4,7 +4,7 @@ var bodyParser = require('body-parser');
 
 var app = express();
 
-app.set('port', (5000)); //ALWAYS LOCAL HOST!
+app.set('port', (process.env.PORT, 5000)); //ALWAYS LOCAL HOST!
 
 qbws.run();
 
