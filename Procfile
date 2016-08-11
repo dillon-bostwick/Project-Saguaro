@@ -1,1 +1,1 @@
-web: node qbhandler.js
+web: node app.js
