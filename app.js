@@ -1,14 +1,15 @@
 var express = require('express');
+var bodyParser = require('body-parser');
+var qbws = require('qbws');
 // var path = require('path');
 // var favicon = require('serve-favicon');
 // var logger = require('morgan');
 // var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
 // var routes = require('./routes/index');
 // var users = require('./routes/users');
-var qbws = require('qbws');
 
 qbws.run();
+
 var app = express();
 
 app.set('port', (process.env.PORT || 5000));
@@ -28,6 +29,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // app.use('/users', users);
 
 ////////////////////////////////////
+//ROUTES////////////////////////////
+////////////////////////////////////
 
 app.post('/newbill', function(req, res) {
   var foo = req.body;
@@ -37,11 +40,14 @@ app.post('/newinvoice', function(req, res) {
   var invoice = req.body;
 })
 
+app.get('/', function(req, res) {
+  console.log("Someone's accessing root");
+})
+
 ////////////////////////////////////
 
 app.listen(app.get('port'), function() {
   console.log('Node app is running on port', app.get('port'));
 });
-
 
 //module.exports = app;
