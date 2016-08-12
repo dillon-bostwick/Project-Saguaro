@@ -4,16 +4,10 @@ var bodyParser = require('body-parser');
 
 var app = express();
 
-app.set('port', (process.env.PORT || 7000)); //ALWAYS LOCAL HOST!
+app.set('port', (process.env.PORT || 7000));
 
 qbws.run();
 
-app.post('/stuff', function(req, res) {
-	var billData = req.body;
-
-	//do something with billData
-})
-
-app.listen(app.get('port'), function() {
-  console.log('Feed data to qbhandler on ', app.get('port'));
-});
+// app.listen(app.get('port'), function() {
+//   console.log('qbhandler running on ', app.get('port'));
+// });
