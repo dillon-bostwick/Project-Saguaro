@@ -10,12 +10,15 @@ var http = require('http');
 // var users = require('./routes/users');
 
 var app = express();
-var server = http.createServer(app);
 
 app.set('port', (process.env.PORT || 5000));
 
 // view engine setup
 //app.set('views', path.join(__dirname, 'views'));
+
+////////////////////////////////////
+//MIDDLEWARE////////////////////////
+////////////////////////////////////
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -32,14 +35,19 @@ app.use(bodyParser.urlencoded({ extended: false }));
 //ROUTES////////////////////////////
 ////////////////////////////////////
 
-
-
-qbws.run();
+app.get('/support', function(req, res) {
+	console.log("Accessing support route");
+});
 
 ////////////////////////////////////
+//SERVER SETUP//////////////////////
+////////////////////////////////////
 
-// app.listen(app.get('port'), function() {
-//   console.log('Node app is running on port', app.get('port'));
-// });
+//qbws takes care of linking the server to the soap at '/wsdl'...
+//The server must get passd to qbws.run(server) so that it knows
+//where to listen
+
+var server = http.createServer(app);
+qbws.run(server);
 
 //module.exports = app;
