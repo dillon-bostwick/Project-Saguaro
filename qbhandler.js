@@ -6,7 +6,7 @@ var app = express();
 
 app.set('port', (process.env.PORT || 7000));
 
-qbws.run();
+qbws.run(); 
 
 // app.listen(app.get('port'), function() {
 //   console.log('qbhandler running on ', app.get('port'));
