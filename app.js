@@ -41,30 +41,35 @@ app.get('/support', function(req, res) {
 
 app.get('/debug', function(req, res) {
 	var builder = require('xmlbuilder');
-	
+
     var requestID = 111;
     var vendorName = 'Bob the builder';
     var refNumber = 222;
+    var amt = 333;
 
 
-    var billAddRequest = {
+    var billAddRequestObj = {
         QBXML: {
+        	"?qbxml": "version=13.0",
             QBXMLMsgsRq: {
                 "@onError": "stopOnError",
                 BillAddRq: {
-                    "@requestID": requestID,
+                    "@requestID": requestID.toString(),
                     BillAdd: {
                         VendorRef: {
                             FullName: vendorName
                         },
-                        RefNumber: refNumber
+                        RefNumber: refNumber,
+                        itemLineAdd: {
+                            amount: amt
+                        }
                     }
                 }
             }
         }
     };
 
-    var requestXML = builder.create(billAddRequest).end();
+    var requestXML = builder.create(billAddRequestObj, {version: '1.0', encoding: 'UTF-8'}).end();
 
     console.log(requestXML);
 })
