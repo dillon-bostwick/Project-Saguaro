@@ -39,6 +39,10 @@ app.get('/support', function(req, res) {
 	console.log("Accessing support route");
 });
 
+app.get('/debug', function(req, res) {
+
+})
+
 ////////////////////////////////////
 //SERVER SETUP//////////////////////
 ////////////////////////////////////
