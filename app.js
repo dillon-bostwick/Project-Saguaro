@@ -2,6 +2,7 @@ var qbws = require('qbws');
 var bodyParser = require('body-parser');
 var express = require('express');
 var http = require('http');
+var mongoose = require('mongoose');
 // var path = require('path');
 // var favicon = require('serve-favicon');
 // var logger = require('morgan');
@@ -10,11 +11,21 @@ var http = require('http');
 // var users = require('./routes/users');
 
 var app = express();
-
 app.set('port', (process.env.PORT || 5000));
 
 // view engine setup
 //app.set('views', path.join(__dirname, 'views'));
+
+////////////////////////////////////
+//DATABSE SCHEMA////////////////////
+////////////////////////////////////
+
+var Schema = mongoose.Schema;
+
+var invoiceSchema = new Schema({
+	_venID: Schema.Types.ObjectId,
+	
+})
 
 ////////////////////////////////////
 //MIDDLEWARE////////////////////////
