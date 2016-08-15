@@ -7,16 +7,14 @@ var favicon = require('serve-favicon');
 var path = require('path');
 
 //made by Dillon
-var qbws = require('./qbws');
+var qbws   = require('./qbws');
 var models = require('./schema');
-var routes = require('./routes/index');
+var publicRouter = require('./routes/index');
+var crudRouter = require('./routes/crud');
 
 var app = express();
 app.set('port', (process.env.PORT || 5000));
 console.log('Express server running on 5000');
-
-// view engine setup
-//app.set('views', path.join(__dirname, 'views'));
 
 ////////////////////////////////////
 //DATABSE SETUP/////////////////////
@@ -38,19 +36,19 @@ db.once("open", function(callback) {
 ////////////////////////////////////
 
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'views')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
  
-app.use('/', routes);
-// app.use('/users', users);
+//app.use('/crud', crudRouter);
+app.use('/', publicRouter);
 
 ////////////////////////////////////
 //SERVER SETUP//////////////////////
 ////////////////////////////////////
 
 //qbws takes care of linking the server to the soap at '/wsdl'...
-//The server must get passd to qbws.run(server) so that it knows
+//The server must get passd to run so that qbws knows
 //where to listen
 
 var server = http.createServer(app);

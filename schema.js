@@ -1,10 +1,15 @@
+/* Define all schema via Mongoose for MongoDB.
+ * All models are exported under schema.models.
+ * For example, to access the Invoice model,
+ * schema.models.invoice
+ */
+
 var mongoose = require('mongoose');
 
 var Schema = mongoose.Schema;
 var ObjectID = mongoose.Schema.ObjectId;
 
-
-
+//Schema:
 
 var invoiceSchema = new Schema({
 	vendor: ObjectID,
@@ -44,15 +49,12 @@ var hoodSchema = new Schema({
 
 //Should payableBills (just an array of invoice IDs) be a schema? it has to be a collection...
 
-var Invoice = mongoose.model('Invoice', invoiceSchema);
-var Vendor = mongoose.model('Vendor', vendorSchema);
-var User = mongoose.model('User', userSchema);
-var Activity = mongoose.model('Vendor', vendorSchema);
-var Hood = mongoose.model('Hood', hoodSchema);
-var archivedInvoice = mongoose.model('archivedInvoice', invoiceSchema);
+//All the models go in .models
 
-module.exports = Invoice;
-module.exports = Vendor;
-module.exports = User;
-module.exports = Activity;
-module.exports = Hood;
+module.exports.models = {
+	invoice: mongoose.model('Invoice', invoiceSchema),
+	vendor: mongoose.model('Vendor', vendorSchema),
+	user: mongoose.model('User', userSchema),
+	activity: mongoose.model('Vendor', vendorSchema),
+	hood: mongoose.model('Hood', hoodSchema),
+}

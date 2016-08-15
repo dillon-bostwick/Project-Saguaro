@@ -11,6 +11,7 @@
     "qbws": "latest",
     "mongoose": "latest",
     "serve-favicon": "latest",
-    "path": "latest"
+    "path": "latest",
+    "angular": "1.5.8"
   }
 }
