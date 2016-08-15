@@ -3,14 +3,16 @@
 <html>
 	<head>
 		<title>Welcome to Saguaro</title>
-		<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 		
-		<link rel="stylesheet" href="../public/style.css" />
+		<link rel="stylesheet" href="/../style.css"/>
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+		<script src="../node_modules/angular/angular.js"></script>
 	</head>
 	
-	<body ng-app="saguaro",>
-		<div></div>
+	<body ng-app="saguaro">
+		<div>
+			<select ng-model="choice" ng-options="x.id as x.name for x in array"></select>
+		</div>
 	</body>
 </html>
