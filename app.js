@@ -9,7 +9,7 @@ var path = require('path');
 //made by Dillon
 var qbws   = require('./qbws');
 var models = require('./schema');
-var publicRouter = require('./routes/index');
+var router = require('./routes/index');
 var crudRouter = require('./routes/crud');
 
 var app = express();
@@ -40,8 +40,8 @@ app.use(express.static(path.join(__dirname, 'views')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
  
-//app.use('/crud', crudRouter);
-app.use('/', publicRouter);
+app.use('/crud', crudRouter);
+app.use('/', router);
 
 ////////////////////////////////////
 //SERVER SETUP//////////////////////
