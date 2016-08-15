@@ -5,6 +5,9 @@ var router = express.Router();
 
 //All database CRUD Routes:
 
+
+
+
 for (var key in schema.models) {
 	var model = schema.models[key];
 
@@ -16,10 +19,11 @@ for (var key in schema.models) {
 		model(req.body).save(mongoLog);
 	})
 
-	/* Pass a standard MongoDB query.
+	/* Pass a standard MongoDB query:
+	 * {'query': '{}'}
 	 * The entire object is sent back.
 	 */
-	router.post('/read' + model.modelName, function(req, res) {
+	router.get('/' + model.modelName, function(req, res) {
 		model.find(req.body, function(error, data) {
 			if (error) {throw error;}
 
@@ -32,8 +36,8 @@ for (var key in schema.models) {
 	 * 
 	 * Data must be in the format:
 	 * {
-	 *   query: {},
-	 *	 updated: {}
+	 *   'query': '{}',
+	 *	 'updated': { 'foo': 'bar' } <---this is the new object to replace
 	 * }
 	 *
 	 * Nothing is sent back.
@@ -45,11 +49,12 @@ for (var key in schema.models) {
 		model.findOneAndUpdate(req.body.query, req.body.updated, mongoLog);
 	})
 
-	/* Pass a standard MongoDB query.
+	/* Pass a standard MongoDB query:
+	 * {'query': '{}'}
 	 * Nothing is sent back.
 	 */
 	router.post('/delete' + model.modelName, function(req, res) {
-		model.findOneAndRemove(req.body, mongoLog);
+		model.findOneAndRemove(req.body.query, mongoLog);
 	})
 }
 

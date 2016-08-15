@@ -10,11 +10,14 @@ var path = require('path');
 var qbws   = require('./qbws');
 var models = require('./schema');
 var router = require('./routes/index');
-var crudRouter = require('./routes/crud');
+var restRouter = require('./routes/rest');
 
 var app = express();
 app.set('port', (process.env.PORT || 5000));
 console.log('Express server running on 5000');
+
+// view engine setup
+//app.set('views', path.join(__dirname, 'views'));
 
 ////////////////////////////////////
 //DATABSE SETUP/////////////////////
@@ -36,11 +39,11 @@ db.once("open", function(callback) {
 ////////////////////////////////////
 
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(express.static(path.join(__dirname, 'views')));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
  
-app.use('/crud', crudRouter);
+app.use('/api', restRouter);
 app.use('/', router);
 
 ////////////////////////////////////

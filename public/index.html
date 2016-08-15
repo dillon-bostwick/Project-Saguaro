@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+
+<html ng-app="saguaro">
+	<head>
+		<title>Saguaro</title>
+		
+		<link rel="stylesheet" href="stylesheets/style.css" />
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+		<script src="javascripts/app.js"></script>
+	</head>
+	
+	<body ng-controller="MainCtrl">
+	    <select ng-model="selectedItem" 
+	            ng-options="item as item.name for item in items"></select>
+
+	    {{selectedItem | json}}
+	</body>
+</html>
