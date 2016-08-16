@@ -12,6 +12,7 @@
     "mongoose": "latest",
     "serve-favicon": "latest",
     "path": "latest",
-    "angular": "1.5.8"
+    "angular": "1.5.8",
+    "underscore": "latest"
   }
 }

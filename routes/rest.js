@@ -1,68 +1,69 @@
 var express = require('express');
-var schema = require('../schema')
+var _ = require('underscore');
+var schema = require('../schema');
 
 var router = express.Router();
 
 //All database CRUD Routes:
 
+_.map(schema.models, function(model) {
+	return model;
+}).forEach(function(model) {
 
-
-
-for (var key in schema.models) {
-	var model = schema.models[key];
-
-	/* Pass an object (if it is missing key value pairs,
-	 * mongoose will figure out the rest).
+	/* POST (CREATE)
+	 * Pass an object (note: mongoose doesn't validate)
 	 * Nothing is sent back.
 	 */
-	router.post('/create' + model.modelName, function(req, res) {
+	router.post('/' + model.modelName + 's', function(req, res) {
 		model(req.body).save(mongoLog);
 	})
 
-	/* Pass a standard MongoDB query:
-	 * {'query': '{}'}
+	/* GET (READ)
+	 * Pass a standard MongoDB query as params
 	 * The entire object is sent back.
 	 */
-	router.get('/' + model.modelName, function(req, res) {
-		model.find(req.body, function(error, data) {
+	router.get('/' + model.modelName + 's', function(req, res) {
+		model.find(req.query, function(error, data) {
 			if (error) {throw error;}
 
 			res.send(data);
 		})
 	})
 
-	/* Will only reset an entire object to a new one. All logic of element
-	 * updating (including pushing to arrays) must be handled by the client.
-	 * 
-	 * Data must be in the format:
-	 * {
-	 *   'query': '{}',
-	 *	 'updated': { 'foo': 'bar' } <---this is the new object to replace
-	 * }
+	/* PUT (UPDATE)
+	 * Pass a standard MongoDB query as params
+	 * Any updates to elements (adding elements, etc.) pass as body
+	 * Imposible to remove single elements but an array can be fully replaced.
 	 *
 	 * Nothing is sent back.
-	 *
-	 * TODO: DEBUG FROM THE CLIENT SIDE (CURL isn't working) - NOT TESTED YET!
 	 */
-	router.post('/update' + model.modelName, function(req, res) {
-		console.log(req.body);
-		model.findOneAndUpdate(req.body.query, req.body.updated, mongoLog);
+	 router.put('/' + model.modelName + 's', function(req, res) {
+		model.find(req.query, function(error, data) {
+			if (error) {throw error}
+
+			var updated = _.extend(req.body, data)
+
+			model.update(req.query, updated, mongoLog);
+ 		})
 	})
 
-	/* Pass a standard MongoDB query:
-	 * {'query': '{}'}
-	 * Nothing is sent back.
-	 */
-	router.post('/delete' + model.modelName, function(req, res) {
-		model.findOneAndRemove(req.body.query, mongoLog);
-	})
-}
+ 	/* DELETE
+ 	 * Pass a standard MongoDB query as params
+ 	 * Nothing is sent back.
+ 	 */
+	router.delete('/' + model.modelName + 's', function(req, res) {
+		console.log(req);
+		model.remove(req.query, mongoLog);
+	}) 
+});
 
-//Helper (saves boilerplating the error callback)
+
+// //Helper (saves boilerplating the error callback)
 var mongoLog = function(error) {
 	if (error) {throw error;}
 
 	console.log("Successful write to MongoDB");
 }
+
 
 module.exports = router;
