@@ -52,8 +52,6 @@ angular.
                 return _.difference(SUBHOODOPTIONS, _.pluck(lineItem.subHoods, 'name'));
             }
 
-
-            //TODO: validation needs work!
             ctrl.submit = function() {
                 ctrl.errors = [];
 
@@ -154,6 +152,11 @@ angular.
                     for (var i = 0; i < lineItems.length; i++) {
                         var lineItem = lineItems[i];
 
+                        //this is necessary because data is stored in subhoods even if the user checks the unknown box
+                        if (lineItem['unknown']) {
+                            lineItem.subHoods = [];
+                        }
+
                         //convert sbhood from array of {name: "foo"}s to array of "foo"s
                         lineItem.subHoods = _.pluck(lineItem.subHoods, 'name');
 
@@ -169,11 +172,10 @@ angular.
                     }
                 }
 
-                //Somehow display the warnings even if there are only warnings, before the final submission
+                //TODO: Somehow display the warnings even if there are only warnings, before the final submission
 
-                //All validation checks out:
-
-                //if a lineItem is marked as unknown==true, make sure to leave subhoods as empty even if there is content in this.subhoods
+                //If all validation checks out:
+                //post via $http, then redirect somewhere...
             }
 
             function throwValError(msg) {
