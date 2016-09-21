@@ -310,6 +310,7 @@ function (args) {
     serviceLog('        string[] authReturn[0] = ' + authReturn[0]);
     serviceLog('        string[] authReturn[1] = ' + authReturn[1]);
 
+    //TODO: this should just be the first two elements -- drop the 0 and the 60. This doesn't need to be done until later, and ideally it should be tested after the change
     return {
         authenticateResult: { string: [authReturn[0], authReturn[1], 0, 60] }
     };
@@ -606,7 +607,7 @@ module.exports.run = function runQBWS(server) {
     soapServer = soap.listen(server, '/wsdl', qbws, xml);
     server.listen(process.env.PORT || 5000);
 
-    serviceLog("SOAP server setup successful, running on 5000/wsdl");
+    serviceLog("SOAP server setup successful, running on /wsdl");
 
     soapServer.log = function soapServerLog(type, data) {
         serviceLog(type + ': ' + data);

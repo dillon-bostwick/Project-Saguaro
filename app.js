@@ -1,23 +1,18 @@
-//npm modules
-var bodyParser = require('body-parser');
 var express = require('express');
 var http = require('http');
 var mongoose = require('mongoose');
 var favicon = require('serve-favicon');
 var path = require('path');
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
 
-//made by Dillon
 var qbws   = require('./qbws');
-var models = require('./schema');
-var router = require('./routes/index');
-var restRouter = require('./routes/rest');
+var router = require('./routes');
 
 var app = express();
+
 app.set('port', (process.env.PORT || 5000));
 console.log('Express server running on 5000');
-
-// view engine setup
-//app.set('views', path.join(__dirname, 'views'));
 
 ////////////////////////////////////
 //DATABSE SETUP/////////////////////
@@ -38,12 +33,8 @@ db.once("open", function(callback) {
 //MIDDLEWARE////////////////////////
 ////////////////////////////////////
 
-app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
- 
-app.use('/api', restRouter);
+app.use(favicon(path.join(__dirname, 'public', 'images/favicon.ico'))); //Sometimes doesn't work
+app.use(express.static(path.join(__dirname, 'public'))); //accesses Angular app
 app.use('/', router);
 
 ////////////////////////////////////
@@ -57,4 +48,5 @@ app.use('/', router);
 var server = http.createServer(app);
 qbws.run(server);
 
-//module.exports = app;
+
+module.exports = app;

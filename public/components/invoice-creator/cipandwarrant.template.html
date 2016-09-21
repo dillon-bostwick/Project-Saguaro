@@ -1,0 +1,25 @@
+<form>
+	<div>
+		<label>Hood:</label>
+		<select ng-model="lineItem._hood" ng-options="hood._id as hood.name for hood in $ctrl.HOODS"></select>
+	</div>
+
+	<div>
+		<label>Sub-hood:</label>
+
+		<div>
+			<input type="checkbox" ng-model="lineItem.unknown"> Unknown<br>
+		</div>
+
+		<div ng-repeat="subHood in lineItem.subHoods" ng-if="!lineItem.unknown">
+			<div>
+				<p>{{subHood.name}}</p>
+				<button ng-click="lineItem.subHoods.splice($index, 1)">Remove</button>
+			</div>
+		</div>
+
+		<div>
+			<select ng-model="lineItem.addNewSubHood" ng-options="subHoodOption for subHoodOption in $ctrl.getSubHoodOptions(lineItem)" ng-model-options="{ getterSetter: true }" ng-if="!lineItem.unknown"></select>
+		</div>
+	</div>
+</form>

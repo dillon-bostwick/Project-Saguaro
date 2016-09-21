@@ -1,0 +1,80 @@
+<h2>Create a new invoice</h2>
+
+<form>
+	<input type="file" accept="image/*,application/pdf">
+
+	<div>
+		<label>Service date:</label>
+		<input type="date" ng-model="$ctrl.serviceDate" />
+		{{$ctrl.validServiceDate()}}
+	</div>
+
+	<div>
+		<label>Invoice #:</label>
+		<input type="text" ng-model="$ctrl.invNum" />
+		{{$ctrl.validInvNum()}}
+	</div>
+
+	<div>
+		<label>Vendor:</label>
+		<select ng-model="$ctrl._vendor" ng-options="vendor._id as vendor.name for vendor in $ctrl.VENDORS"></select>
+	</div>
+
+	<div ng-repeat="lineItem in $ctrl.lineItems">
+		<div>
+			<label>{{'Line item #' + ($index + 1) + ':'}}</label>
+
+			<input type="radio" ng-model="lineItem.type" value="cip" ng-change="$ctrl.loadNewLineItem(lineItem)">
+			CIP 
+			<input type="radio" ng-model="lineItem.type" value="expense" ng-change="$ctrl.loadNewLineItem(lineItem)">
+			Expense 
+			<input type="radio" ng-model="lineItem.type" value="warrant" ng-change="$ctrl.loadNewLineItem(lineItem)">
+			Warrant
+		</div>
+
+		<ng-include src="'components/invoice-creator/cipandwarrant.template.html'" ng-if="lineItem.type == 'cip' || lineItem.type == 'warrant'"></ng-include>
+
+		<ng-include src="'components/invoice-creator/expense.template.html'" ng-if="lineItem.type == 'expense'"></ng-include>
+
+		<div>
+			<label>Amount: $</label>
+			$<input type="Number" ng-model="lineItem.amount" />
+		</div>
+
+		<button ng-click="$ctrl.lineItems.splice($index, 1)"">Remove</button>
+	</div>
+
+
+	<div>
+		<label>Add a new line item: </label>
+
+		<input type="radio" ng-model="$ctrl.addNewLineItem" value="cip" ng-model-options="{ getterSetter: true }">
+		CIP 
+		<input type="radio" ng-model="$ctrl.addNewLineItem" value="expense" ng-model-options="{ getterSetter: true }">
+		Expense 
+		<input type="radio" ng-model="$ctrl.addNewLineItem" value="warrant" ng-model-options="{ getterSetter: true }">
+		Warrant 
+	</div>
+
+	<div>
+		<label>Memo:</label>
+		<textarea rows="4" cols="50" ng-model="ctrl.memo"></textarea>
+	</div>
+
+	<div>
+		<label>Total:</label>
+		<input type="number" ng-model="$ctrl.total" />
+	</div>
+
+	<div>
+		<button ng-click="$ctrl.submit()">Submit</button>
+	</div>
+
+	<div>
+		<ul>
+			<li ng-repeat="error in $ctrl.errors">
+				<p>{{error.type.toUpperCase() + ': ' + error.message}}</p>
+			</li>
+		</ul>
+	</div>
+</form>

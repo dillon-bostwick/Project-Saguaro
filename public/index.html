@@ -1,20 +1,47 @@
-<!DOCTYPE html>
+<!doctype html>
+<html lang="en" ng-app="saguaro">
+  <head>
+    <meta charset="utf-8">
+    <title>Saguaro: Brightwater Invoices</title>
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="stylesheets/app.css" />
+    <link rel="stylesheet" href="stylesheets/app.animations.css" />
 
-<html ng-app="saguaro">
-	<head>
-		<title>Saguaro</title>
-		
-		<link rel="stylesheet" href="stylesheets/style.css" />
 
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
-		<script src="javascripts/app.js"></script>
-	</head>
-	
-	<body ng-controller="MainCtrl">
-	    <select ng-model="selectedItem" 
-	            ng-options="item as item.name for item in items"></select>
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-animate/angular-animate.js"></script>
+    <script src="bower_components/angular-resource/angular-resource.js"></script>
+    <script src="bower_components/angular-route/angular-route.js"></script>
+    <script src="bower_components/underscore/underscore.js"></script>
+    <script src="bower_components/moment/moment.js"></script>
 
-	    {{selectedItem | json}}
-	</body>
+    <script src="app.module.js"></script>
+    <script src="app.config.js"></script>
+    <!-- <script src="app.animations.js"></script> -->
+
+    <!-- permanent components for Saguaro -->
+<!--     <script src="components/bill-confirmation/bill-confirmation.component.js""></script>
+    <script src="components/bill-confirmation/bill-confirmation.module.js""></script>
+    <script src="components/core/core.module.js"></script> -->
+    <script src="components/invoice-creator/invoice-creator.module.js"></script>
+    <script src="components/invoice-creator/invoice-creator.component.js"></script>
+    <!-- 
+    <script src="components/invoice-detail/invoice-detail.component.js"></script>
+    <script src="components/invoice-detail/invoice-detail.module.js"></script>
+    <script src="components/invoice-finder/invoice-finder.component.js"></script>
+    <script src="components/invoice-finder/invoice-finder.module.js"></script>
+    <script src="components/user-dashboard/user-dashboard.component.js"></script>
+    <script src="components/user-dashboard/user-dashboard.module.js"></script> -->
+
+
+  </head>
+  <body>
+    <h1>Project Saguaro: Brightwater Invoice Manager</h1>
+
+    <div class="view-container">
+        <div ng-view class="view-frame"></div>
+    </div>
+
+  </body>
 </html>
