@@ -10,6 +10,9 @@ angular.
         when('/creator', {
           template: '<invoice-creator></invoice-creator>'
         }).
+        when('/userdashboard', {
+          template: '<user-dashboard></user-dashboard>'
+        }).
         when('/', {
           template: '<a href="/auth/dropbox"><button>Log In with Dropbox</button></a>'
         }).
