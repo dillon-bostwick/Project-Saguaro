@@ -68,7 +68,7 @@ angular.
                 ctrl.errors = [];
 
                 if (_.isEmpty(ctrl.invNum)) {
-                    throwValError("Invoice number cannot be blank");
+                    throwValWarning("Invoice number cannot be blank");
                 }
 
                 if (ctrl.serviceDate > now) {

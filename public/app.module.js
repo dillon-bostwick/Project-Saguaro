@@ -2,5 +2,6 @@
 
 angular.module('saguaro', [
 	'ngRoute',
-	'invoiceCreator'
+	'invoiceCreator',
+	'userDashboard'
 	]);

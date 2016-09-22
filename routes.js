@@ -18,8 +18,7 @@ router.get('/auth/dropbox', passport.authenticate('dropbox'));
 router.get('/auth/dropbox/callback',
            passport.authenticate('dropbox', {
                                   successRedirect: '/#!/home',
-                                  failureRedirect: '/#!/angularroutenotfound',
-                                  failureFlash: true }));
+                                  failureRedirect: '/#!/angularroutenotfound'}));
 
 //get user data
 router.get('/userdata', function(req, res) {

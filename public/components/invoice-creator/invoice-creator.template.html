@@ -3,7 +3,7 @@
 <h2>Create a new invoice</h2>
 
 <form>
-	<input type="file" accept="image/*,application/pdf">
+	<input type="file" accept="image/*,application/pdf"> <!-- TODO: Figure this out -->
 
 	<div>
 		<label>Service date:</label>
@@ -34,9 +34,9 @@
 			Warrant
 		</div>
 
-		<ng-include src="'components/invoice-creator/cipandwarrant.template.html'" ng-if="lineItem.type == 'cip' || lineItem.type == 'warrant'"></ng-include>
+		<ng-include src="'components/invoice-creator/cipandwarrant.partial.html'" ng-if="lineItem.type == 'cip' || lineItem.type == 'warrant'"></ng-include>
 
-		<ng-include src="'components/invoice-creator/expense.template.html'" ng-if="lineItem.type == 'expense'"></ng-include>
+		<ng-include src="'components/invoice-creator/expense.partial.html'" ng-if="lineItem.type == 'expense'"></ng-include>
 
 		<div>
 			<label>Amount: $</label>

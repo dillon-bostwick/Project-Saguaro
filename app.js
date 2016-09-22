@@ -19,14 +19,15 @@ var BRIGHTWATERDROPBOXTEAMID = 'dbtid:AADIihV4QHYt6wCTX1MN2VVwJmdBDiv7tc4';
 //OAUTH SETUP///////////////////////
 ////////////////////////////////////
 passport.use(new dropboxStrategy({
-    consumerKey: 'bj9n6iwwtrj0hbg',
-    consumerSecret: 'qtiymyui2i9yjtv',
-    callbackURL: 'http://saguaroqbtester.herokuapp.com/auth/dropbox/callback' // TODO: must get updated depending on server every time...
-  }, function(token, tokenSecret, profile, done) {
+    consumerKey: 'o2h3e5h6mytkwvg',
+    consumerSecret: 'n59fazsvvrs7708',
+    callbackURL: 'http://localhost:5000/auth/dropbox/callback' // NOTE: Switch to http://saguaroqbtester.herokuapp.com/auth/dropbox/callback if testing on Heroku
+  },
+  function(token, tokenSecret, profile, done) {
   		var _user = getUserIdByDropboxId(profile._json.uid); // TODO: needs query callback with err: if no match, return done(null, false, { message: 'Welcome Brightwater member. Have you not logged in to Saguaro yet? Contact an admin with the following unique Dropbox UID: ' + profile._json.uid})
 
-  		if (profile._json.team.team_id != BRIGHTWATERDROPBOXTEAMID) {
-  			return done('user is not in brightwater', false, { message: 'User is valid Dropbox user but does not belong to the Brightwater Homes team'})
+      if (profile._json.team == null || profile._json.team.team_id != BRIGHTWATERDROPBOXTEAMID) {
+  			return done('ERROR: User is valid Dropbox user but does not belong to the Brightwater Homes team', false);
   		}
 
     	return done(null, _user, { message: 'Welcome back' });
