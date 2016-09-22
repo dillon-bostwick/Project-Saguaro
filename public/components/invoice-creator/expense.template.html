@@ -1,6 +1,6 @@
 <form>
 	<div>
 		<label>Expense:</label>
-		<select ng-model="lineItem._expense" ng-options="expense._id as expense.name for expense in $ctrl.EXPENSES"></select>
+		<select ng-model="lineItem._expense" ng-change="$ctrl.validate()" ng-options="expense._id as expense.name for expense in $ctrl.EXPENSES"></select>
 	</div>
 </form>

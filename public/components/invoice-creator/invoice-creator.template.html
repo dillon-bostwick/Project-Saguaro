@@ -1,3 +1,5 @@
+<p>{{'Logged in as: ' + $ctrl.USER.name}}</p>
+
 <h2>Create a new invoice</h2>
 
 <form>
@@ -5,19 +7,19 @@
 
 	<div>
 		<label>Service date:</label>
-		<input type="date" ng-model="$ctrl.serviceDate" />
+		<input type="date" ng-model="$ctrl.serviceDate" ng-change="$ctrl.validate()"/>
 		{{$ctrl.validServiceDate()}}
 	</div>
 
 	<div>
 		<label>Invoice #:</label>
-		<input type="text" ng-model="$ctrl.invNum" />
+		<input type="text" ng-model="$ctrl.invNum" ng-change="$ctrl.validate()"/>
 		{{$ctrl.validInvNum()}}
 	</div>
 
 	<div>
 		<label>Vendor:</label>
-		<select ng-model="$ctrl._vendor" ng-options="vendor._id as vendor.name for vendor in $ctrl.VENDORS"></select>
+		<select ng-model="$ctrl._vendor" ng-options="vendor._id as vendor.name for vendor in $ctrl.VENDORS" ng-change="$ctrl.validate()"></select>
 	</div>
 
 	<div ng-repeat="lineItem in $ctrl.lineItems">
@@ -38,32 +40,32 @@
 
 		<div>
 			<label>Amount: $</label>
-			$<input type="Number" ng-model="lineItem.amount" />
+			$<input type="Number" ng-model="lineItem.amount" ng-change="$ctrl.validate()"/>
 		</div>
 
-		<button ng-click="$ctrl.lineItems.splice($index, 1)"">Remove</button>
+		<button ng-click="$ctrl.lineItems.splice($index, 1); $ctrl.validate();"" ">Remove</button>
 	</div>
 
 
 	<div>
 		<label>Add a new line item: </label>
 
-		<input type="radio" ng-model="$ctrl.addNewLineItem" value="cip" ng-model-options="{ getterSetter: true }">
+		<input type="radio" ng-model="$ctrl.addNewLineItem" value="cip" ng-model-options="{ getterSetter: true }" ng-change="$ctrl.validate()">
 		CIP 
-		<input type="radio" ng-model="$ctrl.addNewLineItem" value="expense" ng-model-options="{ getterSetter: true }">
+		<input type="radio" ng-model="$ctrl.addNewLineItem" value="expense" ng-model-options="{ getterSetter: true }" ng-change="$ctrl.validate()">
 		Expense 
-		<input type="radio" ng-model="$ctrl.addNewLineItem" value="warrant" ng-model-options="{ getterSetter: true }">
+		<input type="radio" ng-model="$ctrl.addNewLineItem" value="warrant" ng-model-options="{ getterSetter: true }" ng-change="$ctrl.validate()">
 		Warrant 
 	</div>
 
 	<div>
 		<label>Memo:</label>
-		<textarea rows="4" cols="50" ng-model="ctrl.memo"></textarea>
+		<textarea rows="4" cols="50" ng-model="ctrl.memo" ng-change="$ctrl.validate()"></textarea>
 	</div>
 
 	<div>
 		<label>Total:</label>
-		<input type="number" ng-model="$ctrl.total" />
+		<input type="number" ng-model="$ctrl.total" ng-change="$ctrl.validate()"/>
 	</div>
 
 	<div>

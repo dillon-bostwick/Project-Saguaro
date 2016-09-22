@@ -3,6 +3,7 @@ var _ = require('underscore');
 var mongoose = require('mongoose');
 var passport = require('passport');
 var restify = require('express-restify-mongoose');
+var ensureLogin = require('connect-ensure-login');
 var models = require('./models');
 
 var router = express.Router();
@@ -10,33 +11,32 @@ var User = models['user'];
 
 ////////////////////////////////////////////////////////////////////////
 
-// API for registering new users and logging in:
+//initial authentication send
+router.get('/auth/dropbox', passport.authenticate('dropbox'));
 
-router.post('/register', function(req, res) {
-  User.register(new User({ username: req.body.username }),
-    req.body.password, function(err, account) {
-    if (err) {
-      return res.status(500).json({
-        err: err
-      });
+//callback from dropbox after authentication
+router.get('/auth/dropbox/callback',
+           passport.authenticate('dropbox', {
+                                  successRedirect: '/#!/home',
+                                  failureRedirect: '/#!/angularroutenotfound',
+                                  failureFlash: true }));
+
+//get user data
+router.get('/userdata', function(req, res) {
+    if (req.user === undefined) {
+        res.json({}); // The user is not logged in
+    } else {
+        res.json({ //TODO: currently req.user stores the user _id of the current user whenver this call is made. instead of responding with some static test full user object, take req.user and query DB by id for actual usuer object, which should be responded 
+            name: 'Marsi Bostwick'
+        });
     }
-    
-    passport.authenticate('local')(req, res, function () {
-      return res.status(200).json({
-        status: 'Registration successful!'
-      });
-    });
-  });
-});
-
-router.post('/login', passport.authenticate('local'), function(req, res) {
-    res.redirect('/');
 });
 
 ////////////////////////////////////////////////////////////////////////
 
 //RESTful endpoints automated for all database collections:
-//TODO: Validation - especially for delete (due to accidents) and post (due to XSS?)
+//TODO: Validation with connect-ensure-login as middleware for every endpoint, but make sure it doesn't cause a redirect to an OAuth page after every single request
+//TODO: Figure out how this framework deals with POST json syntax
 
 _.map(models, function(model) {
 	return model; //first param is name, uri suffix as string

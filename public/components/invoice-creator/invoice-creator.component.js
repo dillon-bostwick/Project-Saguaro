@@ -4,14 +4,26 @@ angular.
     module('invoiceCreator').
     component('invoiceCreator', {
         templateUrl: 'components/invoice-creator/invoice-creator.template.html',
-        controller: function InvoiceCreatorController() {
+        controller: function InvoiceCreatorController($http, $window) {
             var ctrl = this;
 
             //External requests:
+
             ctrl.VENDORS = [{_id: "123", name: "bob"}, {_id: "234", name: "jose"}]; // TODO: needs to HTTP request
             ctrl.HOODS = [{_id: "123", name: "highgrove"}, {_id: "234", name: "lakeside"}]; // TODO: needs to HTTP request
             ctrl.EXPENSES = [{_id: "123", name: "primaryexpense"}, {_id: "234", name: "secondaryexpense"}]; // TODO: needs to HTTP request
 
+            //getting user data from server TODO: this must eventually be done for every page load, so maybe put it in global scope
+            $http.get('/userdata').then(function success(res) {
+                if (_.isEmpty(res.data)) {
+                    // user was not authenticated - shut out
+                    $window.location.href = '/'
+                } else {
+                    ctrl.USER = res.data;
+                }
+            }, httpError);
+
+            /////////////////////////////////////////////////////////////////////////
 
             var now = new Date
             ctrl.serviceDate = new Date;
@@ -52,7 +64,7 @@ angular.
                 return _.difference(SUBHOODOPTIONS, _.pluck(lineItem.subHoods, 'name'));
             }
 
-            ctrl.submit = function() {
+            ctrl.validate = function() {
                 ctrl.errors = [];
 
                 if (_.isEmpty(ctrl.invNum)) {
@@ -126,8 +138,12 @@ angular.
                     throwValError('The total you entered does not equal the sum of all line items. Total: $' + ctrl.total + '. Sum of line items: $' + lineItemSum + '.');
                 }
 
-                if (_.contains(_.pluck(ctrl.errors, 'type'), 'error')) { return; }
+                return _.contains(_.pluck(ctrl.errors, 'type'), 'error');
+            }
 
+            ctrl.submit = function() {
+                if (!ctrl.validate()) { return; }; //can't submit if validation doesn't pass at least errors
+                
                 //Create the invoice object:
                 var newInvoice = {
                     createdDate: now,
@@ -135,7 +151,7 @@ angular.
                     _vendor: ctrl._vendor,
                     invNum: ctrl.invNum,
                     memo: ctrl.memo,
-                    _createdBy: 0, //TODO
+                    _createdBy: ctrl.USER._id,
                     _reviewers: [],
                     actions: [],
                     lineItems: {
@@ -157,7 +173,7 @@ angular.
                             lineItem.subHoods = [];
                         }
 
-                        //convert sbhood from array of {name: "foo"}s to array of "foo"s
+                        //convert subhood from array of {name: "foo"}s to array of "foo"s
                         lineItem.subHoods = _.pluck(lineItem.subHoods, 'name');
 
                         //remove elements only used by the frontend form - don't need to save in DB
@@ -172,7 +188,7 @@ angular.
                     }
                 }
 
-                //TODO: Somehow display the warnings even if there are only warnings, before the final submission
+                //TODO: Needs to push to back of queue of next pipeline member (maybe all users that have QC - via DB query)
 
                 //If all validation checks out:
                 //post via $http, then redirect somewhere...
@@ -184,6 +200,10 @@ angular.
 
             function throwValWarning(msg) {
                 ctrl.errors.push({ type: 'warning', message: msg });
+            }
+
+            function httpError(res) {
+                alert('There was a problem loading data with $http: ' + res);
             }
         }
     });

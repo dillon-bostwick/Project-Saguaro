@@ -63,8 +63,8 @@ var schemas = {
 	}),
 
 	user: new Schema({
-		//validation
 		name: String,
+		dropboxUid: Number,
 		_invoiceQueue: [reference('invoice')],
 		category: [{ type: String, enum: UserCategoryEnum }]
 	}),
