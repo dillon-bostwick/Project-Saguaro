@@ -91,8 +91,9 @@ schemas['invoice'].virtual('total').get(function() {
 })
 
 
+//Should refactor to use _.each instead of for:
 
-var models = {};
+var models = {}
 
 for (var key in schemas) {
 	models[key] = mongoose.model(key, schemas[key])

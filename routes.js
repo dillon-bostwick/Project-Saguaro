@@ -43,6 +43,8 @@ _.map(models, function(model) { return model; }).forEach(function(model) {
     * Nothing is sent back.
     */
     router.post('/api/' + model.modelName, function(req, res) {
+        console.log(req);
+
         model(req.body).save(function(error) {
             res.send(error);
         });
