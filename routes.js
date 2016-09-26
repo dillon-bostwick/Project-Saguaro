@@ -2,7 +2,6 @@ var express = require('express');
 var _ = require('underscore');
 var mongoose = require('mongoose');
 var passport = require('passport');
-var restify = require('express-restify-mongoose');
 var ensureLogin = require('connect-ensure-login');
 var models = require('./models');
 
@@ -25,7 +24,7 @@ router.get('/userdata', function(req, res) {
     if (req.user === undefined) {
         res.json({}); // The user is not logged in
     } else {
-        res.json({ //TODO: currently req.user stores the user _id of the current user whenver this call is made. instead of responding with some static test full user object, take req.user and query DB by id for actual usuer object, which should be responded 
+        res.json({ //TODO: currently req.user stores the user _id of the current user whenever this call is made. Instead of responding with some static test full user object, take req.user and query DB by id for actual user object, which should be responded 
             name: 'Marsi Bostwick',
             _id: '123'
         });
@@ -34,16 +33,75 @@ router.get('/userdata', function(req, res) {
 
 ////////////////////////////////////////////////////////////////////////
 
-//RESTful endpoints automated for all database collections:
+//RESTful endpoints manually created for each database collections:
 //TODO: Validation with connect-ensure-login as middleware for every endpoint, but make sure it doesn't cause a redirect to an OAuth page after every single request
-//TODO: Figure out how this framework deals with POST json syntax
 
-_.map(models, function(model) {
-	return model; //first param is name, uri suffix as string
-}).forEach(function(model) {
-	var uri = restify.serve(router, model);
+_.map(models, function(model) { return model; }).forEach(function(model) {
 
-	console.log("Restful endpoint served at: " + uri);
+    /* POST (CREATE)
+    * Pass an object (note: mongoose doesn't validate)
+    * Nothing is sent back.
+    */
+    router.post('/api/' + model.modelName, function(req, res) {
+        model(req.body).save(function(error) {
+            res.send(error);
+        });
+    });
+
+    /* GET (READ)
+    * Pass a standard MongoDB query as params
+    * The entire object is sent back.
+    */
+    router.get('/api/' + model.modelName, function(req, res) {
+        model.find(req.query, function(error, data) {
+            if (error) {
+                res.send(error);
+            } else {
+                res.send(data);
+            }
+        });
+    });
+
+    /* PUT (UPDATE)
+    * Pass a standard MongoDB query as params
+    * Any updates to elements (adding elements, etc.) pass as body
+    * Imposible to remove single elements but an array can be fully replaced.
+    *
+    * Nothing is sent back.
+    */
+    router.put('/api/' + model.modelName, function(req, res) {
+        model.find(req.query, function(error, data) {
+            if (error) {
+                res.send(error);
+            } else {
+                var updated = _.extend(req.body, data)
+
+                model.update(req.query, updated, mongoLog);
+            }
+        });
+    })
+
+    /* DELETE
+    * Pass a standard MongoDB query as params
+    * Nothing is sent back.
+    */
+    router.delete('/api/' + model.modelName, function(req, res) {
+        model.remove(req.query, function(error) {
+            res.send(error);
+        });
+    });
 });
 
+
 module.exports = router;
+
+
+//This is the module way of doing it:
+// .forEach(function(model) {
+// 	var uri = require('express-restify-mongoose').serve(router, model);
+
+// 	console.log("Restful endpoint served at: " + uri);
+// });
+
+
+

@@ -26,7 +26,7 @@ var schemas = {
 	invoice: new Schema({
 		serviceDate: Date,
 		_vendor: reference('vendor'),
-		invNum: Number,
+		invNum: { type: Number, required: true },
 		lineItems: [{
 			category: {type: String, enum: LineItemCategories},
 			_hood: reference('hood'), // if EXPENSE: must be empty

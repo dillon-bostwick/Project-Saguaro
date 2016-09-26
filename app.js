@@ -21,7 +21,7 @@ var BRIGHTWATERDROPBOXTEAMID = 'dbtid:AADIihV4QHYt6wCTX1MN2VVwJmdBDiv7tc4';
 passport.use(new dropboxStrategy({
     consumerKey: 'o2h3e5h6mytkwvg',
     consumerSecret: 'n59fazsvvrs7708',
-    callbackURL: 'http://saguaroqbtester.herokuapp.com/auth/dropbox/callback' //http://localhost:5000/auth/dropbox/callback' NOTE: Switch to http://saguaroqbtester.herokuapp.com/auth/dropbox/callback if testing on Heroku
+    callbackURL: 'http://localhost:5000/auth/dropbox/callback' //http://localhost:5000/auth/dropbox/callback' NOTE: Switch to http://saguaroqbtester.herokuapp.com/auth/dropbox/callback if testing on Heroku
   },
   function(token, tokenSecret, profile, done) {
   		var _user = getUserIdByDropboxId(profile._json.uid); // TODO: needs query callback with err: if no match, return done(null, false, { message: 'Welcome Brightwater member. Have you not logged in to Saguaro yet? Contact an admin with the following unique Dropbox UID: ' + profile._json.uid})
