@@ -16,42 +16,29 @@ function reference(model) {
 
 var Money = { type: Number, min: 0, max: [150000, 'Amount cannot exceed 150K'] };
 var Now = { type: Date, default: Date.now };
-var ActionsCategoryEnum = ['SHORTPAY', 'BACKCHARGE', 'DNP', 'HOODUPDATE', 'LOTUPDATE', 'PARTIALDNP', 'HOLD', 'COMMENT'];
+var ActionsCategoryEnum = ['CREATED', 'SHORTPAY', 'BACKCHARGE', 'DNP', 'HOODUPDATE', 'LOTUPDATE', 'PARTIALDNP', 'HOLD', 'APPROVED'];
 var UserCategoryEnum = ['DATAENTRY', 'QUALITYCONTROL', 'BUILDER', 'EXEC'];
+var LineItemCategories = ['CIP', 'EXPENSE', 'WARRANTY'];
 
 //Schema:
 
 var schemas = {
 	invoice: new Schema({
-		createdDate: Now,
 		serviceDate: Date,
 		_vendor: reference('vendor'),
 		invNum: Number,
-		memo: String,
-		_createdBy: reference('user'),
-		_reviewers: [reference('user')],
-		lineItems: {
-			cips: [{
-				_hood: reference('hood'),
-				subHoods: [String], // can vary: nullable, or an enum, or just a number
-				_activities: [reference('activity')], // must have at least one, but can be many
-				amount: Money
-			}],
-			expenses: [{
-				_expense: reference('expense'),
-				amount: Money
-			}],
-			warrants: [{
-				_hood: reference('hood'),
-				subHoods: [
-					{name: String
-				}], // can vary: nullable, or an enum, or just a number
-				amount: Money
-			}],
-		},
+		lineItems: [{
+			category: {type: String, enum: LineItemCategories},
+			_hood: reference('hood'), // if EXPENSE: must be empty
+			subHoods: [String], // if CIP or WARRANTY: can vary: null (i.e. unknown), hood, dev, or just a number. If EXPENSE: must be empty
+			_activities: [reference('activity')], // if CIP starts as empty and gets filled. If EXPENSE or WARRANTY: must be empty
+			_expense: reference('expense'), // if CIP or WARRANTY: must be empty
+			amount: Money //required
+		}],
 		actions: [{
-			category: [{ type: String, enum: ActionsCategoryEnum }],
+			category: { type: String, enum: ActionsCategoryEnum },
 			comment: String,
+			changes: String, //TODO: this for now, probably will change
 			date: Now,
 			_user: reference('user')
 		}]

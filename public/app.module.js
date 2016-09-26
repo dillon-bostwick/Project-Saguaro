@@ -3,5 +3,6 @@
 angular.module('saguaro', [
 	'ngRoute',
 	'invoiceCreator',
-	'userDashboard'
+	'userDashboard',
+	'invoiceDetail'
 	]);

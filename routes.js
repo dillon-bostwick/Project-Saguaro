@@ -18,7 +18,7 @@ router.get('/auth/dropbox', passport.authenticate('dropbox'));
 router.get('/auth/dropbox/callback',
            passport.authenticate('dropbox', {
                                   successRedirect: '/#!/home',
-                                  failureRedirect: '/#!/angularroutenotfound'}));
+                                  failureRedirect: '/#!/404'}));
 
 //get user data
 router.get('/userdata', function(req, res) {
@@ -26,7 +26,8 @@ router.get('/userdata', function(req, res) {
         res.json({}); // The user is not logged in
     } else {
         res.json({ //TODO: currently req.user stores the user _id of the current user whenver this call is made. instead of responding with some static test full user object, take req.user and query DB by id for actual usuer object, which should be responded 
-            name: 'Marsi Bostwick'
+            name: 'Marsi Bostwick',
+            _id: '123'
         });
     }
 });

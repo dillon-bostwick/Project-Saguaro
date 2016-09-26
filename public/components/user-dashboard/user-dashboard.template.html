@@ -1,4 +1,4 @@
-<h2>{{$ctrl.USER.name + '\'s Dashboard'}}</h2>
+<h2>{{$ctrl.User.name + '\'s Dashboard'}}</h2>
 
 <div>
 	<label>Search vendor:</label>
@@ -6,13 +6,15 @@
 </div>
 
 <table class="table table-hover">
-	<tr >
-		<th>Vendor</th>
-		<th>Hoods</th>
-		<th>Lots</th>
-	</tr>
-	<tbody ng-repeat="invView in $ctrl.queueView | filter: { vendor: $ctrl.searchVendor }">
+	<thead>
 		<tr>
+			<th>Vendor</th>
+			<th>Hoods</th>
+			<th>Lots</th>
+		</tr>
+	</thead>
+	<tbody ng-repeat="invView in $ctrl.prettyPrintQueue | filter: { vendor: $ctrl.searchVendor }">
+		<tr ng-click="$ctrl.showInvoice(invView._id)">
 			<td>{{invView.vendor}}</td>
 			<td>{{invView.hoods}}</td>
 			<td>{{invView.subHoods}}</td>

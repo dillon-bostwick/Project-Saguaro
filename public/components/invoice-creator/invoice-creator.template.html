@@ -1,4 +1,4 @@
-<p>{{'Logged in as: ' + $ctrl.USER.name}}</p>
+<p>{{'Logged in as: ' + $ctrl.User.name}}</p>
 
 <h2>Create a new invoice</h2>
 
@@ -19,24 +19,24 @@
 
 	<div>
 		<label>Vendor:</label>
-		<select ng-model="$ctrl._vendor" ng-options="vendor._id as vendor.name for vendor in $ctrl.VENDORS" ng-change="$ctrl.validate()"></select>
+		<select ng-model="$ctrl._vendor" ng-options="vendor._id as vendor.name for vendor in $ctrl.Vendors" ng-change="$ctrl.validate()"></select>
 	</div>
 
 	<div ng-repeat="lineItem in $ctrl.lineItems">
 		<div>
 			<label>{{'Line item #' + ($index + 1) + ':'}}</label>
 
-			<input type="radio" ng-model="lineItem.type" value="cip" ng-change="$ctrl.loadNewLineItem(lineItem)">
+			<input type="radio" ng-model="lineItem.type" value="CIP" ng-change="$ctrl.loadNewLineItem(lineItem)">
 			CIP 
-			<input type="radio" ng-model="lineItem.type" value="expense" ng-change="$ctrl.loadNewLineItem(lineItem)">
+			<input type="radio" ng-model="lineItem.type" value="EXPENSE" ng-change="$ctrl.loadNewLineItem(lineItem)">
 			Expense 
-			<input type="radio" ng-model="lineItem.type" value="warrant" ng-change="$ctrl.loadNewLineItem(lineItem)">
-			Warrant
+			<input type="radio" ng-model="lineItem.type" value="WARRANTY" ng-change="$ctrl.loadNewLineItem(lineItem)">
+			Warranty
 		</div>
 
-		<ng-include src="'components/invoice-creator/cipandwarrant.partial.html'" ng-if="lineItem.type == 'cip' || lineItem.type == 'warrant'"></ng-include>
+		<ng-include src="'components/invoice-creator/cipandwarranty.partial.html'" ng-if="lineItem.type == 'CIP' || lineItem.type == 'WARRANTY'"></ng-include>
 
-		<ng-include src="'components/invoice-creator/expense.partial.html'" ng-if="lineItem.type == 'expense'"></ng-include>
+		<ng-include src="'components/invoice-creator/expense.partial.html'" ng-if="lineItem.type == 'EXPENSE'"></ng-include>
 
 		<div>
 			<label>Amount: $</label>
@@ -50,17 +50,17 @@
 	<div>
 		<label>Add a new line item: </label>
 
-		<input type="radio" ng-model="$ctrl.addNewLineItem" value="cip" ng-model-options="{ getterSetter: true }" ng-change="$ctrl.validate()">
+		<input type="radio" ng-model="$ctrl.addNewLineItem" value="CIP" ng-model-options="{ getterSetter: true }" ng-change="$ctrl.validate()">
 		CIP 
-		<input type="radio" ng-model="$ctrl.addNewLineItem" value="expense" ng-model-options="{ getterSetter: true }" ng-change="$ctrl.validate()">
+		<input type="radio" ng-model="$ctrl.addNewLineItem" value="EXPENSE" ng-model-options="{ getterSetter: true }" ng-change="$ctrl.validate()">
 		Expense 
-		<input type="radio" ng-model="$ctrl.addNewLineItem" value="warrant" ng-model-options="{ getterSetter: true }" ng-change="$ctrl.validate()">
-		Warrant 
+		<input type="radio" ng-model="$ctrl.addNewLineItem" value="WARRANTY" ng-model-options="{ getterSetter: true }" ng-change="$ctrl.validate()">
+		Warranty 
 	</div>
 
 	<div>
-		<label>Memo:</label>
-		<textarea rows="4" cols="50" ng-model="ctrl.memo" ng-change="$ctrl.validate()"></textarea>
+		<label>Comment:</label>
+		<textarea rows="4" cols="50" ng-model="$ctrl.comment" ng-change="$ctrl.validate()"></textarea>
 	</div>
 
 	<div>
