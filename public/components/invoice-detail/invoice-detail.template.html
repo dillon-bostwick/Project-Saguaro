@@ -12,7 +12,7 @@
 
 <div>
 	<label>Vendor: </label>
-	<p>{{$ctrl.Invoice.vendor}}</p>
+	<p>{{$ctrl.vendor}}</p>
 </div>
 
 <div>
@@ -23,11 +23,6 @@
 <div>
 	<label>Memo: </label>
 	<p>{{$ctrl.Invoice.memo}}</p>
-</div>
-
-<div>
-	<label>Created by: </label>
-	<p>{{$ctrl.Invoice.createdBy}}</p>
 </div>
 
 <div>
@@ -43,11 +38,11 @@
 		<tbody>
 			<tr ng-repeat="lineItem in $ctrl.Invoice.lineItems">
 				<td>{{lineItem.category}}</td>
-				<td>{{lineItem.hood}} {{lineItem.subHoods.sort().join(', ')}} {{lineItem.expense}}</td>
+				<td>{{lineItem.hood}} {{lineItem.subHoods.join(', ')}} {{lineItem.expense}}</td>
 				<td>${{lineItem.amount}}</td>
 			</tr>
 			<tr>
-				<td></td>
+				<td><b>Total:</b></td>
 				<td></td>
 				<td>${{$ctrl.total}}</td>
 			</tr>

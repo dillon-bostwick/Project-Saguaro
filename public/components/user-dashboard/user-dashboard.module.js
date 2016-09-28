@@ -1,3 +1,3 @@
 'use strict';
 
-angular.module('userDashboard', []);
+angular.module('userDashboard', ['core.api']);

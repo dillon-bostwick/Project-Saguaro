@@ -1,3 +1,3 @@
 'use strict';
 
-angular.module('invoiceCreator', []);
+angular.module('invoiceCreator', ['core.api']);

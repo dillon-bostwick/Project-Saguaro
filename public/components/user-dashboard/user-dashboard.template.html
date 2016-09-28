@@ -1,4 +1,4 @@
-<h2>{{$ctrl.User.name + '\'s Dashboard'}}</h2>
+<h2>{{$ctrl.User.firstName + '\'s Dashboard'}}</h2>
 
 <div>
 	<label>Search vendor:</label>
@@ -10,14 +10,18 @@
 		<tr>
 			<th>Vendor</th>
 			<th>Hoods</th>
-			<th>Lots</th>
+			<th>Sub-hoods</th>
 		</tr>
 	</thead>
-	<tbody ng-repeat="invView in $ctrl.prettyPrintQueue | filter: { vendor: $ctrl.searchVendor }">
-		<tr ng-click="$ctrl.showInvoice(invView._id)">
-			<td>{{invView.vendor}}</td>
-			<td>{{invView.hoods}}</td>
-			<td>{{invView.subHoods}}</td>
+	<tbody ng-repeat="prettyInv in $ctrl.prettyQueue | filter: { vendor: $ctrl.searchVendor }">
+		<tr ng-click="$ctrl.redirectInvoiceDetail(prettyInv._id)">
+			<td>{{prettyInv.vendor}}</td>
+			<td>{{prettyInv.hoods}}</td>
+			<td>{{prettyInv.subHoods}}</td>
 		</tr>
 	</tbody>
 </table>
+
+<div ng-repeat="prettyInv in $ctrl.prettyQueue">
+	{{prettyInv}}
+</div>

@@ -20,6 +20,7 @@ angular.
         when('/', {
           template: '<a href="/auth/dropbox"><button>Log In with Dropbox</button></a>'
         }).
+        
         when('/home', {
           template: '<p>Site map</p><a href="/#!/creator">Invoice creator</a><br><a href="/#!/userdashboard">User dashboard</a>'
         }).

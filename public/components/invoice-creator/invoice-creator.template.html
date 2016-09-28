@@ -1,4 +1,4 @@
-<p>{{'Logged in as: ' + $ctrl.User.name}}</p>
+<p>{{'Welcome, ' + $ctrl.User.firstName}}</p>
 
 <h2>Create a new invoice</h2>
 
@@ -26,17 +26,17 @@
 		<div>
 			<label>{{'Line item #' + ($index + 1) + ':'}}</label>
 
-			<input type="radio" ng-model="lineItem.type" value="CIP" ng-change="$ctrl.loadNewLineItem(lineItem)">
+			<input type="radio" ng-model="lineItem.category" value="CIP" ng-change="$ctrl.loadNewLineItem(lineItem)">
 			CIP 
-			<input type="radio" ng-model="lineItem.type" value="EXPENSE" ng-change="$ctrl.loadNewLineItem(lineItem)">
+			<input type="radio" ng-model="lineItem.category" value="EXPENSE" ng-change="$ctrl.loadNewLineItem(lineItem)">
 			Expense 
-			<input type="radio" ng-model="lineItem.type" value="WARRANTY" ng-change="$ctrl.loadNewLineItem(lineItem)">
+			<input type="radio" ng-model="lineItem.category" value="WARRANTY" ng-change="$ctrl.loadNewLineItem(lineItem)">
 			Warranty
 		</div>
 
-		<ng-include src="'components/invoice-creator/cipandwarranty.partial.html'" ng-if="lineItem.type == 'CIP' || lineItem.type == 'WARRANTY'"></ng-include>
+		<ng-include src="'components/invoice-creator/cipandwarranty.partial.html'" ng-if="lineItem.category == 'CIP' || lineItem.category == 'WARRANTY'"></ng-include>
 
-		<ng-include src="'components/invoice-creator/expense.partial.html'" ng-if="lineItem.type == 'EXPENSE'"></ng-include>
+		<ng-include src="'components/invoice-creator/expense.partial.html'" ng-if="lineItem.category == 'EXPENSE'"></ng-include>
 
 		<div>
 			<label>Amount: $</label>

@@ -4,28 +4,16 @@ angular.
     module('invoiceCreator').
     component('invoiceCreator', {
         templateUrl: 'components/invoice-creator/invoice-creator.template.html',
-        controller: function InvoiceCreatorController($http, $window) {
+        controller: function InvoiceCreatorController(api, $window) {
             var self = this;
 
-            //External requests:
+            // External:
+            self.Vendors = api.Vendor.query();
+            self.Hoods = api.Hood.query();
+            self.Expenses = api.Expense.query();
+            self.User = api.currentUser.get();
 
-            self.Vendors = [{_id: "123", name: "bob"}, {_id: "234", name: "jose"}]; // TODO: needs to HTTP request
-            self.Hoods = [{_id: "123", name: "highgrove"}, {_id: "234", name: "lakeside"}]; // TODO: needs to HTTP request
-            self.Expenses = [{_id: "123", name: "primaryexpense"}, {_id: "234", name: "secondaryexpense"}]; // TODO: needs to HTTP request
-
-            //getting user data from server TODO: this must eventually be done for every page load, so maybe put it in global scope
-            $http.get('/userdata').then(function success(res) {
-                if (_.isEmpty(res.data)) {
-                    // user was not authenticated - shut out
-                    $window.location.href = '/'
-                } else {
-                    self.User = res.data;
-                }
-            }, httpError);
-
-            /////////////////////////////////////////////////////////////////////////
-
-            var now = new Date
+            // Local:
             self.serviceDate = new Date;
             self.invNum = '';
             self._vendor = '';
@@ -38,11 +26,13 @@ angular.
              * Takes the lineItem by reference to be templated
              */        
             self.loadNewLineItem = function(lineItem) {
-                lineItem['amount'] = 0;
+                lineItem.amount = 0;
 
-                if (lineItem.type === 'CIP' || lineItem.type === 'WARRANTY') {
-                    lineItem['subHoods'] = [];
-                    lineItem['addNewSubHood'] = function(subHood) { //getter-setter
+                if (lineItem.category === 'CIP' || lineItem.category === 'WARRANTY') {
+                    lineItem._hood = '';
+                    lineItem.subHoods = [];
+
+                    lineItem.addNewSubHood = function(subHood) { //getter-setter
                         if (!_.isEmpty(arguments)) { //if no arguments we know its a getter
                             return (this.subHoods.push({name: subHood}));
                         }
@@ -54,7 +44,7 @@ angular.
              */
             self.addNewLineItem = function(newType) {
                 if (!_.isEmpty(arguments)) {
-                    var lineItem = {type: newType}
+                    var lineItem = {category: newType}
 
                     self.lineItems.push(lineItem);
                     self.loadNewLineItem(lineItem);
@@ -68,10 +58,17 @@ angular.
              * it removes duplicates.
              */
             self.getSubHoodOptions = function(lineItem) {
-                var SubHoodOptions = ['hood', 'dev', 1, 2, 3];  // TODO: needs to HTTP request from lineItem._hood
+                var hood = _.find(self.Hoods, function(hood) {
+                    return hood._id === lineItem._hood
+                });
 
-                //Only show options that haven't been selected yet:
-                return _.difference(SubHoodOptions, _.pluck(lineItem.subHoods, 'name'));
+                var subHoodOptions = _.range(1, hood.numLots + 1);
+
+                if (hood.hoodable) { subHoodOptions.unshift('hood'); }
+                if (hood.devable) { subHoodOptions.unshift('dev'); }
+
+                // Only show options that haven't been selected yet:
+                lineItem.subHoodOptions = _.difference(subHoodOptions, _.pluck(lineItem.subHoods, 'name'));
             }
 
             /* validate() should run after every change to the form
@@ -87,7 +84,7 @@ angular.
                     throwValWarning("Invoice number cannot be blank");
                 }
 
-                if (self.serviceDate > now) {
+                if (self.serviceDate > new Date) {
                     throwValError("Service date cannot be in future");
                 }
 
@@ -108,7 +105,7 @@ angular.
                 for (var i = 0; i < self.lineItems.length; i++) {
                     var lineItem = self.lineItems[i];
 
-                    if (lineItem.type == 'EXPENSE') {
+                    if (lineItem.category == 'EXPENSE') {
                         if (_.isEmpty(lineItem._expense)) {
                             throwValError("In line item #" + (i + 1) + ": expense cannot be blank");
                         }
@@ -163,7 +160,7 @@ angular.
                 if (!self.validate()) { return; }; //can't submit if validation doesn't pass
 
                 //Create the invoice object that will be stored in DB:
-                var newInvoice = {
+                var newInvoice = new api.Invoice({
                     serviceDate: self.serviceDate,
                     _vendor: self._vendor,
                     invNum: self.invNum,
@@ -171,14 +168,13 @@ angular.
                     actions: [{
                         category: 'CREATED',
                         comment: self.comment,
-                        date: Now,
+                        date: new Date,
                         _user: self.User._id
                     }]
-                }
+                });
 
                 //Some misc. parsing of line items so that it fits the DB model:
-                for (var i = 0; i < newInvoice.lineItems.length; i++) {
-                    var lineItem = newInvoice.lineItems[i];
+                _.each(newInvoice.lineItems, function(lineItem) {
 
                     //this is necessary because data is stored in subhoods even if the user checks the unknown box
                     //Note: there is a difference between subHoods == [] and subHoods == null. The former is used if
@@ -189,22 +185,25 @@ angular.
                     }
 
                     //convert subhood from array of {name: "foo"}s to array of "foo"s
-                    lineItem.subHoods = _.pluck(lineItem.subHoods, 'name');
+                    //the also sort them
+                    lineItem.subHoods = _.pluck(lineItem.subHoods, 'name').sort();
 
                     //remove elements only used by the frontend form - don't need to save in DB
-                    delete lineItem['unknown'];
-                    delete lineItem['addNewSubHood'];
+                    delete lineItem.unknown;
+                    delete lineItem.addNewSubHood;
+                    delete lineItem.subHoodOptions;
                     
                     //this always gets initialized as empty just for good practice, but only CIPs will eventually fill
                     lineItem['_activities'] = [];
-                }
-
-                console.log(newInvoice);
+                });
 
                 //TODO: Needs to push to back of queue of next pipeline member (maybe all users that have QC - via DB query)
 
-                //If all validation checks out:
-                //post via $http, then redirect somewhere...
+                //DEBUG: post and redirect
+                newInvoice.$save(function() {
+                    console.log($window);
+                    $window.location.href = '/#!/userdashboard'; //TODO what should this do?
+                });
             }
 
             function throwValError(msg) {
@@ -213,10 +212,6 @@ angular.
 
             function throwValWarning(msg) {
                 self.errors.push({ type: 'warning', message: msg });
-            }
-
-            function httpError(res) {
-                alert('There was a problem loading data with $http: ' + res);
             }
         }
     });

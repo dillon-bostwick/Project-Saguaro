@@ -7,6 +7,7 @@
  //TODO: Payable bills, archive (archive actually needs some logic - maybe a different schema? Different options for organization)
 
 var mongoose = require('mongoose');
+var _ = require('underscore');
 
 var Schema = mongoose.Schema;
 
@@ -14,7 +15,7 @@ function reference(model) {
 	return { type: mongoose.Schema.ObjectId, ref: model };
 }
 
-var Money = { type: Number, min: 0, max: [150000, 'Amount cannot exceed 150K'] };
+var Money = { type: Number, min: 0, max: [150000, 'Amount cannot exceed 150K'], required: true };
 var Now = { type: Date, default: Date.now };
 var ActionsCategoryEnum = ['CREATED', 'SHORTPAY', 'BACKCHARGE', 'DNP', 'HOODUPDATE', 'LOTUPDATE', 'PARTIALDNP', 'HOLD', 'APPROVED'];
 var UserCategoryEnum = ['DATAENTRY', 'QUALITYCONTROL', 'BUILDER', 'EXEC'];
@@ -24,19 +25,19 @@ var LineItemCategories = ['CIP', 'EXPENSE', 'WARRANTY'];
 
 var schemas = {
 	invoice: new Schema({
-		serviceDate: Date,
-		_vendor: reference('vendor'),
-		invNum: { type: Number, required: true },
+		serviceDate: { type: Date, required: true },
+		_vendor: String,
+		invNum: { type: String, required: true },
 		lineItems: [{
-			category: {type: String, enum: LineItemCategories},
+			category: {type: String, enum: LineItemCategories, required: true },
 			_hood: reference('hood'), // if EXPENSE: must be empty
-			subHoods: [String], // if CIP or WARRANTY: can vary: null (i.e. unknown), hood, dev, or just a number. If EXPENSE: must be empty
-			_activities: [reference('activity')], // if CIP starts as empty and gets filled. If EXPENSE or WARRANTY: must be empty
-			_expense: reference('expense'), // if CIP or WARRANTY: must be empty
+			subHoods: [String], // if CIP or WARRANTY: can vary: null (i.e. unknown), hood, dev, or just a number. If EXPENSE: must be []]
+			_activities: [reference('activity')], // if CIP starts as []] and gets filled. If EXPENSE or WARRANTY: must be []]
+			_expense: reference('expense'), // if CIP or WARRANTY: must be ''.
 			amount: Money //required
 		}],
 		actions: [{
-			category: { type: String, enum: ActionsCategoryEnum },
+			category: { type: String, enum: ActionsCategoryEnum, required: true },
 			comment: String,
 			changes: String, //TODO: this for now, probably will change
 			date: Now,
@@ -46,34 +47,35 @@ var schemas = {
 	}),
 
 	vendor: new Schema({
-		name: String
+		name: { type: String, required: true }
 	}),
 
 	user: new Schema({
-		name: String,
-		dropboxUid: Number,
+		firstName: { type: String, required: true },
+		lastName: { type: String, required: true },
+		dropboxUid: { type: Number, required: true },
 		_invoiceQueue: [reference('invoice')],
-		category: [{ type: String, enum: UserCategoryEnum }]
+		category: { type: String, enum: UserCategoryEnum, required: true }
 	}),
 
 	activity: new Schema({
-		code: Number,
+		code: { type: Number, required: true },
 		desc: String
 	}),
 
 	expense: new Schema({
-		name: String
+		name: { type: String, required: true }
 	}),
 
 	hood: new Schema({
-		name: String,
-		dev: Boolean,
-		hood: Boolean,
-		numLots: Number
+		name: { type: String, required: true },
+		devable: Boolean,
+		hoodable: Boolean,
+		numLots: { type: Number, required: true }
 	}),
 
 	bills: new Schema({
-		_bills: [reference('invoice')]
+		_bill: reference('invoice'),
 	})
 }
 
@@ -81,6 +83,7 @@ var schemas = {
 schemas['invoice'].virtual('total').get(function() {
 	var total = 0;
 
+	//Have to do it manually
 	for (var category in this.entries) {
 		for (var entry in this.entries[category]) {
 			total += entry.amount;
@@ -91,13 +94,15 @@ schemas['invoice'].virtual('total').get(function() {
 })
 
 
-//Should refactor to use _.each instead of for:
+//Everything is required:
+module.exports = _.map(schemas, function(schema, key) {
+	_.each(schema, function(elem, key) {
+		elem = ({
+			type: elem,
+			required: true
+		})
+	})
 
-var models = {}
-
-for (var key in schemas) {
-	models[key] = mongoose.model(key, schemas[key])
-}
-
-module.exports = models;
+	return mongoose.model(key, schema);
+})
 

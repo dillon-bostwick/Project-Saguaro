@@ -4,87 +4,66 @@ angular.
     module('userDashboard').
     component('userDashboard', {
         templateUrl: 'components/user-dashboard/user-dashboard.template.html',
-        controller: function UserDashboardController($window) {
+        controller: function UserDashboardController(api, $window) {
         	var self = this;
 
-        	self.searchVendor = '';
+            self.prettyQueue = [];
+            self.searchVendor = '';
 
+            //Queue gets filled when the User request is complete
+            self.User = api.currentUser.get(function() {
+                _.each(self.User._invoiceQueue, function(inv_id) {
+                    var invoice = api.Invoice.get({ id: inv_id }, function() {
+                        self.prettyQueue.push(prettify(invoice));
+                    });
+                });
+            });
+            
+            //TODO: THIS IS A TOTAL MESS!
 
-        	self.User = {name: 'Marsi', }; // TODO: connect to the global user finder http request
+            /* Given a full invoice object, will return a new object with four
+             * elements:
+             * _id: exact same
+             * vendor: vendor name as string
+             * hoods: pretty list of comma-delimited hoods as string
+             * subhoods: pretty list of comma-delimited subhoods as string
+             */
+            function prettify(invoice) {
+                var hoodNames = [];
+                var vendorName = '';
+                var subHoods = _.pluck(invoice.lineItems, 'subHoods');
 
-        	var Queue = [{
-                _id: '123',
-        		vendor: 'Bob',
-        		lineItems: [
-        			{
-        				_hood: 'Highgrove',
-        				subHoods: ['dev']
-        			}, {
-        				_hood: 'Lakeside',
-        				subHoods: ['hood', 'dev']
-        			}
-        		]
-        	}, {
-                _id: '234',
-        		vendor: 'Jon',
-        		lineItems: [
-        			{
-        				_hood: 'Highgrove',
-        				subHoods: [1]
-        			}, {
-        				_hood: 'Lakeside',
-        				subHoods: [3, 4, 3]
-        			}, {
-        				_hood: 'Highgrove',
-        				subHoods: null
-        			}, {
-        				_hood: '', //i.e. this is an expense
-        				subHoods: []
-        			}
-        		]
-        	}, {
+                //Get the hood names based on _hood id for each line item
+                _.each(_.pluck(invoice.lineItems, '_hood'), function(_hood) { //get each id
+                    if (!_.isUndefined(_hood)) { // in case an expense line item
+                        var hood = api.Hood.get({ id: _hood}, function() { //get the actual object
+                            hoodNames.push(hood.name); //add to the list
+                        });
+                    }
+                });
 
-        	}] //TODO: Should be list of actual invoice objects from a DB query using the USER's _invoiceQueue, which are just ids (the query gives all the user's queue)
+                //Remove empty strings and nulls:
+                hoodNames = hoodNames.filter(function(val) { return val != '' })
+                subHoods = subHoods.filter(function(val) {return (val != '' && val != null)})
 
+                //subHoods might be multidimensional, so:
+                subHoods = _.flatten(subHoods);
 
-        	self.prettyPrintQueue = [];
+                //Remove duplicates:
+                hoodNames = Array.from(new Set(hoodNames));
+                subHoods = Array.from(new Set(subHoods));
 
-        	/* Many operations must be performed on the hoods and subHoods to make them
-        	 * ready for printing in the queue. Must perform for each invoice in queue.
-        	 * Intentionally fleshed out this process avoiding one-liners so it can be changed
-        	 * later if necessary
-        	 */
-        	_.each(Queue, function(invoice) {
-        		var hoods = _.pluck(invoice.lineItems, '_hood');
-        		var subHoods = _.pluck(invoice.lineItems, 'subHoods');
-
-        		//TODO: lookup hood names from _hood (will require a DB http as well as another pluck to get the name)
-
-        		//Remove empty strings and nulls:
-        		hoods = hoods.filter(function(val) { return val != '' })
-        		subHoods = subHoods.filter(function(val) { return (val != '' && val != null)})
-
-        		//subHoods might be 2D array, so:
-        		subHoods = _.flatten(subHoods)
-
-        		//Remove duplicates:
-        		hoods = Array.from(new Set(hoods));
-        		subHoods = Array.from(new Set(subHoods));
-
-        		subHoods = subHoods.sort();
-
-        		self.prettyPrintQueue.push({
+                return {
                     _id: invoice._id,
-        			vendor: invoice.vendor,
-        			hoods: hoods.join(', '),
-        			subHoods: subHoods.join(', ')
-        		});
-        	});
+                    vendor: api.Vendor.get({ id: invoice._vendor }).name,
+                    hoods: hoodNames.join(', '),
+                    subHoods: subHoods.join(', ')
+                };
+            }
 
-
-
-
-            self.showInvoice = function(_id) {
+            /* Given an invoice _id, redirect to the page for that invoice
+             */
+            self.redirectInvoiceDetail = function(_id) {
                 $window.location.href = '/#!/invoices/' + _id;
             }
 		}
