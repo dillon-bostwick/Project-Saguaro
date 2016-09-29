@@ -71,7 +71,8 @@ var schemas = {
 		name: { type: String, required: true },
 		devable: Boolean,
 		hoodable: Boolean,
-		numLots: { type: Number, required: true }
+		numLots: { type: Number, required: true },
+		completedLots: [Number]
 	}),
 
 	bills: new Schema({

@@ -10,7 +10,7 @@ angular.
         when('/creator', {
           template: '<invoice-creator></invoice-creator>'
         }).
-        when('/userdashboard', {
+        when('/dashboard', {
           template: '<user-dashboard></user-dashboard>'
         }).
         when('/invoices/:invoice_id', {
@@ -22,7 +22,7 @@ angular.
         }).
         
         when('/home', {
-          template: '<p>Site map</p><a href="/#!/creator">Invoice creator</a><br><a href="/#!/userdashboard">User dashboard</a>'
+          template: '<p>Site map</p><a href="/#!/creator">Invoice creator</a><br><a href="/#!/dashboard">User dashboard</a>'
         }).
         when('/404', {
           template: '<h2>404</h2><p> Oh flip. I can\'t find what you\'re looking for</p>'

@@ -22,6 +22,11 @@
 		<select ng-model="$ctrl._vendor" ng-options="vendor._id as vendor.name for vendor in $ctrl.Vendors" ng-change="$ctrl.validate()"></select>
 	</div>
 
+	<div>
+		<label>Total:</label>
+		$<input type="number" ng-model="$ctrl.total" ng-change="$ctrl.validate()"/>
+	</div>
+
 	<div ng-repeat="lineItem in $ctrl.lineItems">
 		<div>
 			<label>{{'Line item #' + ($index + 1) + ':'}}</label>
@@ -39,7 +44,7 @@
 		<ng-include src="'components/invoice-creator/expense.partial.html'" ng-if="lineItem.category == 'EXPENSE'"></ng-include>
 
 		<div>
-			<label>Amount: $</label>
+			<label>Amount:</label>
 			$<input type="Number" ng-model="lineItem.amount" ng-change="$ctrl.validate()"/>
 		</div>
 
@@ -64,12 +69,8 @@
 	</div>
 
 	<div>
-		<label>Total:</label>
-		<input type="number" ng-model="$ctrl.total" ng-change="$ctrl.validate()"/>
-	</div>
-
-	<div>
-		<button ng-click="$ctrl.submit()">Submit</button>
+		<button ng-click="$ctrl.submit(true)">Please sir may I have another</button>
+		<button ng-click="$ctrl.submit(false)">Submit and go home</button>
 	</div>
 
 	<div>

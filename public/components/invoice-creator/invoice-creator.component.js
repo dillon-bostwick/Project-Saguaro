@@ -149,14 +149,14 @@ angular.
 
                 if (self.total != lineItemSum) {
 
-                    throwValError('The total you entered does not equal the sum of all line items. Total: $' + ((lineItem.amount == null) ? 0 : lineItem.amount) + '. Sum of line items: $' + ((lineItem.amount == null) ? 0 : lineItem.amount) + '.');
+                    throwValError('The total you entered does not equal the sum of all line items. Total: $' + ((lineItem.amount == null) ? 0 : self.total) + '. Sum of line items: $' + ((lineItem.amount == null) ? 0 : lineItem.amount) + '.'); //TODO This is only pulling from one lineItem - it needs to sum ammount of all lineItem
                 }
 
                 //false if any obj in errors has property type: error -- i.e. warnings are okay
                 return !_.contains(_.pluck(self.errors, 'type'), 'error'); 
             }
 
-            self.submit = function() {
+            self.submit = function(addAnother) {
                 if (!self.validate()) { return; }; //can't submit if validation doesn't pass
 
                 //Create the invoice object that will be stored in DB:
@@ -199,10 +199,12 @@ angular.
 
                 //TODO: Needs to push to back of queue of next pipeline member (maybe all users that have QC - via DB query)
 
-                //DEBUG: post and redirect
                 newInvoice.$save(function() {
-                    console.log($window);
-                    $window.location.href = '/#!/userdashboard'; //TODO what should this do?
+                    if (addAnother) {
+                        $window.location.reload();
+                    } else {
+                        $window.location.href = '/#!/dashboard'
+                    }
                 });
             }
 
