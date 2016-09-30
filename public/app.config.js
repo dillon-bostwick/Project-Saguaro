@@ -13,7 +13,7 @@ angular.
         when('/dashboard', {
           template: '<user-dashboard></user-dashboard>'
         }).
-        when('/invoices/:invoice_id', {
+        when('/invoices/:id', {
           template: '<invoice-detail></invoice-detail>'
         }).
         
@@ -22,10 +22,10 @@ angular.
         }).
         
         when('/home', {
-          template: '<p>Site map</p><a href="/#!/creator">Invoice creator</a><br><a href="/#!/dashboard">User dashboard</a>'
+          template: 'Hello'
         }).
         when('/404', {
-          template: '<h2>404</h2><p> Oh flip. I can\'t find what you\'re looking for</p>'
+          template: '<h2>404</h2><p>I can\'t find what you\'re looking for</p>'
         }).
         otherwise('/404');
     }

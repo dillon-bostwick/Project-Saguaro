@@ -166,7 +166,7 @@ angular.
                     invNum: self.invNum,
                     lineItems: self.lineItems,
                     actions: [{
-                        category: 'CREATED',
+                        desc: 'CREATED',
                         comment: self.comment,
                         date: new Date,
                         _user: self.User._id

@@ -17,7 +17,6 @@ function reference(model) {
 
 var Money = { type: Number, min: 0, max: [150000, 'Amount cannot exceed 150K'], required: true };
 var Now = { type: Date, default: Date.now };
-var ActionsCategoryEnum = ['CREATED', 'SHORTPAY', 'BACKCHARGE', 'DNP', 'HOODUPDATE', 'LOTUPDATE', 'PARTIALDNP', 'HOLD', 'APPROVED'];
 var UserCategoryEnum = ['DATAENTRY', 'QUALITYCONTROL', 'BUILDER', 'EXEC'];
 var LineItemCategories = ['CIP', 'EXPENSE', 'WARRANTY'];
 
@@ -31,15 +30,14 @@ var schemas = {
 		lineItems: [{
 			category: {type: String, enum: LineItemCategories, required: true },
 			_hood: reference('hood'), // if EXPENSE: must be empty
-			subHoods: [String], // if CIP or WARRANTY: can vary: null (i.e. unknown), hood, dev, or just a number. If EXPENSE: must be []]
-			_activities: [reference('activity')], // if CIP starts as []] and gets filled. If EXPENSE or WARRANTY: must be []]
+			subHood: String, // if CIP or WARRANTY: can vary: null (i.e. unknown), hood, dev, or just a number. If EXPENSE: must be []]
+			_activities: [reference('activity')], // if CIP starts as [] and gets filled. If EXPENSE or WARRANTY: must be []]
 			_expense: reference('expense'), // if CIP or WARRANTY: must be ''.
 			amount: Money //required
 		}],
 		actions: [{
-			category: { type: String, enum: ActionsCategoryEnum, required: true },
+			desc: { type: String, required: true },
 			comment: String,
-			changes: String, //TODO: this for now, probably will change
 			date: Now,
 			_user: reference('user')
 		}]
