@@ -4,15 +4,18 @@ angular.
     module('invoiceDetail').
     component('invoiceDetail', {
         templateUrl: 'components/invoice-detail/invoice-detail.template.html',
-        controller: function InvoiceDetailController(api, $routeParams) {
+        controller: function InvoiceDetailController(api, $routeParams, $window) {
             var self = this;
 
-            // External retrievals:
+            // External requests:
             self.Vendors = api.Vendor.query();
             self.Hoods = api.Hood.query();
             self.Expenses = api.Expense.query();
             self.Activities = api.Activity.query();
             self.CurrentUser = api.currentUser.get();
+            self.Users = api.User.query();
+
+            console.log(self.Users);
 
             self.total = 0;
 
@@ -25,9 +28,9 @@ angular.
 
             // Either Invoice is retrived from DB or it gets a starter template:
             self.Invoice = self.isNew
-                ? {
+                ? new api.Invoice({
                     serviceDate: new Date,
-                    invNum: '',
+                    _id: '',
                     _vendor: '',
                     lineItems: [],
                     comment: '',
@@ -37,10 +40,12 @@ angular.
                         date: new Date,
                         _user: self.CurrentUser._id
                     }]
-                }
+                })
                 : api.Invoice.get({ id: $routeParams.id });
 
             ////////////////////////////////////////////////////////////////////
+            //CTRL METHODS
+
             //lineItem logic:
 
             /* Pushes a new lineItem to self.lineItems.
@@ -61,7 +66,7 @@ angular.
              * the back of the _activities array of the lineItem
              */
             self.addActivity = function(lineItem) {
-                lineItem._activities.push({})
+                lineItem._activities.push('')
             }
 
             /* getSubHoodOptions takes a lineItem and returns
@@ -71,7 +76,6 @@ angular.
                 if (lineItem._hood == '') { return []; }
 
                 var hood = _.find(self.Hoods, function(hood) {
-
                     return hood._id === lineItem._hood
                 });
 
@@ -128,29 +132,94 @@ angular.
                 self.updateTotal();
             }
 
-            /*
+            /* Given an array activities, sorts the array alphabetically
+             * according to the 'desc' property of each objet in the array.
+             * returns the sorted array
              */
-            self.sort
+            self.sortByDesc = function(activities) {
+                return activities.sort(function(a, b) {
+                    if (a.desc < b.desc) { return -1; }
+                    if (a.desc > b.desc) { return 1; }
 
+                    return 0;
+                });
+            }
 
+            /* Return whether self.total is NaN - useful for seeing whether
+             * all expressions in "amount" in view have been evaluated.
+             */
+            self.totalIsNaN = function() {
+                return isNaN(self.total);
+            }   
 
-            ////////////////////////////////////////////////////////////////////
-
-
+            /* To be ran every time an amount changes - updates self.total with
+             * the correct amount, or sets to NaN if a view expression has not
+             * been evaluated with eval()
+             */
             self.updateTotal = function() {
                 self.total = _.pluck(self.Invoice.lineItems, 'amount')
                 .reduce(function(a, b) {
-                    console.log(a);
-                    console.log(b);
                     return Number(a) + Number(b);
                 }, 0);
-
-                return true;
             }
 
-            self.submit = function() {
-                
+            self.submit = function(another) {
+                var _receivers = ['64374526']; //TODO: this needs logic
+
+                //Push the invoice id to the necessary receivers
+                pushInvoiceToReceivers(_receivers, self.Invoice._id, self.Users);
+
+                // If the invoice is new, it must get pushed to Invoices
+                if (self.isNew) {
+                    self.Invoice.$save(function() {
+                        if (another) {
+                            //$window.location.reload();
+                        } else {
+                            $window.location.href = '/#!/dashboard'
+                        }
+                    });
+                } else { // Otherwise, already exists, but gets updated
+                    //TODO: needs testing
+                    self.invoice.$update(function() {
+                        if (another) {
+                            //Stub
+                        } else {
+                            $window.location.href = '/#!/dashboard'
+                        }
+                    });
+                }
             }
-    
-        }
-    });
+
+            self.hold = function () {
+
+            }
+
+            ////////////////////////////////////////////////////////////////////
+            //HELPER METHODS
+
+            /* Given a list of receivers (array of ids),
+             * one invoice (id)
+             * and a list of all users in the model (array of ids)
+             * each receiver gets the invoice pushed to the back of their
+             * personal invoice queue.
+             */
+            function pushInvoiceToReceivers(_receivers, _invoice, _users) {
+                var receiverModel;
+
+                console.log(_users);
+
+                _.each(_receivers, function(_receiver) {
+                    receiverModel = _.find(_users, function(user) {
+                        return user._id === _receiver;
+                    });
+
+                    console.log(receiverModel);
+
+                    receiverModel._invoiceQueue.push(_invoice);
+                    receiverModel.$update();
+                });
+            }
+
+
+        } // end controller
+    }); // end component

@@ -22,7 +22,7 @@ router.get('/auth/dropbox', passport.authenticate('dropbox'));
 router.get('/auth/dropbox/callback',
            passport.authenticate('dropbox',
                                  {
-                                    successRedirect: '/#!/home',
+                                    successRedirect: '/#!/dashboard',
                                     failureRedirect: '/#!/404'
                                  }));
 
@@ -37,7 +37,7 @@ router.get('/api/currentuser', function(req, res) {
     if (req.user === undefined) {
         res.send({ error: true }); // The user is not logged in
     } else {
-        userModel.findOne({'_id': req.user}, function(error, data) { // (async)
+        userModel.findById(req.user, function(error, data) { // (async)
             if (error) {
                 res.send({ error: error }) // User id missing from DB
             } else {
@@ -56,9 +56,11 @@ _.map(models, function(model) { return model; }).forEach(function(model) {
     /* POST (CREATE)
      * Pass an object (note: mongoose doesn't validate)
      * Nothing is sent back.
+     * anything as an extram URI param has no effect (wildcard)
      */
-    router.post('/api/' + model.modelName, function(req, res) {
+    router.post('/api/' + model.modelName + '/:wildcard', function(req, res) {
         model(req.body).save(function(error) {
+            console.log(error);
             if (error) {
                 console.log('Error:\n' + JSON.stringify(error));
                 res.send(error);
@@ -68,7 +70,7 @@ _.map(models, function(model) { return model; }).forEach(function(model) {
         });
     });
 
-    /* GET (READ)
+    /* GET (READ) by query
      * Pass a standard MongoDB query as params
      * The entire object is sent back.
      */
@@ -84,11 +86,9 @@ _.map(models, function(model) { return model; }).forEach(function(model) {
     });
 
     /* GET by id
+     * same as get by query except the id is passed as part of the URI
      */
     router.get('/api/' + model.modelName + '/:id', function(req, res) {
-        console.log(model.modelName);
-        console.log(req.params.id);
-
         model.findById(req.params.id, function(error, data) {
             if (error) {
                 console.log(error);
@@ -99,8 +99,7 @@ _.map(models, function(model) { return model; }).forEach(function(model) {
         });
     });
 
-    /* PUT (UPDATE)
-    * Pass an id as as params.id
+    /* PUT (UPDATE) by id
     * Any updates to elements (adding elements, etc.) pass as body
     * Imposible to remove single elements but an array can be fully replaced.
     *
@@ -109,28 +108,33 @@ _.map(models, function(model) { return model; }).forEach(function(model) {
     router.put('/api/' + model.modelName + '/:id', function(req, res) {
         model.findById(req.params.id, function(error, data) {
             if (error) {
-                console.log(error);
-                res.send(error);
+                console.log("Error with finding id:\n" + error);
+                res.json(error);
             } else {
-                var updated = _.extend(req.body, data);
-
-                model.update(req.query, updated, mongoLog);
-                res.send({ success: true, updated: updated });
+                _.extend(data, req.body)
+                .save(function(error, data) {
+                    if (error) {
+                        console.log("Error updating model:\n" + error);
+                        res.json(error);
+                    } else {
+                        res.json({ success: true });
+                    }
+                });
             }
         });
     })
 
-    /* DELETE
+    /* DELETE by id
     * Pass a standard MongoDB query as params
     * Nothing is sent back.
     */
-    router.delete('/api/' + model.modelName, ensureLoggedIn('/'), function(req, res) {
-        model.remove(req.query, function(error) {
+    router.delete('/api/' + model.modelName + '/:id', ensureLoggedIn('/'), function(req, res) {
+        model.removeById(req.params.id, function(error) {
             if (error) {
                 console.log(error);
                 res.status(500).send(error);
             } else {
-                res.send({ success: true });
+                res.json({ success: true });
             }
         });
     });

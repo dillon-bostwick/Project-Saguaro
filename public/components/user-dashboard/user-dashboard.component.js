@@ -7,64 +7,74 @@ angular.
         controller: function UserDashboardController(api, $window) {
         	var self = this;
 
-            self.prettyQueue = [];
-            self.searchVendor = '';
+            // External requests:
+            self.Vendors = api.Vendor.query();
+            self.Hoods = api.Hood.query();
+            self.Expenses = api.Expense.query();
+            self.Activities = api.Activity.query();
+            self.Invoices = api.Invoice.query();
+            self.CurrentUser = api.currentUser.get();
 
-            //Queue gets filled when the User request is complete
-            self.User = api.currentUser.get(function() {
-                _.each(self.User._invoiceQueue, function(inv_id) {
-                    var invoice = api.Invoice.get({ id: inv_id }, function() {
-                        self.prettyQueue.push(prettify(invoice));
-                    });
-                });
-            });
-            
-            //TODO: THIS IS A TOTAL MESS!
+            //Must be one of [QUEUE, TEAM, ARCHIVE] - QUEUE by default
+            self.view = 'QUEUE';
+            //The list of invoices to reveal - user queue by default because above
+            self.invList = getUserQueue();
 
-            /* Given a full invoice object, will return a new object with four
-             * elements:
-             * _id: exact same
-             * vendor: vendor name as string
-             * hoods: pretty list of comma-delimited hoods as string
-             * subhoods: pretty list of comma-delimited subhoods as string
+            //Filter fields:
+            self.filterVendor = '';
+            self.sortBy = '';
+
+            ////////////////////////////////////////////////////////////////////
+
+            self.updateInvList = function() {
+                switch(self.view) {
+                    case 'QUEUE':
+                        invList = getUserQueue(self);
+                        break;
+                    case 'TEAM':
+                        invList = getAllUserQueues(self);
+                        break;
+                    case 'ARCHIVE':
+                        alert('Archive function is not ready!') //TODO
+                        break;
+                    default:
+                        throw new Error;
+                }
+            }
+
+            /* Given an invoice, return a single string that gives relevant info
+             * and a summary of all line items
              */
-            function prettify(invoice) {
-                var hoodNames = [];
-                var vendorName = '';
-                var subHoods = _.pluck(invoice.lineItems, 'subHoods');
-
-                //Get the hood names based on _hood id for each line item
-                _.each(_.pluck(invoice.lineItems, '_hood'), function(_hood) { //get each id
-                    if (!_.isUndefined(_hood)) { // in case an expense line item
-                        var hood = api.Hood.get({ id: _hood}, function() { //get the actual object
-                            hoodNames.push(hood.name); //add to the list
-                        });
-                    }
-                });
-
-                //Remove empty strings and nulls:
-                hoodNames = hoodNames.filter(function(val) { return val != '' })
-                subHoods = subHoods.filter(function(val) {return (val != '' && val != null)})
-
-                //subHoods might be multidimensional, so:
-                subHoods = _.flatten(subHoods);
-
-                //Remove duplicates:
-                hoodNames = Array.from(new Set(hoodNames));
-                subHoods = Array.from(new Set(subHoods));
-
-                return {
-                    _id: invoice._id,
-                    vendor: api.Vendor.get({ id: invoice._vendor }).name,
-                    hoods: hoodNames.join(', '),
-                    subHoods: subHoods.join(', ')
-                };
+            self.getDetailStr = function(invoice) {
+                var detailStr = 'foo';
+                //stub
+                return detailStr;
             }
 
             /* Given an invoice _id, redirect to the page for that invoice
              */
             self.redirectInvoiceDetail = function(_id) {
                 $window.location.href = '/#!/invoices/' + _id;
+            }
+
+            ////////////////////////////////////////////////////////////////////
+
+            /* Returns an array of invoice objects that correspond to 
+             * all the invoice ids in the _invoiceQueue of CurrentUser.
+             */
+             //TODO: NOT TESTED!
+           function getUserQueue(self) {
+                console.log(self.Invoices);
+                console.log(self.CurrentUser);
+
+                return _.filter(self.Invoices, function(Invoice) {
+                    return _.contains(self.CurrentUser._invoiceQueue, Invoice._id)
+                });
+            }
+
+            function getAllUserQueues(self) {
+                //TODO stub
+                return foo;
             }
 		}
     });

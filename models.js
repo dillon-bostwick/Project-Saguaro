@@ -26,7 +26,7 @@ var schemas = {
 	invoice: new Schema({
 		serviceDate: { type: Date, required: true },
 		_vendor: String,
-		invNum: { type: String, required: true },
+		_id: { type: String, required: true },
 		lineItems: [{
 			category: {type: String, enum: LineItemCategories, required: true },
 			_hood: reference('hood'), // if EXPENSE: must be empty
@@ -39,7 +39,7 @@ var schemas = {
 			desc: { type: String, required: true },
 			comment: String,
 			date: Now,
-			_user: reference('user')
+			_user: String // ref
 		}]
 		//pdf or image upload - or link to dropbox file?
 	}),
@@ -49,11 +49,11 @@ var schemas = {
 	}),
 
 	user: new Schema({
+		_id: { type: String, required: true },
 		firstName: { type: String, required: true },
 		lastName: { type: String, required: true },
-		dropboxUid: { type: Number, required: true },
-		_invoiceQueue: [reference('invoice')],
-		category: { type: String, enum: UserCategoryEnum, required: true }
+		_invoiceQueue: [String],
+		category: { type: String, enum: UserCategoryEnum, }
 	}),
 
 	activity: new Schema({
@@ -74,7 +74,7 @@ var schemas = {
 	}),
 
 	bills: new Schema({
-		_bill: reference('invoice'),
+		_bill: String, // Invoice ref
 	})
 }
 
@@ -91,6 +91,9 @@ schemas['invoice'].virtual('total').get(function() {
 
 	return total;
 })
+
+schemas.invoice.set('versionKey', false);
+schemas.user.set('versionKey', false);
 
 
 //Everything is required:

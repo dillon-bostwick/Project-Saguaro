@@ -1,40 +1,53 @@
-<h2>Invoice</h2>
+<h2 ng-if="$ctrl.isNew"><i>Create</i> an invoice</h2>
+<h2 ng-if="$ctrl.canReview"><i>Review</i> an invoice</h2>
+<h2 ng-if="!$ctrl.canEdit"><i>Read</i> an invoice</h2>
 
 <div class="well well-lg">
-	<input type="file" accept="image/*,application/pdf"> <!-- TODO: Figure this out -->
+	<h3>Details</h3>
 
-	<div ng-if="!$ctrl.isNew">
-		<label>Created on: </label>
-		<p>{{$ctrl.Invoice.createdDate}}</p>
-	</div>
+	<table class="table table-hover">
+		<thead>
+			<tr>
+				<th>File upload</th>
+				<th>Service date</th>
+				<th>Vendor</th>
+				<th>Invoice #</th>
+			</tr>
+		</thead>
 
-	<div>
-		<label>Service date: </label>
-		<input
-			ng-if="$ctrl.canEdit",
-			type="date"
-			ng-model="$ctrl.Invoice.serviceDate"/>
-	</div>
+		<tbody>
+			<tr>
+				<td>
+					<input type="file" accept="image/*,application/pdf">
+				</td>
 
-	<div>
-		<label>Vendor: </label>
-		<select
-			ng-if="$ctrl.canEdit",
-			ng-model="$ctrl.Invoice._vendor"
-			ng-options="vendor._id
-				as vendor.name
-				for vendor
-				in $ctrl.Vendors">
-		</select>
-	</div>
+				<td>
+					<input
+						ng-if="$ctrl.canEdit",
+						type="date"
+						ng-model="$ctrl.Invoice.serviceDate"/>
+				</td>
 
-	<div>
-		<label>Invoice #: </label>
-		<input
-			ng-if="$ctrl.canEdit",
-			type="text",
-			ng-model="$ctrl.Invoice.invNum"/>
-	</div>
+				<td>
+					<select
+						ng-if="$ctrl.canEdit",
+						ng-model="$ctrl.Invoice._vendor"
+						ng-options="vendor._id
+							as vendor.name
+							for vendor
+							in $ctrl.Vendors">
+					</select>
+				</td>
+
+				<td>
+					<input
+						ng-if="$ctrl.canEdit",
+						type="text",
+						ng-model="$ctrl.Invoice._id"/>
+				</td>
+			</tr>
+		</tbody>
+	</table>
 </div>
 
 
@@ -129,10 +142,10 @@
 						</button>
 
 						<!-- Existing activities -->
-						<div ng-repeat="activity in lineItem._activities">
+						<div ng-repeat="_activity in lineItem._activities">
 							<!-- code-->
 							<select 
-								ng-model = "activity",
+								ng-model = "_activity",
 								ng-options = "activityOption._id
 									as activityOption.code
 									for activityOption
@@ -141,11 +154,11 @@
 
 							<!-- desc -->					
 							<select 
-								ng-model = "activity",
+								ng-model = "_activity",
 								ng-options = "activityOption._id
 									as activityOption.desc
 									for activityOption
-									in sortByDesc($ctrl.getActivityOptions(lineItem))">
+									in $ctrl.sortByDesc($ctrl.getActivityOptions(lineItem))">
 							</select>
 						</div>
 					</div>
@@ -182,7 +195,8 @@
 			<!-- Extra line for total -->
 			<tr>
 				<td colspan="4" align="right"><b>Total:</b></td>
-				<td>${{$ctrl.total}}</td>
+				<!-- This is so users don't see NaN and get confused -->
+				<td>{{$ctrl.totalIsNaN() ? 'EVALUATE' : '$' + $ctrl.total}}</td>
 			</tr>
 		</tbody>
 	</table>
@@ -215,7 +229,8 @@
 	<div ng-if="$ctrl.isNew">
 		<p>Leave a comment as <b>{{$ctrl.CurrentUser.firstName}}</b> before submitting:</p><br>
 		<textarea rows="4" cols="80" ng-model="$ctrl.Invoice.actions[0].comment"></textarea>
-		<button class="btn btn-primary btn-lg btn-block" ng-click="$ctrl.submit()">Submit</button>
+		<button class="btn btn-primary btn-lg btn-block" ng-click="$ctrl.submit(true)">Submit and add another</button>
+		<button class="btn btn-primary btn-lg btn-block" ng-click="$ctrl.submit(false)">Submit and go home</button>
 	</div>
 
 	<div ng-if="$ctrl.canReview">

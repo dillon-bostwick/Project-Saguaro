@@ -50,14 +50,10 @@ passport.use(new dropboxStrategy({
     }
     
     // Now we query the db to see if there's a match
-    userModel.findOne({ 'dropboxUid': profile._json.uid }, function(error, data) {
-      if (error) {
-        // Second possible error: the query failed because they aren't yet in the DB
-        return done('ERROR: Welcome Brightwater member. You don\'t have an account with Saguaro yet. Your unique Dropbox UID is: ' + profile._json.uid, false);
-      }
-      console.log(profile._json.uid);
-      // Now we store the user's _id in the sid. The _id can later be retrieved in a route callback as req.user
-      return done(null, data._id);
+    userModel.findById(profile._json.uid, function(error, data) {
+      return error
+        ? done('ERROR: Welcome Brightwater member. You don\'t have an account with Saguaro yet. Your unique Dropbox UID is: ' + profile._json.uid, false)
+        : done(null, data._id);
     }); 
 }));
 

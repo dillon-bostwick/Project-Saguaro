@@ -16,10 +16,9 @@ angular.
 
         //returns an object literal with full $resource for each collection
         return _.object(collNames, _.map(collNames, function(collName) {
-            return $resource('/api/' + collName + '/:id', { id: '@_id' }, {
-                update: {
-                    method: 'PUT'
-                }
+            return $resource('/api/' + collName + '/:id', { id: '@_id' },
+            {
+                update: { method: 'PUT' }
             })
         }));
     }])
