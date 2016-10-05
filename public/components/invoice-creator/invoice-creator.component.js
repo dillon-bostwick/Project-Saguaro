@@ -11,7 +11,7 @@ angular.
             self.Vendors = api.Vendor.query();
             self.Hoods = api.Hood.query();
             self.Expenses = api.Expense.query();
-            self.User = api.currentUser.get();
+            self.CurrentUser = api.currentUser.get();
 
             // Local:
             self.serviceDate = new Date;

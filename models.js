@@ -12,10 +12,10 @@ var _ = require('underscore');
 var Schema = mongoose.Schema;
 
 function reference(model) {
-	return { type: mongoose.Schema.ObjectId, ref: model };
+	return { type: String }; //Fuck - I gave up
 }
 
-var Money = { type: Number, min: 0, max: [150000, 'Amount cannot exceed 150K'], required: true };
+var Money = { type: Number, min: 0, max: [150000, 'Amount cannot exceed 150K']};
 var Now = { type: Date, default: Date.now };
 var UserCategoryEnum = ['DATAENTRY', 'QUALITYCONTROL', 'BUILDER', 'EXEC'];
 var LineItemCategories = ['CIP', 'EXPENSE', 'WARRANTY'];
@@ -24,11 +24,12 @@ var LineItemCategories = ['CIP', 'EXPENSE', 'WARRANTY'];
 
 var schemas = {
 	invoice: new Schema({
-		serviceDate: { type: Date, required: true },
+		serviceDate: Date,
 		_vendor: String,
-		_id: { type: String, required: true },
+		_id: String,
+		amount: Money,
 		lineItems: [{
-			category: {type: String, enum: LineItemCategories, required: true },
+			category: {type: String, enum: LineItemCategories},
 			_hood: reference('hood'), // if EXPENSE: must be empty
 			subHood: String, // if CIP or WARRANTY: can vary: null (i.e. unknown), hood, dev, or just a number. If EXPENSE: must be []]
 			_activities: [reference('activity')], // if CIP starts as [] and gets filled. If EXPENSE or WARRANTY: must be []]
@@ -36,7 +37,7 @@ var schemas = {
 			amount: Money //required
 		}],
 		actions: [{
-			desc: { type: String, required: true },
+			desc: String,
 			comment: String,
 			date: Now,
 			_user: String // ref

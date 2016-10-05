@@ -6,18 +6,15 @@ angular.
         templateUrl: 'components/invoice-detail/invoice-detail.template.html',
         controller: function InvoiceDetailController(api, $routeParams, $window) {
             var self = this;
+            window.ctrl = self; // For debugging
 
             // External requests:
             self.Vendors = api.Vendor.query();
             self.Hoods = api.Hood.query();
             self.Expenses = api.Expense.query();
             self.Activities = api.Activity.query();
-            self.CurrentUser = api.currentUser.get();
+            self.CurrentUser = api.CurrentUser.get();
             self.Users = api.User.query();
-
-            console.log(self.Users);
-
-            self.total = 0;
 
             // Whether the invoice is new:
             self.isNew = $routeParams.id === 'new';
@@ -42,6 +39,8 @@ angular.
                     }]
                 })
                 : api.Invoice.get({ id: $routeParams.id });
+
+                self.foo = ''
 
             ////////////////////////////////////////////////////////////////////
             //CTRL METHODS
@@ -125,11 +124,11 @@ angular.
             /* Given a lineItem, runs the JS native eval() function on the
              * lineItem's amount - in other words, if the amount is a string
              * including operators, it will evaluate the operators and convert
-             * it to a Number. Also updates total upon change
+             * it to a Number. Also updates total amount upon change
              */
             self.evaluateAmount = function(lineItem) {
                 lineItem.amount = eval(lineItem.amount);
-                self.updateTotal();
+                self.updateAmount();
             }
 
             /* Given an array activities, sorts the array alphabetically
@@ -145,19 +144,19 @@ angular.
                 });
             }
 
-            /* Return whether self.total is NaN - useful for seeing whether
+            /* Return whether Invoice.amount is NaN - useful for seeing whether
              * all expressions in "amount" in view have been evaluated.
              */
-            self.totalIsNaN = function() {
-                return isNaN(self.total);
+            self.amountIsNaN = function() {
+                return isNaN(self.Invoice.amount);
             }   
 
-            /* To be ran every time an amount changes - updates self.total with
+            /* To be ran every time an amount changes - updates Invoice.amount with
              * the correct amount, or sets to NaN if a view expression has not
              * been evaluated with eval()
              */
-            self.updateTotal = function() {
-                self.total = _.pluck(self.Invoice.lineItems, 'amount')
+            self.updateAmount = function() {
+                self.Invoice.amount = _.pluck(self.Invoice.lineItems, 'amount')
                 .reduce(function(a, b) {
                     return Number(a) + Number(b);
                 }, 0);
@@ -171,9 +170,11 @@ angular.
 
                 // If the invoice is new, it must get pushed to Invoices
                 if (self.isNew) {
+                    console.log(self.Invoice);
                     self.Invoice.$save(function() {
+                        console.log(self.Invoice);
                         if (another) {
-                            //$window.location.reload();
+                            $window.location.reload();
                         } else {
                             $window.location.href = '/#!/dashboard'
                         }
@@ -206,14 +207,10 @@ angular.
             function pushInvoiceToReceivers(_receivers, _invoice, _users) {
                 var receiverModel;
 
-                console.log(_users);
-
                 _.each(_receivers, function(_receiver) {
                     receiverModel = _.find(_users, function(user) {
                         return user._id === _receiver;
                     });
-
-                    console.log(receiverModel);
 
                     receiverModel._invoiceQueue.push(_invoice);
                     receiverModel.$update();

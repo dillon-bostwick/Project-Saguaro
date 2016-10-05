@@ -4,8 +4,9 @@ angular.
     module('userDashboard').
     component('userDashboard', {
         templateUrl: 'components/user-dashboard/user-dashboard.template.html',
-        controller: function UserDashboardController(api, $window) {
+        controller: function UserDashboardController(api, $window, $q) {
         	var self = this;
+            window.ctrl = self; // For debugging
 
             // External requests:
             self.Vendors = api.Vendor.query();
@@ -13,26 +14,36 @@ angular.
             self.Expenses = api.Expense.query();
             self.Activities = api.Activity.query();
             self.Invoices = api.Invoice.query();
-            self.CurrentUser = api.currentUser.get();
+            self.CurrentUser = api.CurrentUser.get();
 
             //Must be one of [QUEUE, TEAM, ARCHIVE] - QUEUE by default
             self.view = 'QUEUE';
-            //The list of invoices to reveal - user queue by default because above
-            self.invList = getUserQueue();
+            self.invList = []; //Gets initially filled by $q promise below
 
             //Filter fields:
             self.filterVendor = '';
             self.sortBy = '';
+
+            /* Wait for the CurrentUser and Invoices to both load before
+             * initiating the first queue view. When the page loads it always
+             * starts as getUserQueue (i.e. self.view == 'QUEUE')
+             */
+            $q.all([
+                self.CurrentUser.$promise,
+                self.Invoices.$promise
+            ]).then(function(data) {
+                self.invList = getUserQueue(self.CurrentUser, self.Invoices);
+            })
 
             ////////////////////////////////////////////////////////////////////
 
             self.updateInvList = function() {
                 switch(self.view) {
                     case 'QUEUE':
-                        invList = getUserQueue(self);
+                        self.invList = getUserQueue(self.CurrentUser, self.Invoices);
                         break;
                     case 'TEAM':
-                        invList = getAllUserQueues(self);
+                        self.invList = getAllUserQueues(self);
                         break;
                     case 'ARCHIVE':
                         alert('Archive function is not ready!') //TODO
@@ -51,6 +62,10 @@ angular.
                 return detailStr;
             }
 
+            self.getVendorNameById = function(id) {
+                return _.findWhere(self.Vendors, { _id: id }).name;
+            }
+
             /* Given an invoice _id, redirect to the page for that invoice
              */
             self.redirectInvoiceDetail = function(_id) {
@@ -63,12 +78,9 @@ angular.
              * all the invoice ids in the _invoiceQueue of CurrentUser.
              */
              //TODO: NOT TESTED!
-           function getUserQueue(self) {
-                console.log(self.Invoices);
-                console.log(self.CurrentUser);
-
-                return _.filter(self.Invoices, function(Invoice) {
-                    return _.contains(self.CurrentUser._invoiceQueue, Invoice._id)
+           function getUserQueue(CurrentUser, Invoices) {
+                return _.filter(Invoices, function(Invoice) {
+                    return _.contains(CurrentUser._invoiceQueue, Invoice._id)
                 });
             }
 

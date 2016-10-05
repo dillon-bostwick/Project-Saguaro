@@ -18,12 +18,16 @@
 		<tbody>
 			<tr>
 				<td>
-					<input type="file" accept="image/*,application/pdf">
+					<input
+						ng-if="$ctrl.canEdit" 
+						type="file" 
+						accept="image/*,application/pdf"
+					>
 				</td>
 
 				<td>
 					<input
-						ng-if="$ctrl.canEdit",
+						ng-if="$ctrl.canEdit"
 						type="date"
 						ng-model="$ctrl.Invoice.serviceDate"/>
 				</td>
@@ -41,8 +45,8 @@
 
 				<td>
 					<input
-						ng-if="$ctrl.canEdit",
-						type="text",
+						ng-if="$ctrl.canEdit"
+						type="text"
 						ng-model="$ctrl.Invoice._id"/>
 				</td>
 			</tr>
@@ -142,10 +146,12 @@
 						</button>
 
 						<!-- Existing activities -->
-						<div ng-repeat="_activity in lineItem._activities">
+						<div ng-repeat="_activity in lineItem._activities track by $index">
+						<!-- http://www.codelord.net/2014/05/10/understanding-angulars-magic-dont-bind-to-primitives/ -->
+
 							<!-- code-->
 							<select 
-								ng-model = "_activity",
+								ng-model = "lineItem._activities[$index]",
 								ng-options = "activityOption._id
 									as activityOption.code
 									for activityOption
@@ -154,12 +160,17 @@
 
 							<!-- desc -->					
 							<select 
-								ng-model = "_activity",
+								ng-model = "lineItem._activities[$index]",
 								ng-options = "activityOption._id
 									as activityOption.desc
 									for activityOption
 									in $ctrl.sortByDesc($ctrl.getActivityOptions(lineItem))">
-							</select>
+						</select>
+
+							<button
+								ng-click="lineItem._activities.splice($index, 1);">
+								X
+							</button>
 						</div>
 					</div>
 				</td>
@@ -169,7 +180,7 @@
 					$<input
 						type="Text"
 						ng-model="lineItem.amount"
-						ng-change="$ctrl.updateTotal();"/>
+						ng-change="$ctrl.updateAmount();"/>
 
 					<button ng-click="$ctrl.evaluateAmount(lineItem)">
 						Evaluate
@@ -192,11 +203,11 @@
 				</td>
 			</tr>
 
-			<!-- Extra line for total -->
+			<!-- Extra line for total amount -->
 			<tr>
 				<td colspan="4" align="right"><b>Total:</b></td>
 				<!-- This is so users don't see NaN and get confused -->
-				<td>{{$ctrl.totalIsNaN() ? 'EVALUATE' : '$' + $ctrl.total}}</td>
+				<td>{{$ctrl.amountIsNaN() ? 'EVALUATE' : '$' + $ctrl.Invoice.amount}}</td>
 			</tr>
 		</tbody>
 	</table>
