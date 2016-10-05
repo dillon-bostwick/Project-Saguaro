@@ -4,7 +4,7 @@ angular.
     module('invoiceDetail').
     component('invoiceDetail', {
         templateUrl: 'components/invoice-detail/invoice-detail.template.html',
-        controller: function InvoiceDetailController(api, $routeParams, $window) {
+        controller: function InvoiceDetailController(api, $routeParams, $window, $filter) {
             var self = this;
             window.ctrl = self; // For debugging
 
@@ -13,16 +13,32 @@ angular.
             self.Hoods = api.Hood.query();
             self.Expenses = api.Expense.query();
             self.Activities = api.Activity.query();
-            self.CurrentUser = api.CurrentUser.get();
             self.Users = api.User.query();
+
+            /* Note: self.isNew can be processed on page load because $routeParams 
+             * processes on page load. For self.canReview and self.canEdit, must
+             * wait for the CurrentUser to be fetched from the api (via a server
+             * round trip processing SID cookie). Note that the camelCased currentUser
+             * is different from the PascalCased self.CurrentUser. The former is
+             * the returned data from the promise, while the latter is used to
+             * bind to the view (which obviously Angular knows when to update).
+             * Enjoy!
+             */
+            self.CurrentUser = api.CurrentUser.get().$promise.then(function(currentUser) {
+                // Whether is in the current user's queue:
+                self.canReview = _.contains(currentUser._invoiceQueue, $routeParams.id);
+                // Whether it can be edited at all:
+                self.canEdit = self.isNew || self.canReview;
+
+                // See self.Invoice declaration for this:
+                if (self.isNew) {
+                    self.Invoice.actions[0]._user = currentUser._id;
+                }
+            });
 
             // Whether the invoice is new:
             self.isNew = $routeParams.id === 'new';
-            // Whether is in the current user's queue:
-            self.canReview = _.contains(self.CurrentUser._invoiceQueue, $routeParams.id);
-            // Whether it can be edited at all:
-            self.canEdit = self.isNew || self.canReview
-
+            
             // Either Invoice is retrived from DB or it gets a starter template:
             self.Invoice = self.isNew
                 ? new api.Invoice({
@@ -35,12 +51,10 @@ angular.
                         desc: 'CREATED',
                         comment: '',
                         date: new Date,
-                        _user: self.CurrentUser._id
+                        _user: undefined // Wait for CurrentUser promise resolution to fill
                     }]
                 })
                 : api.Invoice.get({ id: $routeParams.id });
-
-                self.foo = ''
 
             ////////////////////////////////////////////////////////////////////
             //CTRL METHODS
@@ -52,7 +66,7 @@ angular.
              */
             self.addLineItem = function() {
                 self.Invoice.lineItems.push({
-                    category: 'CIP',
+                    category: 'CIP', //default behavior is CIP
                     _hood: '',
                     subHood: '',
                     _activities: [],
@@ -72,41 +86,29 @@ angular.
              * the possible options that can be selected for ANOTHER subHood.
              */
             self.getSubHoodOptions = function(lineItem) {
-                if (lineItem._hood == '') { return []; }
-
-                var hood = _.find(self.Hoods, function(hood) {
-                    return hood._id === lineItem._hood
-                });
-
-                //All the lots up to numLots excluding completedLots:
-                var subHoodOptions = _.difference(_.range(1, hood.numLots + 1), hood.completedLots);
-
-                //Then add hood or dev as appropriate:
-                if (hood.hoodable) { subHoodOptions.unshift('hood'); }
-                if (hood.devable) { subHoodOptions.unshift('dev'); }
-
-                return subHoodOptions
+                return lineItem._hood
+                    ? self.getElementById(lineItem._hood, 'subHoodOptions', 'Hoods')
+                    : [];
             }
 
             /* Given a subHood (dev, hood, or a number), determine which activities
              * can be applicable to that subHood. Follows Brightwater logic:
              * 0000-0399 = Dev
              * 0400-0999 = Hood
-             * 1000-9999 = Lots
+             * 1000-9999 = else
              */
             self.getActivityOptions = function(lineItem) {
-                //TODO: need to test
                 switch(lineItem.subHood) {
                     case '':
                         return [];
-                    case 'dev':
+                    case 'Dev':
                         return _.filter(self.Activities, function(activity) {
                             return   0 <= activity.code && 
                                    399 >= activity.code
                         });
 
                         break;
-                    case 'hood':
+                    case 'Hood':
                         return _.filter(self.Activities, function(activity) {
                             return 400 <= activity.code &&
                                    999 >= activity.code
@@ -127,7 +129,7 @@ angular.
              * it to a Number. Also updates total amount upon change
              */
             self.evaluateAmount = function(lineItem) {
-                lineItem.amount = eval(lineItem.amount);
+                lineItem.amount = $filter('currency')(eval(lineItem.amount), '');
                 self.updateAmount();
             }
 
@@ -143,13 +145,6 @@ angular.
                     return 0;
                 });
             }
-
-            /* Return whether Invoice.amount is NaN - useful for seeing whether
-             * all expressions in "amount" in view have been evaluated.
-             */
-            self.amountIsNaN = function() {
-                return isNaN(self.Invoice.amount);
-            }   
 
             /* To be ran every time an amount changes - updates Invoice.amount with
              * the correct amount, or sets to NaN if a view expression has not
@@ -170,7 +165,6 @@ angular.
 
                 // If the invoice is new, it must get pushed to Invoices
                 if (self.isNew) {
-                    console.log(self.Invoice);
                     self.Invoice.$save(function() {
                         console.log(self.Invoice);
                         if (another) {
@@ -192,7 +186,25 @@ angular.
             }
 
             self.hold = function () {
+                //Stub
+            }
 
+            ////////////////////////////////////////////////////////////////////
+            //db getters
+
+            /* Given an id and a collection, return the name of that document
+             * 
+             * Warning: this is reproduced elsewhere (as of writing, in user-dashboard).
+             *  Consider moving to core!
+             */
+            self.getNameById = function(id, collection) {
+                var document = _.findWhere(self[collection], { _id: id })
+
+                return (document.name || [document.firstName, document.lastName].join(' '));
+            }
+
+            self.getElementById = function(id, element, collection) {
+                return _.findWhere(self[collection], { _id: id })[element];
             }
 
             ////////////////////////////////////////////////////////////////////

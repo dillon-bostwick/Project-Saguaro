@@ -15,7 +15,7 @@ angular.
         }).
         
         when('/', {
-          template: '<a href="/auth/dropbox"><button>Log In with Dropbox</button></a>'
+          templateUrl: 'login.html'
         }).
         when('/404', {
           template: '<h2>404</h2><p>I can\'t find what you\'re looking for</p>'

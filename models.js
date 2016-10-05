@@ -68,10 +68,8 @@ var schemas = {
 
 	hood: new Schema({
 		name: { type: String, required: true },
-		devable: Boolean,
-		hoodable: Boolean,
-		numLots: { type: Number, required: true },
-		completedLots: [Number]
+		shortHand: { type: String, required: true },
+		subHoodOptions: [String]
 	}),
 
 	bills: new Schema({

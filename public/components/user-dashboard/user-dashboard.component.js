@@ -57,19 +57,50 @@ angular.
              * and a summary of all line items
              */
             self.getDetailStr = function(invoice) {
-                var detailStr = 'foo';
-                //stub
-                return detailStr;
+                // Get lists of ids excluding empty strings
+                var hoods =   _.pluck(invoice.lineItems, '_hood').filter(Boolean);
+                var expenses = _.pluck(invoice.lineItems, '_expense').filter(Boolean);
+
+                
+
+                // Dereference from ids to names
+                hoods = _.map(hoods, function(id) { return self.getElementById(id, 'shortHand', 'Hoods'); });
+                expenses = _.map(expenses, function(id) { return self.getNameById(id, 'Expenses'); });
+
+                return  [
+                            _.uniq(expenses).join(', '),
+                            _.uniq(hoods).join(', ')
+                        ]
+                        .filter(Boolean)
+                        .join(' / ')
+                        || 'N/A';
             }
 
-            self.getVendorNameById = function(id) {
-                return _.findWhere(self.Vendors, { _id: id }).name;
-            }
+            
 
             /* Given an invoice _id, redirect to the page for that invoice
              */
-            self.redirectInvoiceDetail = function(_id) {
-                $window.location.href = '/#!/invoices/' + _id;
+            self.redirectInvoiceDetail = function(id) {
+                console.log(id);
+                $window.location.href = '/#!/invoices/' + id;
+            }
+
+            ////////////////////////////////////////////////////////////////////
+            //db getters
+
+            /* Given an id and a collection, return the name of that document
+             * 
+             * Warning: this is reproduced elsewhere (as of writing, in user-dashboard).
+             *  Consider moving to core!
+             */
+            self.getNameById = function(id, collection) {
+                var document = _.findWhere(self[collection], { _id: id })
+
+                return (document.name || [document.firstName, document.lastName].join(' '));
+            }
+
+            self.getElementById = function(id, element, collection) {
+                return _.findWhere(self[collection], { _id: id })[element];
             }
 
             ////////////////////////////////////////////////////////////////////

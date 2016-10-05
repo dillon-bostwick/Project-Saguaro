@@ -35,7 +35,7 @@ router.get('/auth/dropbox/callback',
 router.get('/api/currentuser', function(req, res) {
     // In this case, req.user is actually the _id of the current user
     if (req.user === undefined) {
-        res.send({ error: true }); // The user is not logged in
+        res.send({ loggedIn: false }); // The user is not logged in
     } else {
         userModel.findById(req.user, function(error, data) { // (async)
             if (error) {

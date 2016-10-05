@@ -206,8 +206,7 @@
 			<!-- Extra line for total amount -->
 			<tr>
 				<td colspan="4" align="right"><b>Total:</b></td>
-				<!-- This is so users don't see NaN and get confused -->
-				<td>{{$ctrl.amountIsNaN() ? 'EVALUATE' : '$' + $ctrl.Invoice.amount}}</td>
+				<td>{{($ctrl.Invoice.amount | currency) || 'Check line items'}}</td>
 			</tr>
 		</tbody>
 	</table>
@@ -227,9 +226,9 @@
 		</thead>
 		<tbody>
 			<tr ng-repeat="action in $ctrl.Invoice.actions">
-				<td>{{action.date}}</td>
+				<td>{{action.date | date}}</td>
 				<td>{{action.desc}}</td>
-				<td>{{action.user}}</td>
+				<td>{{$ctrl.getNameById(action._user, 'Users')}}</td>
 				<td>{{action.comment}}</td>
 			</tr>
 		</tbody>
@@ -240,6 +239,7 @@
 	<div ng-if="$ctrl.isNew">
 		<p>Leave a comment as <b>{{$ctrl.CurrentUser.firstName}}</b> before submitting:</p><br>
 		<textarea rows="4" cols="80" ng-model="$ctrl.Invoice.actions[0].comment"></textarea>
+
 		<button class="btn btn-primary btn-lg btn-block" ng-click="$ctrl.submit(true)">Submit and add another</button>
 		<button class="btn btn-primary btn-lg btn-block" ng-click="$ctrl.submit(false)">Submit and go home</button>
 	</div>

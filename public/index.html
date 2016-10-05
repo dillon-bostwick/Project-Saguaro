@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <title>Saguaro: Brightwater Invoices</title>
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
-    <link rel="stylesheet" href="stylesheets/app.css" />
-    <link rel="stylesheet" href="stylesheets/app.animations.css" />
+    <link rel="stylesheet" href="bower_components/fontawesome/css/font-awesome.css" />
+    <link rel="stylesheet" href="stylesheets/bootstrap-social.css" />
 
 
     <script src="bower_components/jquery/dist/jquery.js"></script>
@@ -28,6 +28,7 @@
     <script src="components/core/core.module.js"></script>
     <script src="components/core/api/api.module.js"></script>
     <script src="components/core/api/api.service.js"></script>
+    <script src="components/core/pretty-date/pretty-date.filter.js"></script>
     <script src="components/invoice-creator/invoice-creator.module.js"></script>
     <script src="components/invoice-creator/invoice-creator.component.js"></script>
     <script src="components/invoice-detail/invoice-detail.module.js"></script>
@@ -36,14 +37,12 @@
     <script src="components/user-dashboard/user-dashboard.module.js"></script>
     <script src="components/user-dashboard/user-dashboard.component.js"></script>
 
-
   </head>
-  <body>
-    <h1>Brightwater Invoice Manager</h1>
 
-    <div class="view-container">
+  <body class="container-fluid">
+        <h1 class="h1">Brightwater Invoice Manager</h1>
+
         <div ng-view class="view-frame"></div>
-    </div>
-
   </body>
+
 </html>

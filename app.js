@@ -23,7 +23,7 @@ var BRIGHTWATERDROPBOXTEAMID = 'dbtid:AADIihV4QHYt6wCTX1MN2VVwJmdBDiv7tc4';
 
 mongoose.Promise = global.Promise;
 
-mongoose.connect("mongodb://localhost:27017/saguaro");
+mongoose.connect("mongodb://localhost:27017/saguaro"); // db is called 'saguaro'
 
 var db = mongoose.connection;
 
@@ -97,8 +97,6 @@ app.use('/', router); // routes must declare after passport
 
 var server = http.createServer(app);
 qbws.run(server);
-
-
 
 module.exports = app;
 
