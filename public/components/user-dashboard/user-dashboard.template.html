@@ -50,6 +50,7 @@
 		<tbody ng-repeat="invoice in $ctrl.invList">
 			<tr ng-click="$ctrl.redirectInvoiceDetail(invoice._id)">
 				<td>{{invoice.actions[0].date | date}}</td> <!-- [0] is always created -->
+				<!-- TODO: Should this be date created or date added? -->
 				<td>{{$ctrl.getNameById(invoice._vendor, 'Vendors')}}</td>
 				<td>{{$ctrl.getDetailStr(invoice)}}</td>
 				<td>{{(invoice.amount | currency) || 'Not entered'}}</td>
