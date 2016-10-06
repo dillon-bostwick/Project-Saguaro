@@ -2,6 +2,29 @@
 <h2 ng-if="$ctrl.canReview"><i>Review</i> an invoice</h2>
 <h2 ng-if="!$ctrl.canEdit"><i>Read</i> an invoice</h2>
 
+<!-- History -->
+<div class="well well-lg" ng-if="!$ctrl.isNew">
+	<h3>Invoice History:</h3>
+	<table class="table table-hover">
+		<thead>
+			<tr>
+				<th>Date</th>
+				<th>Description</th>
+				<th>User</th>
+				<th>Comment</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="action in $ctrl.Invoice.actions">
+				<td>{{action.date | date}}</td>
+				<td>{{action.desc}}</td>
+				<td>{{$ctrl.getNameById(action._user, 'Users')}}</td>
+				<td>{{action.comment || 'N/A'}}</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
 <form name="Form" novalidate>
 	<div class="well well-lg">
 		<h3>Details</h3>
@@ -64,6 +87,7 @@
 			<!-- Headers -->
 			<thead>
 				<tr>
+					<th>#</th>
 					<th>Category</th>
 					<th>Hood</th>
 					<th>Lot</th>
@@ -75,11 +99,13 @@
 			<!-- Each line item -->
 			<tbody>
 				<tr ng-repeat="lineItem in $ctrl.Invoice.lineItems">
+					<td><b>{{$index + 1}}</b></td>
+
 					<!-- Switch the line item type if can edit -->
 					<td ng-if="$ctrl.canEdit" class="btn-group">
 						<label class="btn btn-primary active">
 							<input
-								name="Line Item Type"
+								name="Line Item #{{$index + 1}}: Type"
 								type="radio"
 								ng-model="lineItem.category"
 								value="CIP"
@@ -89,7 +115,7 @@
 
 						<label class="btn btn-primary active">
 							<input
-								name="Line Item Type"
+								name="Line Item #{{$index + 1}}: Type"
 								type="radio"
 								ng-model="lineItem.category"
 								value="EXPENSE"
@@ -99,7 +125,7 @@
 
 						<label class="btn btn-primary active">
 							<input
-								name="Line Item Type"
+								name="Line Item #{{$index + 1}}: Type"
 								type="radio"
 								ng-model="lineItem.category"
 								value="WARRANTY"
@@ -109,7 +135,7 @@
 
 						<label class="btn btn-primary active">
 							<input
-								name="Line Item Type"
+								name="Line Item #{{$index + 1}}: Type"
 								type="radio"
 								ng-model="lineItem.category"
 								value="HOA"
@@ -119,10 +145,10 @@
 					</td>
 
 					<!-- Expense -->
-					<td ng-if="lineItem.category === 'EXPENSE'">
+					<td ng-if="lineItem.category === 'EXPENSE'" colspan="3">
 						<label>Expense:</label>
 						<select
-							name="Expense"
+							name="Line Item #{{$index + 1}}: Expense"
 							ng-model="lineItem._expense"
 							ng-options="expense._id as expense.name for expense in $ctrl.Expenses"
 						></select>
@@ -131,7 +157,7 @@
 					<!-- Hood -->
 					<td ng-if="lineItem.category !== 'EXPENSE'">
 						<select
-							name="Hood"
+							name="Line Item #{{$index + 1}}: Hood"
 							ng-model = "lineItem._hood"
 							ng-options = "hood._id
 								as hood.name
@@ -143,9 +169,9 @@
 
 
 					<!-- Lot -->
-					<td>
+					<td ng-if="lineItem.category !== 'EXPENSE'">
 						<select
-							name="Lot"
+							name="Line Item #{{$index + 1}}: Lot"
 							ng-if = "lineItem.category !== 'EXPENSE'",
 							ng-model = "lineItem.subHood",
 							ng-options = "subHoodOption for subHoodOption in $ctrl.getSubHoodOptions(lineItem)",
@@ -154,7 +180,7 @@
 					</td>
 
 					<!-- Activities -->
-					<td>
+					<td ng-if="lineItem.category !== 'EXPENSE'">
 						<!-- Existing -->
 						<div ng-if="lineItem.category === 'CIP' &&
 						            lineItem.subHood != ''">
@@ -168,19 +194,19 @@
 
 								<!-- code-->
 								<select 
-									name="Activity"
-									ng-model = "lineItem._activities[$index]",
-									ng-options = "option._id 
+									name="Line Item #{{$index + 1}}: Activity"
+									ng-model="lineItem._activities[$index]"
+									ng-options="option._id 
 										as option.code 
 										for option
 										in $ctrl.getActivityOptions(lineItem, $index)">
 								</select>
 
 								<!-- desc -->					
-								<select 
-									name="Activity"
-									ng-model = "lineItem._activities[$index]",
-									ng-options = "option._id
+								<select
+									name="Line Item #{{$index + 1}}: Activity"
+									ng-model="lineItem._activities[$index]"
+									ng-options="option._id
 										as option.desc
 										for option
 										in $ctrl.sortByDesc($ctrl.getActivityOptions(lineItem))">
@@ -197,7 +223,7 @@
 					<!-- Amount -->
 					<td>
 						$<input
-							name="Amount"
+							name="Line Item #{{$index + 1}}: Amount"
 							type="Text"
 							ng-model="lineItem.amount"
 							ng-change="$ctrl.updateAmount();"/>
@@ -218,20 +244,22 @@
 
 				<!-- Adding a new line item -->
 				<tr ng-if="$ctrl.canEdit">
-					<td colspan="5">
-						<button ng-click="$ctrl.addLineItem()">Add line item</button>
+					<td colspan="6">
+						<button class="btn btn-primary btn-block" ng-click="$ctrl.addLineItem()">Add line item</button>
 					</td>
 				</tr>
 
 				<!-- Extra line for total amount -->
 				<tr>
-					<td colspan="4" align="right"><b>Total:</b></td>
+					<td colspan="5" align="right"><b>Total:</b></td>
 					<td>{{($ctrl.Invoice.amount | currency) || 'Check line items'}}</td>
 				</tr>
 			</tbody>
 		</table>
 	</div>
 </form>
+
+
 
 
 <!-- if new, just leave a comment -->
@@ -271,35 +299,35 @@
 	</div>
 </div>
 
-<div ng-if="$ctrl.canReview">
-		<p>Leave a general comment before submitting:</p>
-		<textarea rows="4" cols="80" ng-model="$ctrl.generalComment"></textarea>
-</div>
-
 <!-- submit button if new -->
 <div ng-if="$ctrl.canEdit" class="well well-lg">
+	<div ng-if="$ctrl.canReview">
+		<p>Leave a general comment before submitting:</p>
+		<textarea rows="4" cols="80" ng-model="$ctrl.generalComment"></textarea>
+	</div>
+
 	<button
 		ng-if="$ctrl.canReview"
-		class="btn btn-primary btn-lg btn-block"
+		class="btn btn-primary btn-lg"
 		ng-click="$ctrl.hold()">
 		Hold
 	</button>
 
 	<button
 		ng-if="$ctrl.isNew || CurrentUser._invoiceQueue > 1"
-		class="btn btn-primary btn-lg btn-block"
+		class="btn btn-primary btn-lg"
 		ng-click="$ctrl.submit(true)">
 		Submit and add another
 	</button>
 
 	<button
-		class="btn btn-primary btn-lg btn-block"
+		class="btn btn-primary btn-lg"
 		ng-click="$ctrl.submit(false)">
 		Submit and go home
 	</button>
 </div>
 
-<a class="btn btn-primary btn-lg btn-block" href='/#!/dashboard'>
+<a class="btn btn-primary btn-lg" href='/#!/dashboard'>
     Go back
 </a>
 

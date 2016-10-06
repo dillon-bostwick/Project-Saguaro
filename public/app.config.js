@@ -24,8 +24,7 @@ angular.
 
       //Configure AngularInputModified:
       inputModifiedConfigProvider
-        .enableGlobally() //TODO
-        .setModifiedClassName('')
-        .setNotModifiedClassName('')
+        .enableGlobally()
+        .setModifiedClassName('aim-modified')
     }
   ]);

@@ -14,37 +14,16 @@ angular.
             self.Expenses = api.Expense.query();
             self.Activities = api.Activity.query();
             self.Users = api.User.query();
-
-            /* Note: self.isNew can be processed on page load because $routeParams 
-             * processes on page load. For self.canReview and self.canEdit, must
-             * wait for the CurrentUser to be fetched from the api (via a server
-             * round trip processing SID cookie). Note that the camelCased currentUser
-             * is different from the PascalCased self.CurrentUser. The former is
-             * the returned data from the promise, while the latter is used to
-             * bind to the view (which obviously Angular knows when to update).
-             */
-            api.CurrentUser.get().$promise.then(function(currentUser) {
-                self.CurrentUser = currentUser
-
-                // Whether is in the current user's queue:
-                self.canReview = _.contains(currentUser._invoiceQueue, $routeParams.id);
-                // Whether it can be edited at all:
-                self.canEdit = self.isNew || self.canReview;
-
-                // See self.Invoice declaration for this:
-                if (self.isNew) {
-                    self.Invoice.actions[0]._user = currentUser._id;
-                }
-            });
-
-            // Whether the invoice is new:
-            self.isNew = $routeParams.id === 'new';
+            self.CurrentUser = api.CurrentUser.get()
 
             //Used for adding new changes to Invoice.actions when it is being
             //edited:
             self.changeComments = [];
             self.generalComment = '';
-            
+
+            // Whether the invoice is new:
+            self.isNew = $routeParams.id === 'new';
+
             // Either Invoice is retrived from DB or it gets a starter template:
             self.Invoice = self.isNew
                 ? new api.Invoice({
@@ -60,7 +39,39 @@ angular.
                         _user: undefined // Wait for CurrentUser promise resolution to fill
                     }]
                 })
-                : api.Invoice.get({ id: $routeParams.id });
+                : api.Invoice.get({ id: $routeParams.id })
+
+            ////////////////////////////////////////////////////////////////////
+            //PROMISES
+
+            /* Note: self.isNew can be processed on page load because $routeParams 
+             * processes on page load. For self.canReview and self.canEdit, must
+             * wait for the CurrentUser to be fetched from the api (via a server
+             * round trip processing SID cookie). Note that the camelCased currentUser
+             * is different from the PascalCased self.CurrentUser. The former is
+             * the returned data from the promise, while the latter is used to
+             * bind to the view (which obviously Angular knows when to update).
+             */
+            self.CurrentUser.$promise.then(function(currentUser) {
+                // Whether is in the current user's queue:
+                self.canReview = _.contains(currentUser._invoiceQueue, $routeParams.id);
+                // Whether it can be edited at all:
+                self.canEdit = self.isNew || self.canReview;
+
+                // See self.Invoice declaration for this:
+                if (self.isNew) {
+                    self.Invoice.actions[0]._user = currentUser._id;
+                }
+
+                return currentUser;
+            });
+            
+
+            //Set pristine after the invoice loads, so that AIM doesn't
+            //recognize the invoice load from api is a Form change
+            self.Invoice.$promise.then(function(invoice) {
+                    $scope.Form.$setPristine()
+            });
 
             ////////////////////////////////////////////////////////////////////
             //CTRL METHODS
@@ -205,7 +216,7 @@ angular.
             }
 
             self.hold = function () {
-                submitExistingInvoice(self, true, true);
+                submitExistingInvoice(self, true, false);
             }
 
             ////////////////////////////////////////////////////////////////////
