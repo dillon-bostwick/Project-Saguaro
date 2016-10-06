@@ -42,6 +42,7 @@
 		<thead>
 			<tr>
 				<th>Received On</th>
+				<th>Created On</th>
 				<th>Vendor</th>
 				<th>Details</th>
 				<th>Total</th>
@@ -49,12 +50,14 @@
 		</thead>
 		<tbody ng-repeat="invoice in $ctrl.invList">
 			<tr ng-click="$ctrl.redirectInvoiceDetail(invoice._id)">
-				<td>{{invoice.actions[0].date | date}}</td> <!-- [0] is always created -->
-				<!-- TODO: Should this be date created or date added? -->
+				<td>{{invoice.actions[0].date | date}}</td> <!-- last is always received -->
+				<td>{{invoice.actions[invoice.actions.length - 1].date | date}}</td> <!-- 0 is always created -->
 				<td>{{$ctrl.getNameById(invoice._vendor, 'Vendors')}}</td>
 				<td>{{$ctrl.getDetailStr(invoice)}}</td>
 				<td>{{(invoice.amount | currency) || 'Not entered'}}</td>
+
 			</tr>
 		</tbody>
 	</table>
 <div>
+

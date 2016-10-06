@@ -1,12 +1,12 @@
 'use strict';
 
 angular.
-    module('invoiceDetail').
+    module('invoiceDetail', ['ngInputModified']).
     component('invoiceDetail', {
         templateUrl: 'components/invoice-detail/invoice-detail.template.html',
-        controller: function InvoiceDetailController(api, $routeParams, $window, $filter) {
-            var self = this;
-            window.ctrl = self; // For debugging
+        controller: function InvoiceDetailController(api, $routeParams, $window, $filter, $scope) {
+            var self = this; // for clarity
+            window.scope = $scope // for debugging
 
             // External requests:
             self.Vendors = api.Vendor.query();
@@ -22,9 +22,10 @@ angular.
              * is different from the PascalCased self.CurrentUser. The former is
              * the returned data from the promise, while the latter is used to
              * bind to the view (which obviously Angular knows when to update).
-             * Enjoy!
              */
-            self.CurrentUser = api.CurrentUser.get().$promise.then(function(currentUser) {
+            api.CurrentUser.get().$promise.then(function(currentUser) {
+                self.CurrentUser = currentUser
+
                 // Whether is in the current user's queue:
                 self.canReview = _.contains(currentUser._invoiceQueue, $routeParams.id);
                 // Whether it can be edited at all:
@@ -38,6 +39,11 @@ angular.
 
             // Whether the invoice is new:
             self.isNew = $routeParams.id === 'new';
+
+            //Used for adding new changes to Invoice.actions when it is being
+            //edited:
+            self.changeComments = [];
+            self.generalComment = '';
             
             // Either Invoice is retrived from DB or it gets a starter template:
             self.Invoice = self.isNew
@@ -96,31 +102,51 @@ angular.
              * 0000-0399 = Dev
              * 0400-0999 = Hood
              * 1000-9999 = else
+             *
+             * lineItem is the line item and currentIndex is the the index of the
+             * activity in lineItem._activities that is being changed - this is
+             * so that it is persistent in the dropdown list when other currently
+             * selected activities would otherwise get filtered out by the function
              */
-            self.getActivityOptions = function(lineItem) {
+            self.getActivityOptions = function(lineItem, currentIndex) {
+                var activityOptions;
+
                 switch(lineItem.subHood) {
                     case '':
-                        return [];
+                        activityOptions = [];
                     case 'Dev':
-                        return _.filter(self.Activities, function(activity) {
+                        activityOptions = self.Activities.filter(function(activity) {
                             return   0 <= activity.code && 
                                    399 >= activity.code
                         });
 
                         break;
                     case 'Hood':
-                        return _.filter(self.Activities, function(activity) {
+                        activityOptions = self.Activities.filter(function(activity) {
                             return 400 <= activity.code &&
                                    999 >= activity.code
                         });
 
                         break;
                     default: // i.e. is number so lots
-                        return _.filter(self.Activities, function(activity) {
+                        activityOptions = self.Activities.filter(function(activity) {
                             return 1000 <= activity.code &&
                                    9999 >= activity.code
                         });
                 }
+
+                //Remove currently selected options EXCEPT for the currently
+                //selected item itself
+                // activityOptions = activityOptions.filter(function(option) {
+
+                //     //option is not in activities unless it is current activity
+                //     return $.inArray(option._id, lineItem._activities) === -1 ||
+                //            option._id === lineItem._activities[currentIndex];
+                // });
+
+                // console.log(currentIndex, activityOptions.length);
+
+                return activityOptions;
             }
 
             /* Given a lineItem, runs the JS native eval() function on the
@@ -157,37 +183,35 @@ angular.
                 }, 0);
             }
 
+            /* When a new invoice is submitted, many actions occur:
+             * Gets pushed to the queues of pipeline receivers
+             * If new, run submitNewInvoice which pushes it to Invoices
+             * if existing, run submitExistingInvoice which:
+             *   - Makes the changes pristine
+             *   - Adds changes to Invoice.actions in proper format
+             *   - Update the invoice in Invoiecs
+             *
+             * paramater:
+             *   Boolean another: if false, returns to dashboard, otherwise,
+             *   adds new invoices or loads next invoice in user queue
+             */
             self.submit = function(another) {
                 var _receivers = ['64374526']; //TODO: this needs logic
 
-                //Push the invoice id to the necessary receivers
                 pushInvoiceToReceivers(_receivers, self.Invoice._id, self.Users);
 
-                // If the invoice is new, it must get pushed to Invoices
-                if (self.isNew) {
-                    self.Invoice.$save(function() {
-                        console.log(self.Invoice);
-                        if (another) {
-                            $window.location.reload();
-                        } else {
-                            $window.location.href = '/#!/dashboard'
-                        }
-                    });
-                } else { // Otherwise, already exists, but gets updated
-                    //TODO: needs testing
-                    self.invoice.$update(function() {
-                        if (another) {
-                            //Stub
-                        } else {
-                            $window.location.href = '/#!/dashboard'
-                        }
-                    });
-                }
+                self.isNew ? submitNewInvoice(self, another)
+                           : submitExistingInvoice(self, another, false)
             }
 
             self.hold = function () {
-                //Stub
+                submitExistingInvoice(self, true, true);
             }
+
+            ////////////////////////////////////////////////////////////////////
+            //AIM (Angular-Input-Modified)
+
+
 
             ////////////////////////////////////////////////////////////////////
             //db getters
@@ -198,9 +222,14 @@ angular.
              *  Consider moving to core!
              */
             self.getNameById = function(id, collection) {
-                var document = _.findWhere(self[collection], { _id: id })
+                var doc = _.findWhere(self[collection], { _id: id })
 
-                return (document.name || [document.firstName, document.lastName].join(' '));
+                // If not found return null, otherwise return the name or
+                // 'firstName lastName'
+                return doc
+                    ? doc.name
+                    || [doc.firstName, doc.lastName].join(' ')
+                    : null;
             }
 
             self.getElementById = function(id, element, collection) {
@@ -229,6 +258,58 @@ angular.
                 });
             }
 
+            function submitNewInvoice(self, another) {
+                self.Invoice.$save(function() {
+                    if (another) {
+                        $window.location.reload();
+                    } else {
+                        $window.location.href = '/#!/dashboard'
+                    }
+                });
+            }
 
+            /* Parameters:
+             *   self: $ctrl
+             *   another: Boolean - add another vs go home
+             *   hold: Boolean - whether to list action as "APPROVED" vs "HOLD"
+             *
+             * Description:
+             *   Adds all modifiedModels to actions, sets pristine, adds a
+             *   action (approved or hold), updates in database, redirects
+             *   acording to another.
+             */
+            function submitExistingInvoice(self, another, hold) {
+                //If changes were made, push them to the invoice history at
+                //self.Invoice.actions
+                //TODO: TEST!
+                for (var i = 0; i < $scope.Form.modifiedModels.length; i++) {
+                    self.Invoice.actions.push({
+                        desc: 'CHANGED: ' + $scope.Form.modifiedModels[i].$name,
+                        comment: self.changeComments[i],
+                        date: new Date,
+                        _user: self.CurrentUser._id
+                    })
+                }
+
+                //Set to pristine - due to AIM nature, changes not confirmed
+                $scope.Form.$setPristine()
+
+                //Approval or hold action:
+                self.Invoice.actions.push({
+                    desc: hold ? 'HOLD' : 'APPROVED',
+                    comment: self.generalComment,
+                    date: new Date,
+                    _user: self.CurrentUser._id
+                })
+
+                //TODO: needs testing
+                self.Invoice.$update(function() {
+                    if (another) {
+                        //Stub - href next queue in user queue
+                    } else {
+                        $window.location.href = '/#!/dashboard'
+                    }
+                });
+            }
         } // end controller
     }); // end component

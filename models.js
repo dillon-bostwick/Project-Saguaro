@@ -18,7 +18,7 @@ function reference(model) {
 var Money = { type: Number, min: 0, max: [150000, 'Amount cannot exceed 150K']};
 var Now = { type: Date, default: Date.now };
 var UserCategoryEnum = ['DATAENTRY', 'QUALITYCONTROL', 'BUILDER', 'EXEC'];
-var LineItemCategories = ['CIP', 'EXPENSE', 'WARRANTY'];
+var LineItemCategories = ['CIP', 'EXPENSE', 'WARRANTY', 'HOA'];
 
 //Schema:
 
