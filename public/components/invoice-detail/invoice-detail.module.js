@@ -1,3 +1,3 @@
 'use strict';
 
-angular.module('invoiceDetail', []);
+angular.module('invoiceDetail', ['ngInputModified']);

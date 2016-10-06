@@ -1,25 +1,31 @@
 'use strict';
 
 angular.
-	module('saguaro').
-	config(['$locationProvider' ,'$routeProvider',
-    function config($locationProvider, $routeProvider) {
+	module('saguaro')
+	.config(['$locationProvider' ,'$routeProvider', 'inputModifiedConfigProvider',
+    function config($locationProvider, $routeProvider, inputModifiedConfigProvider) {
     	$locationProvider.hashPrefix('!');
 
-    	$routeProvider.
-        when('/dashboard', {
+      //Define routes
+    	$routeProvider
+        .when('/dashboard', {
           template: '<user-dashboard></user-dashboard>'
-        }).
-        when('/invoices/:id', {
+        })
+        .when('/invoices/:id', {
           template: '<invoice-detail></invoice-detail>'
-        }).
-        
-        when('/', {
+        })
+        .when('/', {
           templateUrl: 'login.html'
-        }).
-        when('/404', {
+        })
+        .when('/404', {
           template: '<h2>404</h2><p>I can\'t find what you\'re looking for</p>'
-        }).
-        otherwise('/404');
+        })
+        .otherwise('/404');
+
+      //Configure AngularInputModified:
+      inputModifiedConfigProvider
+        .enableGlobally() //TODO
+        .setModifiedClassName('')
+        .setNotModifiedClassName('')
     }
   ]);
