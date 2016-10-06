@@ -37,7 +37,7 @@
 	<input type="text" ng-model="$ctrl.filterVendor">
 </div>
 
-<div class="well well-lg">
+<div class="well well-lg" ng-if="$ctrl.invList.length !== 0">
 	<table class="table table-hover">
 		<thead>
 			<tr>
@@ -48,6 +48,7 @@
 				<th>Total</th>
 			</tr>
 		</thead>
+		
 		<tbody ng-repeat="invoice in $ctrl.invList">
 			<tr ng-click="$ctrl.redirectInvoiceDetail(invoice._id)">
 				<td>{{invoice.actions[0].date | date}}</td> <!-- last is always received -->
@@ -55,9 +56,10 @@
 				<td>{{$ctrl.getNameById(invoice._vendor, 'Vendors')}}</td>
 				<td>{{$ctrl.getDetailStr(invoice)}}</td>
 				<td>{{(invoice.amount | currency) || 'Not entered'}}</td>
-
 			</tr>
 		</tbody>
 	</table>
-<div>
+</div>
+
+<h3 ng-if="$ctrl.invList.length === 0">Queue is empty!</h3>
 
