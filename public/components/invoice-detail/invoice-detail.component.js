@@ -5,13 +5,15 @@ angular.
     component('invoiceDetail', {
         templateUrl: 'components/invoice-detail/invoice-detail.template.html',
         controller: function InvoiceDetailController(api, $routeParams, $window, $filter, $scope) {
-            var self = this; // for clarity
-            window.scope = $scope // for debugging
+            var self = this;
+            window.ctrl = self; // For debugging
+            self.path = $window.location.hash
 
             // External requests:
             self.Vendors = api.Vendor.query();
             self.Hoods = api.Hood.query();
             self.Expenses = api.Expense.query();
+            self.Hoas = api.Hoa.query();
             self.Activities = api.Activity.query();
             self.Users = api.User.query();
             self.CurrentUser = api.CurrentUser.get()
@@ -69,9 +71,11 @@ angular.
 
             //Set pristine after the invoice loads, so that AIM doesn't
             //recognize the invoice load from api is a Form change
-            self.Invoice.$promise.then(function(invoice) {
+            if (self.canReview) {
+                self.Invoice.$promise.then(function(invoice) {
                     $scope.Form.$setPristine()
-            });
+                });
+            }
 
             ////////////////////////////////////////////////////////////////////
             //CTRL METHODS
@@ -219,10 +223,11 @@ angular.
                 submitExistingInvoice(self, true, false);
             }
 
-            ////////////////////////////////////////////////////////////////////
-            //AIM (Angular-Input-Modified)
+            self.deleteInvoice = function() {
+                self.Invoice.$delete();
 
-
+                $window.location.href = '/#!/dashboard';
+            }
 
             ////////////////////////////////////////////////////////////////////
             //db getters
@@ -244,7 +249,9 @@ angular.
             }
 
             self.getElementById = function(id, element, collection) {
-                return _.findWhere(self[collection], { _id: id })[element];
+                var doc = _.findWhere(self[collection], { _id: id });
+
+                return doc ? doc[element] : null;
             }
 
             ////////////////////////////////////////////////////////////////////

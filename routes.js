@@ -128,8 +128,9 @@ _.map(models, function(model) { return model; }).forEach(function(model) {
     * Pass a standard MongoDB query as params
     * Nothing is sent back.
     */
-    router.delete('/api/' + model.modelName + '/:id', ensureLoggedIn('/'), function(req, res) {
-        model.removeById(req.params.id, function(error) {
+    router.delete('/api/' + model.modelName + '/:id', function(req, res) {
+        model.findByIdAndRemove(req.params.id, function(error) {
+            console.log(error);
             if (error) {
                 console.log(error);
                 res.status(500).send(error);

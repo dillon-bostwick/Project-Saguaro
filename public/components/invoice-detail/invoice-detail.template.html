@@ -1,3 +1,5 @@
+<div ng-include="'navbar.partial.html'"></div>
+
 <h2 ng-if="$ctrl.isNew"><i>Create</i> an invoice</h2>
 <h2 ng-if="$ctrl.canReview"><i>Review</i> an invoice</h2>
 <h2 ng-if="!$ctrl.canEdit"><i>Read</i> an invoice</h2>
@@ -25,7 +27,7 @@
 	</table>
 </div>
 
-<form name="Form" novalidate>
+<form name="Form" bs-modifiable="{{$ctrl.canReview}}" novalidate>
 	<div class="well well-lg">
 		<h3>Details</h3>
 
@@ -70,10 +72,11 @@
 
 					<td>
 						<input
-							ng-if="$ctrl.canEdit"
+							ng-if="$ctrl.isNew"
 							name="Invoice #"
 							type="text"
 							ng-model="$ctrl.Invoice._id"/>
+						<p ngif="!$ctrl.isNew">{{$ctrl.Invoice._id}}</p>
 					</td>
 				</tr>
 			</tbody>
@@ -154,8 +157,18 @@
 						></select>
 					</td>
 
+					<!-- HOA -->
+					<td ng-if="lineItem.category === 'HOA'" colspan="3">
+						<label>HOA:</label>
+						<select
+							name="Line Item #{{$index + 1}}: HOA"
+							ng-model="lineItem._expense"
+							ng-options="hoa._id as hoa.name for hoa in $ctrl.Hoas"
+						></select>
+					</td>
+
 					<!-- Hood -->
-					<td ng-if="lineItem.category !== 'EXPENSE'">
+					<td ng-if="lineItem.category === ('CIP' || 'WARRANTY')">
 						<select
 							name="Line Item #{{$index + 1}}: Hood"
 							ng-model = "lineItem._hood"
@@ -169,7 +182,7 @@
 
 
 					<!-- Lot -->
-					<td ng-if="lineItem.category !== 'EXPENSE'">
+					<td ng-if="lineItem.category === ('CIP' || 'WARRANTY')">
 						<select
 							name="Line Item #{{$index + 1}}: Lot"
 							ng-if = "lineItem.category !== 'EXPENSE'",
@@ -180,7 +193,7 @@
 					</td>
 
 					<!-- Activities -->
-					<td ng-if="lineItem.category !== 'EXPENSE'">
+					<td ng-if="lineItem.category === ('CIP' || 'WARRANTY')">
 						<!-- Existing -->
 						<div ng-if="lineItem.category === 'CIP' &&
 						            lineItem.subHood != ''">
@@ -305,6 +318,21 @@
 		<p>Leave a general comment before submitting:</p>
 		<textarea rows="4" cols="80" ng-model="$ctrl.generalComment"></textarea>
 	</div>
+	
+	<div class="well">
+		{{$ctrl.isNew ? 'Add another?' : 'Review next invoice?'}}
+		<input
+			type="checkbox"
+			ng-model="addAnother">
+	</div>
+
+
+	<button
+		ng-if="$ctrl.canReview"
+		class="btn btn-primary btn-lg"
+		ng-click="$ctrl.deleteInvoice()">
+		Delete
+	</button>
 
 	<button
 		ng-if="$ctrl.canReview"
@@ -314,16 +342,9 @@
 	</button>
 
 	<button
-		ng-if="$ctrl.isNew || CurrentUser._invoiceQueue > 1"
 		class="btn btn-primary btn-lg"
-		ng-click="$ctrl.submit(true)">
-		Submit and add another
-	</button>
-
-	<button
-		class="btn btn-primary btn-lg"
-		ng-click="$ctrl.submit(false)">
-		Submit and go home
+		ng-click="$ctrl.submit(addAnother)">
+		Submit
 	</button>
 </div>
 

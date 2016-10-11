@@ -54,14 +54,14 @@ function buildRequest() {
     // strRequestXML = '';
     // inputXMLDoc = null;
 
-    // BillQuery
-    // billAddRequestObj = builder.create('QBXML', { version: '1.0' })
-    //           .instruction('qbxml', 'version="4.0"')
-    //           .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
-    //               .ele('BillQueryRq', { 'requestID': '3' })
-    //                   .ele('MaxReturned')
-    //                       .text('1');
-    // requestXML = inputXMLDoc.end({ 'pretty': false });
+    BillQuery
+    billAddRequestObj = builder.create('QBXML', { version: '1.0' })
+              .instruction('qbxml', 'version="4.0"')
+              .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
+                  .ele('BillQueryRq', { 'requestID': '3' })
+                      .ele('MaxReturned')
+                          .text('1');
+    requestXML = inputXMLDoc.end({ 'pretty': false });
     
 ///////
 
@@ -93,7 +93,9 @@ function buildRequest() {
 
     //var requestXML = builder.create(billAddRequestObj, {version: '1.0', encoding: 'UTF-8'}).end({ 'pretty': false });
 
-return ["<?xml version=\"1.0\"<?qbxml version=\"13.0\"?><QBXML></QBXML>"];
+    return [
+        "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n<?qbxml version=\"7.0\"?>\n<QBXML>\n  <QBXMLMsgsRq>\n    <EmployeeQueryRq>\n      <OwnerID>0</OwnerID>\n      <ActiveStatus>All</ActiveStatus>\n    </EmployeeQueryRq>\n  </QBXMLMsgsRq>\n</QBXML>\n"
+    ];
 
     //return [requestXML];
 }
@@ -105,7 +107,7 @@ return ["<?xml version=\"1.0\"<?qbxml version=\"13.0\"?><QBXML></QBXML>"];
  * // returns 2.0
  * parseForVersion("2.0.1.30");
  * @param input {String} A version number
- * @returns {String} First two version components (i.e. &lt;Major>.&lt;Minor>)
+ * @returns {String} First two version components (i.e. <Major>.<Minor>)
  * or the original input parameter if it does not match the regular expression
  */
 function parseForVersion(input) {

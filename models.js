@@ -72,7 +72,11 @@ var schemas = {
 		subHoodOptions: [String]
 	}),
 
-	bills: new Schema({
+	hoa: new Schema({
+		name: { type: String, required: true }
+	}),
+
+	bill: new Schema({
 		_bill: String, // Invoice ref
 	})
 }

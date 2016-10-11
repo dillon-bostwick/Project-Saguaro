@@ -7,6 +7,62 @@ angular.
         controller: function UserDashboardController(api, $window, $q) {
         	var self = this;
             window.ctrl = self; // For debugging
+            self.path = $window.location.hash
+
+            ////////////////////////////////////////////////////////////////////
+            //Constants:
+
+            self.FILTEROPTIONS = [
+                {
+                    desc: 'Vendor name',
+                    value: ''
+                },
+                {
+                    desc: 'Hood name',
+                    value: ''
+                },
+                {
+                    desc: 'Expense',
+                    value: ''
+                }
+            ]
+
+            self.SORTOPTIONS = [
+                {
+                    desc: 'Service date (oldest first)',
+                    value: ''
+                },
+                {
+                    desc: 'Service date (newest first)',
+                    value: ''
+                },
+                {
+                    desc: 'Received date (oldest first)',
+                    value: ''
+                },
+                {
+                    desc: 'Received date (newest first)',
+                    value: ''
+                },
+                {
+                    desc: 'Keyed date (oldest first)',
+                    value: ''
+                },
+                {
+                    desc: 'Keyed date (newest first)',
+                    value: ''
+                },
+                {
+                    desc: 'Amount (greatest first)',
+                    value: ''
+                },
+                {
+                    desc: 'Amount (least first)',
+                    value: ''
+                }
+            ]
+
+            ////////////////////////////////////////////////////////////////////
 
             // External requests:
             self.Vendors = api.Vendor.query();
@@ -19,10 +75,8 @@ angular.
             //Must be one of [QUEUE, TEAM, ARCHIVE] - QUEUE by default
             self.view = 'QUEUE';
             self.invList = []; //Gets initially filled by $q promise below
-
-            //Filter fields:
-            self.filterVendor = '';
-            self.sortBy = '';
+            self.filters = [];
+            self.sorter = self.SORTOPTIONS[0];
 
             /* Wait for the CurrentUser and Invoices to both load before
              * initiating the first queue view. When the page loads it always
@@ -56,15 +110,15 @@ angular.
             /* Given an invoice, return a single string that gives relevant info
              * and a summary of all line items
              */
+
+             //TODO: not putting too much effort into this because it will change later
             self.getDetailStr = function(invoice) {
                 // Get lists of ids excluding empty strings
                 var hoods =   _.pluck(invoice.lineItems, '_hood').filter(Boolean);
                 var expenses = _.pluck(invoice.lineItems, '_expense').filter(Boolean);
 
-                
-
                 // Dereference from ids to names
-                hoods = _.map(hoods, function(id) { return self.getElementById(id, 'shortHand', 'Hoods'); });
+                hoods = _.map(hoods, function(id) {return self.getElementById(id, 'shortHand', 'Hoods'); });
                 expenses = _.map(expenses, function(id) { return self.getNameById(id, 'Expenses'); });
 
                 return  [
@@ -94,13 +148,20 @@ angular.
              *  Consider moving to core!
              */
             self.getNameById = function(id, collection) {
-                var document = _.findWhere(self[collection], { _id: id })
+                var doc = _.findWhere(self[collection], { _id: id })
 
-                return (document.name || [document.firstName, document.lastName].join(' '));
+                // If not found return null, otherwise return the name or
+                // '[FIRSTNAME] [LASTNAME]'
+                return doc
+                    ? doc.name
+                    || [doc.firstName, doc.lastName].join(' ')
+                    : null;
             }
 
             self.getElementById = function(id, element, collection) {
-                return _.findWhere(self[collection], { _id: id })[element];
+                var doc = _.findWhere(self[collection], { _id: id })[element];
+
+                return doc ? doc[element] : null;
             }
 
             ////////////////////////////////////////////////////////////////////

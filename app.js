@@ -41,7 +41,7 @@ db.once("open", function(callback) {
 passport.use(new dropboxStrategy({
     consumerKey: 'o2h3e5h6mytkwvg',
     consumerSecret: 'n59fazsvvrs7708',
-    callbackURL: 'http://saguaroqbtester.herokuapp.com/auth/dropbox/callback' //http://localhost:5000/auth/dropbox/callback' NOTE: Switch to  if testing on Heroku
+    callbackURL: 'http://localhost:5000/auth/dropbox/callback' // NOTE: Switch to  if testing on Heroku http://saguaroqbtester.herokuapp.com/auth/dropbox/callback
   },
   function(token, tokenSecret, profile, done) {
     // First possible error: user is not a member of the team
