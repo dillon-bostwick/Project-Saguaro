@@ -67,12 +67,14 @@ angular.
 
                 return currentUser;
             });
-            
 
             //Set pristine after the invoice loads, so that AIM doesn't
             //recognize the invoice load from api is a Form change
             if (self.canReview) {
+                console.log("msg");
                 self.Invoice.$promise.then(function(invoice) {
+                    console.log(self.Vendors);
+                    console.log("msg");
                     $scope.Form.$setPristine()
                 });
             }

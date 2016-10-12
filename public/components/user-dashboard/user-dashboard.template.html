@@ -36,31 +36,35 @@
 </div>
 
 <div class="well well-lg">
-	<label>Add a filter:</label>
-
-	<!-- Oct 11 -->
-
-
 	<label>Sort by:</label>
-	<select ng-model="$ctrl.sorter" ng-options='option.value as option.desc for option in $ctrl.SORTOPTIONS'>
+
+	<select 
+		ng-model="$ctrl.currentSorter"
+		ng-options='option.value 
+					as option.desc
+					for option
+					in $ctrl.SORTOPTIONS'>
+	</select>
 </div>
 
 <div class="well well-lg" ng-if="$ctrl.invList.length !== 0">
 	<table class="table table-hover">
 		<thead>
 			<tr>
-				<th>Received On</th>
-				<th>Created On</th>
+				<th>Received date</th>
+				<th>Keyed date</th>
+				<th>Service date</th>
 				<th>Vendor</th>
 				<th>Details</th>
 				<th>Total</th>
 			</tr>
 		</thead>
 		
-		<tbody ng-repeat="invoice in $ctrl.invList">
+		<tbody ng-repeat="invoice in $ctrl.invList | orderBy: $ctrl.currentSorter">
 			<tr ng-click="$ctrl.redirectInvoiceDetail(invoice._id)">
 				<td>{{invoice.actions[0].date | date}}</td> <!-- last is always received -->
 				<td>{{invoice.actions[invoice.actions.length - 1].date | date}}</td> <!-- 0 is always created -->
+				<td>{{invoice.serviceDate | date}}</td>
 				<td>{{$ctrl.getNameById(invoice._vendor, 'Vendors')}}</td>
 				<td>{{$ctrl.getDetailStr(invoice)}}</td>
 				<td>{{(invoice.amount | currency) || 'Not entered'}}</td>

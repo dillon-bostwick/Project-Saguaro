@@ -12,55 +12,40 @@ angular.
             ////////////////////////////////////////////////////////////////////
             //Constants:
 
-            self.FILTEROPTIONS = [
-                {
-                    desc: 'Vendor name',
-                    value: ''
-                },
-                {
-                    desc: 'Hood name',
-                    value: ''
-                },
-                {
-                    desc: 'Expense',
-                    value: ''
-                }
-            ]
-
             self.SORTOPTIONS = [
                 {
                     desc: 'Service date (oldest first)',
-                    value: ''
+                    value: 'serviceDate'
                 },
                 {
                     desc: 'Service date (newest first)',
-                    value: ''
+                    value: '-serviceDate'
                 },
                 {
                     desc: 'Received date (oldest first)',
-                    value: ''
+                    value: 'actions[actions.length - 1].date'
                 },
                 {
                     desc: 'Received date (newest first)',
-                    value: ''
+                    value: '-actions[actions.length - 1].date'
                 },
                 {
                     desc: 'Keyed date (oldest first)',
-                    value: ''
+                    value: 'actions[0].date'
                 },
                 {
                     desc: 'Keyed date (newest first)',
-                    value: ''
+                    value: '-actions[0].date'
                 },
                 {
                     desc: 'Amount (greatest first)',
-                    value: ''
+                    value: '-amount'
                 },
                 {
                     desc: 'Amount (least first)',
-                    value: ''
+                    value: 'amount'
                 }
-            ]
+            ];
 
             ////////////////////////////////////////////////////////////////////
 
@@ -75,8 +60,8 @@ angular.
             //Must be one of [QUEUE, TEAM, ARCHIVE] - QUEUE by default
             self.view = 'QUEUE';
             self.invList = []; //Gets initially filled by $q promise below
-            self.filters = [];
-            self.sorter = self.SORTOPTIONS[0];
+            self.currentFilters = [];
+            self.currentSorter = self.SORTOPTIONS[0].value;
 
             /* Wait for the CurrentUser and Invoices to both load before
              * initiating the first queue view. When the page loads it always

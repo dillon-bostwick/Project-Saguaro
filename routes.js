@@ -60,9 +60,8 @@ _.map(models, function(model) { return model; }).forEach(function(model) {
      */
     router.post('/api/' + model.modelName + '/:wildcard', function(req, res) {
         model(req.body).save(function(error) {
-            console.log(error);
             if (error) {
-                console.log('Error:\n' + JSON.stringify(error));
+                console.log(error);
                 res.send(error);
             } else {
                 res.send({ success: true })
