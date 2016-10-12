@@ -27,7 +27,8 @@
 	</table>
 </div>
 
-<form name="Form" bs-modifiable="{{$ctrl.canReview}}" novalidate>
+<!-- if bs-modfiable is true, form changes tracked with AIM -->
+<form name="Form" bs-modifiable="{{$ctrl.canReview && $ctrl.enableAim}}" novalidate>
 	<div class="well well-lg">
 		<h3>Details</h3>
 
@@ -43,6 +44,7 @@
 
 			<tbody>
 				<tr>
+					<!-- File uploader -->
 					<td>
 						<input
 							ng-if="$ctrl.canEdit" 
@@ -50,14 +52,32 @@
 							accept="image/*,application/pdf">
 					</td>
 
+					<!-- TODO: date picker -->
 					<td>
-						<input
-							type="date"
-							name="Service Date"
-							ng-if="$ctrl.canEdit"
-							ng-model="$ctrl.Invoice.serviceDate">
+						<p class="input-group">
+      						<input
+      							uib-datepicker-popup
+      							ng-if="$ctrl.canEdit"
+          						type="text"
+          						class="form-control"
+          						ng-model="$ctrl.Invoice.serviceDate"
+          						is-open="$ctrl.openDate"
+          						datepicker-options="$ctrl.datePickerOptions"
+          						close-text="Close"/>
+
+     					 	<span class="input-group-btn">
+        						<button
+        							type="button"
+        							class="btn btn-default"
+        							ng-click="$ctrl.openDate = true">
+
+        							<i class="glyphicon glyphicon-calendar"></i>
+        						</button>
+      						</span>
+    					</p>
 					</td>
 
+					<!-- Vendor picker -->
 					<td>
 						<select
 							ng-if="$ctrl.canEdit"
@@ -70,6 +90,7 @@
 						</select>
 					</td>
 
+					<!-- invoice id -->
 					<td>
 						<input
 							ng-if="$ctrl.isNew"
@@ -105,46 +126,40 @@
 					<td><b>{{$index + 1}}</b></td>
 
 					<!-- Switch the line item type if can edit -->
-					<td ng-if="$ctrl.canEdit" class="btn-group">
-						<label class="btn btn-primary active">
-							<input
-								name="Line Item #{{$index + 1}}: Type"
-								type="radio"
-								ng-model="lineItem.category"
-								value="CIP"
-								ng-change="$ctrl.loadNewLineItem(lineItem)">
-							CIP
-						</label>
+					<td ng-if="$ctrl.canEdit" >
+						<div class="btn-group">
+							<label class="btn btn-primary"
+									name="Line Item #{{$index + 1}}: Type"
+									uib-btn-radio="'CIP'"
+									ng-model="lineItem.category"
+									ng-change="$ctrl.loadNewLineItem(lineItem)">
+								CIP
+							</label>
 
-						<label class="btn btn-primary active">
-							<input
-								name="Line Item #{{$index + 1}}: Type"
-								type="radio"
-								ng-model="lineItem.category"
-								value="EXPENSE"
-								ng-change="$ctrl.loadNewLineItem(lineItem)">
-							Expense 
-						</label>
+							<label class="btn btn-primary"
+									name="Line Item #{{$index + 1}}: Type"
+									uib-btn-radio="'EXPENSE'"
+									ng-model="lineItem.category"
+									ng-change="$ctrl.loadNewLineItem(lineItem)">
+								Expense 
+							</label>
 
-						<label class="btn btn-primary active">
-							<input
-								name="Line Item #{{$index + 1}}: Type"
-								type="radio"
-								ng-model="lineItem.category"
-								value="WARRANTY"
-								ng-change="$ctrl.loadNewLineItem(lineItem)">
-							Warranty
-						</label>
+							<label class="btn btn-primary"
+									name="Line Item #{{$index + 1}}: Type"
+									uib-btn-radio="'WARRANTY'"
+									ng-model="lineItem.category"
+									ng-change="$ctrl.loadNewLineItem(lineItem)">
+								Warranty
+							</label>
 
-						<label class="btn btn-primary active">
-							<input
-								name="Line Item #{{$index + 1}}: Type"
-								type="radio"
-								ng-model="lineItem.category"
-								value="HOA"
-								ng-change="$ctrl.loadNewLineItem(lineItem)">
-							HOA
-						</label>
+							<label class="btn btn-primary"
+									name="Line Item #{{$index + 1}}: Type"
+									uib-btn-radio="'HOA'"
+									ng-model="lineItem.category"
+									ng-change="$ctrl.loadNewLineItem(lineItem)">
+								HOA
+							</label>
+						</div>
 					</td>
 
 					<!-- Expense -->
@@ -168,7 +183,7 @@
 					</td>
 
 					<!-- Hood -->
-					<td ng-if="lineItem.category === ('CIP' || 'WARRANTY')">
+					<td ng-if="lineItem.category === 'CIP' || lineItem.category === 'WARRANTY'">
 						<select
 							name="Line Item #{{$index + 1}}: Hood"
 							ng-model = "lineItem._hood"
@@ -182,7 +197,7 @@
 
 
 					<!-- Lot -->
-					<td ng-if="lineItem.category === ('CIP' || 'WARRANTY')">
+					<td ng-if="lineItem.category === 'CIP' || lineItem.category === 'WARRANTY'">
 						<select
 							name="Line Item #{{$index + 1}}: Lot"
 							ng-if = "lineItem.category !== 'EXPENSE'",
@@ -192,8 +207,11 @@
 						</select>
 					</td>
 
+					<!-- filler in case warranty -->
+					<td ng-if="lineItem.category === 'WARRANTY'"></td>
+
 					<!-- Activities -->
-					<td ng-if="lineItem.category === ('CIP' || 'WARRANTY')">
+					<td ng-if="lineItem.category === 'CIP'">
 						<!-- Existing -->
 						<div ng-if="lineItem.category === 'CIP' &&
 						            lineItem.subHood != ''">

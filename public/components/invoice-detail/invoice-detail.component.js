@@ -1,7 +1,7 @@
 'use strict';
 
 angular.
-    module('invoiceDetail', ['ngInputModified']).
+    module('invoiceDetail', ['ngInputModified', 'ui.bootstrap']).
     component('invoiceDetail', {
         templateUrl: 'components/invoice-detail/invoice-detail.template.html',
         controller: function InvoiceDetailController(api, $routeParams, $window, $filter, $scope) {
@@ -25,6 +25,7 @@ angular.
 
             // Whether the invoice is new:
             self.isNew = $routeParams.id === 'new';
+            self.enableAim = false;
 
             // Either Invoice is retrived from DB or it gets a starter template:
             self.Invoice = self.isNew
@@ -59,7 +60,6 @@ angular.
                 self.canReview = _.contains(currentUser._invoiceQueue, $routeParams.id);
                 // Whether it can be edited at all:
                 self.canEdit = self.isNew || self.canReview;
-
                 // See self.Invoice declaration for this:
                 if (self.isNew) {
                     self.Invoice.actions[0]._user = currentUser._id;
@@ -71,13 +71,21 @@ angular.
             //Set pristine after the invoice loads, so that AIM doesn't
             //recognize the invoice load from api is a Form change
             if (self.canReview) {
-                console.log("msg");
                 self.Invoice.$promise.then(function(invoice) {
-                    console.log(self.Vendors);
-                    console.log("msg");
+                    self.enableAim = true;
                     $scope.Form.$setPristine()
                 });
             }
+
+            self.datePickerOptions = {
+                disabled: [],
+                maxDate: new Date(3000, 1, 1),
+                minDate: new Date(2000, 1, 1),
+                startingDay: 1
+            };
+            
+            self.foo = new Date();
+            self.openDate = false;
 
             ////////////////////////////////////////////////////////////////////
             //CTRL METHODS
@@ -330,6 +338,12 @@ angular.
                         $window.location.href = '/#!/dashboard'
                     }
                 });
+
+
+
+
+
+
             }
         } // end controller
     }); // end component

@@ -26,7 +26,7 @@
       </ul>
 
       <ul class="nav navbar-nav navbar-right">
-        <li><a>Logged in as: {{$ctrl.CurrentUser.firstName}}</a></li>
+        <li><a>Logged in as: {{$ctrl.CurrentUser.firstName || 'NOBODY!'}}</a></li>
         <li><a>Account type: {{$ctrl.CurrentUser.category}}</a></li>
         <li><a href="/login">Logout</a></li>
       </ul>

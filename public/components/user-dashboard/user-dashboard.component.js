@@ -120,7 +120,6 @@ angular.
             /* Given an invoice _id, redirect to the page for that invoice
              */
             self.redirectInvoiceDetail = function(id) {
-                console.log(id);
                 $window.location.href = '/#!/invoices/' + id;
             }
 

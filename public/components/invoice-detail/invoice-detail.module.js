@@ -1,3 +1,3 @@
 'use strict';
 
-angular.module('invoiceDetail', ['ngInputModified']);
+angular.module('invoiceDetail', ['ngInputModified', 'ui.bootstrap']);
