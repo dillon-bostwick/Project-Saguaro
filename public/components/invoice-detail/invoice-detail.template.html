@@ -58,6 +58,7 @@
       						<input
       							uib-datepicker-popup
       							ng-if="$ctrl.canEdit"
+      							name="Service Date"
           						type="text"
           						class="form-control"
           						ng-model="$ctrl.Invoice.serviceDate"
@@ -244,8 +245,9 @@
 							</select>
 
 								<button
+									class="btn btn-danger"
 									ng-click="lineItem._activities.splice($index, 1);">
-									X
+									&times;
 								</button>
 							</div>
 						</div>
@@ -267,8 +269,9 @@
 					<!-- Delete button -->
 					<td>
 						<button
+							class="btn btn-danger"
 							ng-click="$ctrl.Invoice.lineItems.splice($index, 1);">
-							X
+							&times;
 						</button>
 					</td>
 				</tr>
@@ -276,7 +279,10 @@
 				<!-- Adding a new line item -->
 				<tr ng-if="$ctrl.canEdit">
 					<td colspan="6">
-						<button class="btn btn-primary btn-block" ng-click="$ctrl.addLineItem()">Add line item</button>
+						<button class="btn btn-block btn-secondary"
+								ng-click="$ctrl.addLineItem()">
+							Add Line Item
+						</button>
 					</td>
 				</tr>
 
@@ -338,32 +344,54 @@
 	</div>
 	
 	<div class="well">
-		{{$ctrl.isNew ? 'Add another?' : 'Review next invoice?'}}
-		<input
-			type="checkbox"
-			ng-model="addAnother">
+		<div ng-if="$ctrl.isNew || ($ctrl.canReview && $ctrl.CurrentUser._invoiceQueue.length > 1)">
+			{{$ctrl.isNew ? 'Add another?' : 'Review next invoice?'}}
+
+			<input
+				type="checkbox"
+				ng-model="$ctrl.addAnother">
+		</div>
+
+		<p ng-if="!($ctrl.isNew || ($ctrl.canReview && $ctrl.CurrentUser._invoiceQueue.length > 1))">
+			<b>This is the last invoice left in your queue!</b>
+		</p>
 	</div>
 
-
 	<button
+		uib-btn-checkbox
 		ng-if="$ctrl.canReview"
-		class="btn btn-primary btn-lg"
-		ng-click="$ctrl.deleteInvoice()">
+		type="button"
+		class="btn btn-primary btn-lg btn-danger"
+		ng-model="$ctrl.hideDeleteConfirm">
 		Delete
 	</button>
 
 	<button
 		ng-if="$ctrl.canReview"
-		class="btn btn-primary btn-lg"
+		class="btn btn-primary btn-lg bt-info"
 		ng-click="$ctrl.hold()">
 		Hold
 	</button>
 
 	<button
-		class="btn btn-primary btn-lg"
-		ng-click="$ctrl.submit(addAnother)">
-		Submit
+		class="btn btn-primary btn-lg btn-success"
+		ng-click="$ctrl.submit()">
+		{{$ctrl.isNew ? 'Submit' : 'Approve'}}
 	</button>
+
+	<div uib-collapse="$ctrl.hideDeleteConfirm" class="well well-lg">
+		<button
+			class="btn btn-primary btn-lg btn-danger"
+			ng-click="$ctrl.deleteInvoice()">
+			Delete forever
+		</button>
+
+		<button
+			class="btn btn-primary btn-lg btn-danger"
+			ng-click="alert(TODO)">
+			Send to archives
+		</button>
+	</div>
 </div>
 
 <a class="btn btn-primary btn-lg" href='/#!/dashboard'>

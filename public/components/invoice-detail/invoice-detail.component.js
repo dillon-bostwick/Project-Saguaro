@@ -23,9 +23,24 @@ angular.
             self.changeComments = [];
             self.generalComment = '';
 
+            // Bootstrap UI bools
+            self.addAnother = false; //Checkbox at bottom of form
+            self.hideDeleteConfirm = true; //collapser for delete confirm
+
             // Whether the invoice is new:
             self.isNew = $routeParams.id === 'new';
-            self.enableAim = false;
+
+            //Third party configs:
+
+            self.enableAim = false; //Starts disabed - wait until the invoice promise
+            self.openDate = false;  //Opens datepicker on icon click
+
+            self.datePickerOptions = {
+                disabled: [],
+                maxDate: new Date(3000, 1, 1),
+                minDate: new Date(2000, 1, 1),
+                startingDay: 1
+            };
 
             // Either Invoice is retrived from DB or it gets a starter template:
             self.Invoice = self.isNew
@@ -42,7 +57,7 @@ angular.
                         _user: undefined // Wait for CurrentUser promise resolution to fill
                     }]
                 })
-                : api.Invoice.get({ id: $routeParams.id })
+                : api.Invoice.get({ id: $routeParams.id });
 
             ////////////////////////////////////////////////////////////////////
             //PROMISES
@@ -70,25 +85,18 @@ angular.
 
             //Set pristine after the invoice loads, so that AIM doesn't
             //recognize the invoice load from api is a Form change
-            if (self.canReview) {
+            if (!self.isNew) { // i.e., the invoice must have been an api get
                 self.Invoice.$promise.then(function(invoice) {
-                    self.enableAim = true;
-                    $scope.Form.$setPristine()
+                    //Datepicker needs to initially get a Date object
+                    invoice.serviceDate = new Date(invoice.serviceDate);
+
+                    self.enableAim = true; //Turn on AIM
+                    $scope.Form.$setPristine() //Reset changes tracked
                 });
             }
 
-            self.datePickerOptions = {
-                disabled: [],
-                maxDate: new Date(3000, 1, 1),
-                minDate: new Date(2000, 1, 1),
-                startingDay: 1
-            };
-            
-            self.foo = new Date();
-            self.openDate = false;
-
             ////////////////////////////////////////////////////////////////////
-            //CTRL METHODS
+            //FORM CTRL METHODS
 
             //lineItem logic:
 
@@ -138,6 +146,7 @@ angular.
 
                 switch(lineItem.subHood) {
                     case '':
+                        console.log("msg");
                         activityOptions = [];
                     case 'Dev':
                         activityOptions = self.Activities.filter(function(activity) {
@@ -208,6 +217,9 @@ angular.
                 }, 0);
             }
 
+            ////////////////////////////////////////////////////////////////////
+            // BOTTOM OF FORM BUTTONS
+
             /* When a new invoice is submitted, many actions occur:
              * Gets pushed to the queues of pipeline receivers
              * If new, run submitNewInvoice which pushes it to Invoices
@@ -220,13 +232,13 @@ angular.
              *   Boolean another: if false, returns to dashboard, otherwise,
              *   adds new invoices or loads next invoice in user queue
              */
-            self.submit = function(another) {
+            self.submit = function() {
                 var _receivers = ['64374526']; //TODO: this needs logic
 
                 pushInvoiceToReceivers(_receivers, self.Invoice._id, self.Users);
 
-                self.isNew ? submitNewInvoice(self, another)
-                           : submitExistingInvoice(self, another, false)
+                self.isNew ? submitNewInvoice(self, self.addAnother)
+                           : submitExistingInvoice(self, self.addAnother, false)
             }
 
             self.hold = function () {
@@ -235,6 +247,8 @@ angular.
 
             self.deleteInvoice = function() {
                 self.Invoice.$delete();
+
+                //TODO: Delete from personal queue as well
 
                 $window.location.href = '/#!/dashboard';
             }
@@ -338,12 +352,13 @@ angular.
                         $window.location.href = '/#!/dashboard'
                     }
                 });
-
-
-
-
-
-
             }
+
+
+
+
+
+
+
         } // end controller
     }); // end component

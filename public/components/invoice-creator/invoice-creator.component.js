@@ -21,7 +21,6 @@ angular.
             self.total = 0;
             self.comment = '';
 
-
             /* Create a new template lineItem object for cip, warranty, or expense.
              * Takes the lineItem by reference to be templated
              */        

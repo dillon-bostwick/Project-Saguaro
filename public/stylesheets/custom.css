@@ -1,5 +1,19 @@
+
+/* AIM  */
 input.ng-valid.aim-modified {
     background-color: yellow;
     background: yellow;
     color: #000000;
 }
+
+/* Datepicker */
+.full button span {
+    background-color: limegreen;
+    border-radius: 32px;
+    color: black;
+  }
+  .partially button span {
+    background-color: orange;
+    border-radius: 32px;
+    color: black;
+  }
