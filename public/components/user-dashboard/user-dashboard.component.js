@@ -4,9 +4,9 @@ angular.
     module('userDashboard').
     component('userDashboard', {
         templateUrl: 'components/user-dashboard/user-dashboard.template.html',
-        controller: function UserDashboardController(api, $window, $q) {
+        controller: function UserDashboardController(api, $window, $q, $location) {
         	var self = this;
-            window.ctrl = self; // For debugging
+            window.ctrl = self;
             self.path = $window.location.hash
 
             ////////////////////////////////////////////////////////////////////
@@ -63,6 +63,9 @@ angular.
             self.currentFilters = [];
             self.currentSorter = self.SORTOPTIONS[0].value;
 
+            //Alerter based on query string
+            self.alertMessage = $location.search().alert || '';
+
             /* Wait for the CurrentUser and Invoices to both load before
              * initiating the first queue view. When the page loads it always
              * starts as getUserQueue (i.e. self.view == 'QUEUE')
@@ -107,11 +110,11 @@ angular.
                 expenses = _.map(expenses, function(id) { return self.getNameById(id, 'Expenses'); });
 
                 return  [
-                            _.uniq(expenses).join(', '),
-                            _.uniq(hoods).join(', ')
+                            _.uniq(expenses).join(' | '),
+                            _.uniq(hoods).join(' | ')
                         ]
                         .filter(Boolean)
-                        .join(' / ')
+                        .join(' | ')
                         || 'N/A';
             }
 
@@ -144,8 +147,8 @@ angular.
 
             self.getElementById = function(id, element, collection) {
                 var doc = _.findWhere(self[collection], { _id: id })[element];
-
-                return doc ? doc[element] : null;
+                
+                return doc ? doc : null;
             }
 
             ////////////////////////////////////////////////////////////////////

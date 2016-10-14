@@ -6,14 +6,25 @@ angular.
         templateUrl: 'components/invoice-detail/invoice-detail.template.html',
         controller: function InvoiceDetailController(api, $routeParams, $window, $filter, $scope) {
             var self = this;
-            window.ctrl = self; // For debugging
+            window.ctrl = self;
             self.path = $window.location.hash
+
+            ////////////////////////////////////////////////////////////////////
+            //Constants:
+
+            self.PIPELINE = {
+                DATAENTRY: ['64374526'],
+                QUALITYCONTROL: [],
+                BUILDER: [],
+                EXEC: []
+            };
+
+            ////////////////////////////////////////////////////////////////////
 
             // External requests:
             self.Vendors = api.Vendor.query();
             self.Hoods = api.Hood.query();
             self.Expenses = api.Expense.query();
-            self.Hoas = api.Hoa.query();
             self.Activities = api.Activity.query();
             self.Users = api.User.query();
             self.CurrentUser = api.CurrentUser.get()
@@ -23,30 +34,29 @@ angular.
             self.changeComments = [];
             self.generalComment = '';
 
-            // Bootstrap UI bools
+            // Bootstrap UI & third-party configs:
             self.addAnother = false; //Checkbox at bottom of form
             self.hideDeleteConfirm = true; //collapser for delete confirm
+            self.enableAim = false; //Starts disabed - wait until the invoice promise
+            self.openDate = false;  //Opens datepicker on icon click
+            self.showAlert = true;
 
             // Whether the invoice is new:
             self.isNew = $routeParams.id === 'new';
 
-            //Third party configs:
-
-            self.enableAim = false; //Starts disabed - wait until the invoice promise
-            self.openDate = false;  //Opens datepicker on icon click
-
             self.datePickerOptions = {
                 disabled: [],
-                maxDate: new Date(3000, 1, 1),
-                minDate: new Date(2000, 1, 1),
+                maxDate: new Date,
+                minDate: new Date(2015, 1, 1),
                 startingDay: 1
             };
 
             // Either Invoice is retrived from DB or it gets a starter template:
             self.Invoice = self.isNew
                 ? new api.Invoice({
+                    _id: generateMongoObjectId(),
                     serviceDate: new Date,
-                    _id: '',
+                    invNum: '',
                     _vendor: '',
                     lineItems: [],
                     comment: '',
@@ -104,15 +114,21 @@ angular.
              * Note: it is a angular getter/setter, hence must check args
              */
             self.addLineItem = function() {
+                //Push the line item itself
                 self.Invoice.lineItems.push({
                     category: 'CIP', //default behavior is CIP
                     _hood: '',
                     subHood: '',
                     _activities: [],
                     _expense: '',
-                    amount: undefined
+                    amount: undefined,
+                    desc: ''
                 });
             }
+
+            //Instead of predeclaring (this gets ran on pageload but waits
+            //for the addLineItem definition)
+            if (self.isNew) { self.addLineItem(); }
 
             /* Given a lineItem, pushes an empty object literal to
              * the back of the _activities array of the lineItem
@@ -146,8 +162,8 @@ angular.
 
                 switch(lineItem.subHood) {
                     case '':
-                        console.log("msg");
                         activityOptions = [];
+                        break;
                     case 'Dev':
                         activityOptions = self.Activities.filter(function(activity) {
                             return   0 <= activity.code && 
@@ -349,16 +365,22 @@ angular.
                     if (another) {
                         //Stub - href next queue in user queue
                     } else {
-                        $window.location.href = '/#!/dashboard'
+                        console.log(self.Invoice.invNum);
+                        $window.location.href = '/#!/dashboard?' + $.param({ alert: 'Successfully updated invoice' });
                     }
                 });
             }
 
-
-
-
-
-
+            /* Generate a new MongoDB ObjectId
+             * thanks to solenoid at:
+             * https://gist.github.com/solenoid/1372386
+             */
+            function generateMongoObjectId() {
+                var timestamp = (new Date().getTime() / 1000 | 0).toString(16);
+                return timestamp + 'xxxxxxxxxxxxxxxx'.replace(/[x]/g, function() {
+                    return (Math.random() * 16 | 0).toString(16);
+                }).toLowerCase();
+            };
 
         } // end controller
     }); // end component

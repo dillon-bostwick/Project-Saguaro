@@ -1,3 +1,11 @@
+<!-- Alert bar -->
+<div uib-alert
+     ng-if="$ctrl.alertMessage"
+     class="alert-success"
+     close="$ctrl.alertMessage = ''1">
+    {{$ctrl.alertMessage}}
+</div>
+
 <!-- Navbar -->
 <nav class="navbar navbar-default">
   <div class="container-fluid">
@@ -23,6 +31,12 @@
           </a>
         </li>
 
+        <li  ng-class="$ctrl.path === '#!/settings' ? 'active' : ''">
+          <a href="#!/settings">
+            Settings
+          </a>
+        </li>
+
       </ul>
 
       <ul class="nav navbar-nav navbar-right">
@@ -33,5 +47,3 @@
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>
-
-{{$scope}}

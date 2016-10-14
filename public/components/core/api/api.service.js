@@ -11,8 +11,7 @@ angular.
             'Expense',
             'Hood',
             'Bills',
-            'CurrentUser',
-            'Hoa'
+            'CurrentUser'
         ]
 
         //returns an object literal with full $resource for each collection

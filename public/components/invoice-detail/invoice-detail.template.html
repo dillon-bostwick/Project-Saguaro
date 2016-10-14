@@ -18,7 +18,7 @@
 		</thead>
 		<tbody>
 			<tr ng-repeat="action in $ctrl.Invoice.actions">
-				<td>{{action.date | date}}</td>
+				<td>{{action.date | date : 'MMM d, y h:mm a'}}</td>
 				<td>{{action.desc}}</td>
 				<td>{{$ctrl.getNameById(action._user, 'Users')}}</td>
 				<td>{{action.comment || 'N/A'}}</td>
@@ -56,7 +56,7 @@
 					<td>
 						<p class="input-group">
       						<input
-      							uib-datepicker-popup
+      							uib-datepicker-popup="MM/dd/yyyy"
       							ng-if="$ctrl.canEdit"
       							name="Service Date"
           						type="text"
@@ -79,6 +79,7 @@
 					</td>
 
 					<!-- Vendor picker -->
+					<!-- TODO: Doesn't filter based of active - always show all -->
 					<td>
 						<select
 							ng-if="$ctrl.canEdit"
@@ -94,11 +95,10 @@
 					<!-- invoice id -->
 					<td>
 						<input
-							ng-if="$ctrl.isNew"
+							ng-if="$ctrl.canEdit"
 							name="Invoice #"
 							type="text"
-							ng-model="$ctrl.Invoice._id"/>
-						<p ngif="!$ctrl.isNew">{{$ctrl.Invoice._id}}</p>
+							ng-model="$ctrl.Invoice.invNum"/>
 					</td>
 				</tr>
 			</tbody>
@@ -118,6 +118,7 @@
 					<th>Lot</th>
 					<th>Activities</th>
 					<th>Amount</th>
+					<th>Description</th>
 				</tr>
 			</thead>
 
@@ -152,14 +153,6 @@
 									ng-change="$ctrl.loadNewLineItem(lineItem)">
 								Warranty
 							</label>
-
-							<label class="btn btn-primary"
-									name="Line Item #{{$index + 1}}: Type"
-									uib-btn-radio="'HOA'"
-									ng-model="lineItem.category"
-									ng-change="$ctrl.loadNewLineItem(lineItem)">
-								HOA
-							</label>
 						</div>
 					</td>
 
@@ -173,35 +166,24 @@
 						></select>
 					</td>
 
-					<!-- HOA -->
-					<td ng-if="lineItem.category === 'HOA'" colspan="3">
-						<label>HOA:</label>
-						<select
-							name="Line Item #{{$index + 1}}: HOA"
-							ng-model="lineItem._expense"
-							ng-options="hoa._id as hoa.name for hoa in $ctrl.Hoas"
-						></select>
-					</td>
-
 					<!-- Hood -->
-					<td ng-if="lineItem.category === 'CIP' || lineItem.category === 'WARRANTY'">
+					<td ng-if="lineItem.category !== 'EXPENSE'">
 						<select
 							name="Line Item #{{$index + 1}}: Hood"
 							ng-model = "lineItem._hood"
 							ng-options = "hood._id
 								as hood.name
 								for hood
-								in $ctrl.Hoods"
-							ng-change = "lineItem.subHood = '';">
+								in $ctrl.Hoods">
 						</select>
 					</td>
 
 
 					<!-- Lot -->
-					<td ng-if="lineItem.category === 'CIP' || lineItem.category === 'WARRANTY'">
+					<td ng-if="lineItem.category !== 'EXPENSE'">
 						<select
 							name="Line Item #{{$index + 1}}: Lot"
-							ng-if = "lineItem.category !== 'EXPENSE'",
+							ng-if = "lineItem.category !== 'EXPENSE' && lineItem._hood !== ''",
 							ng-model = "lineItem.subHood",
 							ng-options = "subHoodOption for subHoodOption in $ctrl.getSubHoodOptions(lineItem)",
 							ng-change = "lineItem._activities = [];">
@@ -215,9 +197,11 @@
 					<td ng-if="lineItem.category === 'CIP'">
 						<!-- Existing -->
 						<div ng-if="lineItem.category === 'CIP' &&
-						            lineItem.subHood != ''">
-							<button ng-click="$ctrl.addActivity(lineItem)">
-								Add
+						            lineItem.subHood !== '' && lineItem.subHood != null">
+							<button 
+								class="btn btn-secondary btn-sm"
+								ng-click="$ctrl.addActivity(lineItem)">
+								Add Activity
 							</button>
 
 							<!-- Existing activities -->
@@ -226,7 +210,7 @@
 
 								<!-- code-->
 								<select 
-									name="Line Item #{{$index + 1}}: Activity"
+									name="Line Item #{{$parent.$index + 1}}: Activity #{{$index + 1}}"
 									ng-model="lineItem._activities[$index]"
 									ng-options="option._id 
 										as option.code 
@@ -236,7 +220,7 @@
 
 								<!-- desc -->					
 								<select
-									name="Line Item #{{$index + 1}}: Activity"
+									name="Line Item #{{$parent.$index + 1}}: Activity #{{$index + 1}}"
 									ng-model="lineItem._activities[$index]"
 									ng-options="option._id
 										as option.desc
@@ -245,7 +229,7 @@
 							</select>
 
 								<button
-									class="btn btn-danger"
+									class="btn btn-danger btn-sm"
 									ng-click="lineItem._activities.splice($index, 1);">
 									&times;
 								</button>
@@ -266,10 +250,18 @@
 						</button>
 					</td>
 
+					<td>
+						<input
+							name="Line Item #{{$index + 1}}: Description"
+							type="text"
+							ng-model="lineItem.desc"/>
+					</td>
+
 					<!-- Delete button -->
 					<td>
 						<button
-							class="btn btn-danger"
+							class="btn btn-danger btn-sm"
+							ng-disabled="$ctrl.Invoice.lineItems.length === 1"
 							ng-click="$ctrl.Invoice.lineItems.splice($index, 1);">
 							&times;
 						</button>
@@ -278,7 +270,7 @@
 
 				<!-- Adding a new line item -->
 				<tr ng-if="$ctrl.canEdit">
-					<td colspan="6">
+					<td colspan="8">
 						<button class="btn btn-block btn-secondary"
 								ng-click="$ctrl.addLineItem()">
 							Add Line Item

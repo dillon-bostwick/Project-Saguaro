@@ -5,31 +5,24 @@
 <div class="well well-lg">
 
 	<div class="btn-group">
-		<label class="btn btn-primary active">
-			<input
-				type="radio"
-				ng-model="$ctrl.view"
-				value="QUEUE",
-				ng-change="$ctrl.updateInvList()"
-				checked>
+		<label class="btn btn-primary"
+			   ng-model="$ctrl.view"
+			   uib-btn-radio="'QUEUE'"
+			   ng-change="$ctrl.updateInvList()">
 			My Queue
 		</label>
 
-		<label class="btn btn-primary active">
-			<input
-				type="radio"
-				ng-model="$ctrl.view"
-				value="TEAM",
-				ng-change="$ctrl.updateInvList()">
+		<label class="btn btn-primary"
+			   ng-model="$ctrl.view"
+			   uib-btn-radio="'TEAM'",
+			   ng-change="$ctrl.updateInvList()">
 			Team View
 		</label>
 
-		<label class="btn btn-primary active">
-			<input
-				type="radio"
-				ng-model="$ctrl.view"
-				value="ARCHIVE",
-				ng-change="$ctrl.updateInvList()">
+		<label class="btn btn-primary"
+			   ng-model="$ctrl.view"
+			   uib-btn-radio="'ARCHIVE'",
+			   ng-change="$ctrl.updateInvList()">
 			Archives
 		</label>
 	</div>
@@ -62,10 +55,10 @@
 		
 		<tbody ng-repeat="invoice in $ctrl.invList | orderBy: $ctrl.currentSorter">
 			<tr ng-click="$ctrl.redirectInvoiceDetail(invoice._id)">
-				<td>{{invoice.actions[0].date | date}}</td> <!-- last is always received -->
-				<td>{{invoice.actions[invoice.actions.length - 1].date | date}}</td> <!-- 0 is always created -->
+				<td>{{invoice.actions[0].date | date : 'MMM d, y h:mm a'}}</td> <!-- last is always received -->
+				<td>{{invoice.actions[invoice.actions.length - 1].date | date : 'MMM d, y h:mm a'}}</td> <!-- 0 is always created -->
 				<td>{{invoice.serviceDate | date}}</td>
-				<td>{{$ctrl.getNameById(invoice._vendor, 'Vendors')}}</td>
+				<td>{{$ctrl.getNameById(invoice._vendor, 'Vendors') || 'N/A'}}</td>
 				<td>{{$ctrl.getDetailStr(invoice)}}</td>
 				<td>{{(invoice.amount | currency) || 'Not entered'}}</td>
 			</tr>
@@ -73,5 +66,5 @@
 	</table>
 </div>
 
-<h3 ng-if="$ctrl.invList.length === 0">Queue is empty!</h3>
+<h3 ng-if="$ctrl.invList.length === 0">Your queue is empty!</h3>
 

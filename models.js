@@ -24,9 +24,10 @@ var LineItemCategories = ['CIP', 'EXPENSE', 'WARRANTY', 'HOA'];
 
 var schemas = {
 	invoice: new Schema({
+		_id: String,
 		serviceDate: Date,
 		_vendor: String,
-		_id: String,
+		invNum: String,
 		amount: Money,
 		lineItems: [{
 			category: {type: String, enum: LineItemCategories},
@@ -34,7 +35,8 @@ var schemas = {
 			subHood: String, // if CIP or WARRANTY: can vary: null (i.e. unknown), hood, dev, or just a number. If EXPENSE: must be []]
 			_activities: [reference('activity')], // if CIP starts as [] and gets filled. If EXPENSE or WARRANTY: must be []]
 			_expense: reference('expense'), // if CIP or WARRANTY: must be ''.
-			amount: Money //required
+			amount: Money, //required
+			desc: String
 		}],
 		actions: [{
 			desc: String,
@@ -46,7 +48,8 @@ var schemas = {
 	}),
 
 	vendor: new Schema({
-		name: { type: String, required: true }
+		name: { type: String, required: true },
+		active: Boolean
 	}),
 
 	user: new Schema({
@@ -71,11 +74,7 @@ var schemas = {
 		shortHand: { type: String, required: true },
 		subHoodOptions: [String]
 	}),
-
-	hoa: new Schema({
-		name: { type: String, required: true }
-	}),
-
+	
 	bill: new Schema({
 		_bill: String, // Invoice ref
 	})

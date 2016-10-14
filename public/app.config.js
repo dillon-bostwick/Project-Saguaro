@@ -11,6 +11,9 @@ angular.
         .when('/dashboard', {
           template: '<user-dashboard></user-dashboard>'
         })
+        .when('/settings', {
+          template: '<settings></settings>'
+        })
         .when('/invoices/:id', {
           template: '<invoice-detail></invoice-detail>'
         })
