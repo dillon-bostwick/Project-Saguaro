@@ -195,7 +195,6 @@ angular.
                 // });
 
                 // console.log(currentIndex, activityOptions.length);
-
                 return activityOptions;
             }
 

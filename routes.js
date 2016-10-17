@@ -1,5 +1,6 @@
 /* TODO FINAL:
  * - reinsert ensureLoggedIn('/') as middleware (second argument) for get/post/put methods
+ * to ensure all backend validation
  */
 
 var express = require('express');
@@ -49,8 +50,9 @@ router.get('/api/currentuser', function(req, res) {
 
 ////////////////////////////////////////////////////////////////////////
 
-//RESTful endpoints manually created for each database collections:
-
+/* RESTful endpoints manually created for each database collections.
+ * Automated routing for each model in the models object
+ */
 _.map(models, function(model) { return model; }).forEach(function(model) {
 
     /* POST (CREATE)
@@ -142,16 +144,6 @@ _.map(models, function(model) { return model; }).forEach(function(model) {
 
 
 module.exports = router;
-
-
-
-
-
-
-
-
-
-
 
 
 

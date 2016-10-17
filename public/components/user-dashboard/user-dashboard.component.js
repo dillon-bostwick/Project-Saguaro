@@ -136,11 +136,9 @@ angular.
              */
             self.getNameById = function(id, collection) {
                 var doc = _.findWhere(self[collection], { _id: id })
-
-                // If not found return null, otherwise return the name or
-                // '[FIRSTNAME] [LASTNAME]'
+                
                 return doc
-                    ? doc.name
+                    ?  doc.name
                     || [doc.firstName, doc.lastName].join(' ')
                     : null;
             }
@@ -148,7 +146,7 @@ angular.
             self.getElementById = function(id, element, collection) {
                 var doc = _.findWhere(self[collection], { _id: id })[element];
                 
-                return doc ? doc : null;
+                return doc || null;
             }
 
             ////////////////////////////////////////////////////////////////////

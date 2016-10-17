@@ -1,4 +1,19 @@
-//npm modules
+/* Dillon Bostwick 2016
+ * 
+ * app.js establishes router with express.
+ * 
+ * If localhost, runs on port 5000. Note: Must swap the callbackURL for the OAuth
+ * passport strategy manually if hosting in a different environment because 
+ * it doesn't switch according to an environ variable.
+ *
+ * Serves:
+ * /api/... - RESTful connection to db
+ * /wsdl - SOAP connection to qbwc
+ * /#!/... - Angular app
+ * mongoDB connection on port 27017
+ */
+
+//imported modules
 var express = require('express');
 var bodyParser = require('body-parser');
 var http = require('http');
@@ -10,7 +25,7 @@ var expressSession = require('express-session');
 var _ = require('underscore');
 var dropboxStrategy = require('passport-dropbox').Strategy;
 
-//local imports
+//local modules
 var qbws   = require('./qbws');
 var router = require('./routes');
 var userModel = _.find(require('./models'), function(model) { return model.modelName === 'user'});
@@ -63,7 +78,6 @@ passport.use(new dropboxStrategy({
     }); 
 }));
 
-
 //Serialize user by 
 passport.serializeUser(function(user, cb) {
   cb(null, user);
@@ -112,14 +126,11 @@ module.exports = app;
  * if no match, returns null
  */
 function getUserIdByDropboxId(dropboxUid) {
-  var userModel = _.find(models, function(model) { return model.modelName === 'user'})
-
-  userModel.find({'dropboxUid': dropboxUid}, function(error, data) {
-    if (error) {
-      return null;
-    } else {
-      console.log("made it");
-      return data._id;
-    }
+  //find in models array
+  _.find(models, function(model) { return model.modelName === 'user'})
+  
+  //db find given result of previous find
+  .find({'dropboxUid': dropboxUid}, function(error, data) {
+    return error ? null : data._id
   });
 }

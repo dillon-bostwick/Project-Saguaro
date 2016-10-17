@@ -1,4 +1,6 @@
-/* Define all schema via Mongoose for MongoDB.
+/* Dillon Bostwick 2016
+ * 
+ * Define all schema via Mongoose for MongoDB.
  * All models are exported under schema.models.
  * For example, to access the Invoice model,
  * schema.models.invoice
