@@ -15,10 +15,17 @@ var qbws   = require('./qbws');
 var router = require('./routes');
 var userModel = _.find(require('./models'), function(model) { return model.modelName === 'user'});
 
+//CONSTANTS:
+
 var BRIGHTWATERDROPBOXTEAMID = 'dbtid:AADIihV4QHYt6wCTX1MN2VVwJmdBDiv7tc4';
 
+var CONSUMERKEY = 'o2h3e5h6mytkwvg';
+var CONSUMERSECRET = 'n59fazsvvrs7708';
+var LOCALHOSTCALLBACK = 'http://localhost:5000/auth/dropbox/callback';
+var HEROKUCALLBACK = 'http://saguaroqbtester.herokuapp.com/auth/dropbox/callback';
+
 ////////////////////////////////////
-//DATABSE SETUP/////////////////////
+//DATABASE SETUP////////////////////
 ////////////////////////////////////
 
 mongoose.Promise = global.Promise;
@@ -36,12 +43,12 @@ db.once("open", function(callback) {
 ////////////////////////////////////
 //OAUTH SETUP///////////////////////
 ////////////////////////////////////
-
+console.log("process.env.PORT === " + process.env.PORT);
 
 passport.use(new dropboxStrategy({
-    consumerKey: 'o2h3e5h6mytkwvg',
-    consumerSecret: 'n59fazsvvrs7708',
-    callbackURL: 'http://localhost:5000/auth/dropbox/callback' // NOTE: Switch to  if testing on Heroku http://saguaroqbtester.herokuapp.com/auth/dropbox/callback
+    consumerKey: CONSUMERKEY,
+    consumerSecret: CONSUMERSECRET,
+    callbackURL: process.env.PORT ? HEROKUCALLBACK : LOCALHOSTCALLBACK //assuming that if process.env.PORT is truthy we're on heroku...
   },
   function(token, tokenSecret, profile, done) {
     // First possible error: user is not a member of the team
