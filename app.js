@@ -43,7 +43,6 @@ db.once("open", function(callback) {
 ////////////////////////////////////
 //OAUTH SETUP///////////////////////
 ////////////////////////////////////
-console.log("process.env.PORT === " + process.env.PORT);
 
 passport.use(new dropboxStrategy({
     consumerKey: CONSUMERKEY,
