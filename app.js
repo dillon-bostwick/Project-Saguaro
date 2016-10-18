@@ -2,10 +2,6 @@
  * 
  * app.js establishes router with express.
  * 
- * If localhost, runs on port 5000. Note: Must swap the callbackURL for the OAuth
- * passport strategy manually if hosting in a different environment because 
- * it doesn't switch according to an environ variable.
- *
  * Serves:
  * /api/... - RESTful connection to db
  * /wsdl - SOAP connection to qbwc

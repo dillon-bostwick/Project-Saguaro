@@ -142,8 +142,8 @@ angular.
              */
             self.getSubHoodOptions = function(lineItem) {
                 return lineItem._hood
-                    ? self.getElementById(lineItem._hood, 'subHoodOptions', 'Hoods')
-                    : [];
+                       ? self.getElementById(lineItem._hood, 'subHoodOptions', 'Hoods')
+                       : [];
             }
 
             /* Given a subHood (dev, hood, or a number), determine which activities
@@ -371,7 +371,7 @@ angular.
             }
 
             /* Generate a new MongoDB ObjectId
-             * thanks to solenoid at:
+             * Coped from user solenoid at:
              * https://gist.github.com/solenoid/1372386
              */
             function generateMongoObjectId() {

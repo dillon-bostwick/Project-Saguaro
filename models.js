@@ -59,7 +59,9 @@ var schemas = {
 		firstName: { type: String, required: true },
 		lastName: { type: String, required: true },
 		_invoiceQueue: [String],
-		category: { type: String, enum: UserCategoryEnum, }
+		canCreate: Boolean,
+		canOverride: Boolean,
+		isAdmin: Boolean
 	}),
 
 	activity: new Schema({
@@ -76,9 +78,11 @@ var schemas = {
 		shortHand: { type: String, required: true },
 		subHoodOptions: [String]
 	}),
-	
-	bill: new Schema({
-		_bill: String, // Invoice ref
+
+	group: new Schema({
+		name: String,
+		nextGroup: reference('group'), // or null for bill
+		isHead: Boolean
 	})
 }
 

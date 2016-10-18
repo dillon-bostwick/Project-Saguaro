@@ -9,6 +9,8 @@ angular.
             window.ctrl = self;
             self.path = $window.location.hash
 
+            var DIRNAME = '/components/settings/';
+
             ////////////////////////////////////////////////////////////////////
 
             // External requests:
@@ -18,16 +20,41 @@ angular.
             self.Activities = api.Activity.query();
             self.Invoices = api.Invoice.query();
             self.CurrentUser = api.CurrentUser.get();
+            self.Groups = api.Group.query();
+            self.Users = api.User.query();
 
             ////////////////////////////////////////////////////////////////////
 
-            self.groups = [
+            /* .panel-default, .panel-primary, .panel-success, .panel-info, .panel-warning, or .panel-danger */
+            self.viewPanels = [
                 {
-                  title: 'Dynamic Group Header - 1',
-                  template: 'hello.html'
+                    title: 'Define users and groups',
+                    template: DIRNAME + 'user-define.partial.html',
+                    class: 'panel-default'
+                },
+                {
+                    title: 'Define invoice pipeline',
+                    template: DIRNAME + 'pipeline-define.partial.html',
+                    class: 'panel-default'
+                },
+                {
+                    title: 'Update data',
+                    template: DIRNAME + 'update-data.partial.html',
+                    class: 'panel-default'
                 }
             ];
 
+            ////////////////////////////////////////////////////////////////////
 
+            self.makeAdmin = function(user) {
+                if (user.isAdmin) {
+                    user.canOverride = true;
+                    user.canCreate   = true;
+                }
+            };
+
+            self.submitUserChange = function() {
+                //TODO
+            }
     	}
     });

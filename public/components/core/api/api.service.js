@@ -10,7 +10,7 @@ angular.
             'Activity',
             'Expense',
             'Hood',
-            'Bills',
+            'Group',
             'CurrentUser'
         ]
 
