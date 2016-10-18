@@ -65,6 +65,7 @@ angular.
 
             //Alerter based on query string
             self.alertMessage = $location.search().alert || '';
+            self.isLoading = false;
 
             /* Wait for the CurrentUser and Invoices to both load before
              * initiating the first queue view. When the page loads it always

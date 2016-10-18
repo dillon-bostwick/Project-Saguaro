@@ -1,7 +1,7 @@
 <table class="table table-hover">
 	<thead>
 			<tr>
-				<th>Name</th>
+				<th colspan="2">Name</th>
 				<th>Create new?</th>
 				<th>Override pipeline?</th>
 				<th>Admin?</th>
@@ -9,10 +9,14 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr ng-repeat="user in $ctrl.Users | orderBy: 'firstName'">
+			<tr ng-repeat="user in $ctrl.Users | orderBy: 'lastName' | orderBy: 'firstName'">
+				<td>
+					<p>{{user.firstName}}</p>
+				</td>
+
 				<td>
 					<p>
-						<b>{{[user.firstName, user.lastName].join(' ')}}</b>
+						<b>{{user.lastName}}</b>
 						{{user._id === $ctrl.CurrentUser._id ? '(you)' : ''}}
 					</p>
 				</td>
@@ -41,7 +45,7 @@
 							ng-options="group._id
 								as group.name
 								for group
-								in $ctrl.Groups">
+								in $ctrl.Groups | orderBy: 'name'">
 					</select>
 				</td>
 			</tr>

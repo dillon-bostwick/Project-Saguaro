@@ -23,23 +23,39 @@ angular.
             self.Groups = api.Group.query();
             self.Users = api.User.query();
 
+            self.isLoading = false;
+            self.alertMessage = ''; //This should never get a alert from a query string as long as in settings - because no redirects to here
+
+            ////////////////////////////////////////////////////////////////////
+
+            self.viewGroups = [];
+
+            /* Groups are by default structured as a linked list, so that is more efficient
+             * when invoices are pushed from user to user. However, we want to restructure
+             * as an ordered array so that it can bind to an Angular repeater. Starting where
+             * isHead, create realGroups until _nextGroup === null)
+             */
+            self.Groups.$promise.then(function(groups) {
+                var currentGroup = _.findWhere(groups, { isHead: true });
+
+                while (currentGroup._nextGroup) {
+                    self.viewGroups.push(currentGroup);
+                    currentGroup = currentGroup._nextGroup
+                }
+            });
+
             ////////////////////////////////////////////////////////////////////
 
             /* .panel-default, .panel-primary, .panel-success, .panel-info, .panel-warning, or .panel-danger */
             self.viewPanels = [
                 {
-                    title: 'Define users and groups',
+                    title: 'Define users',
                     template: DIRNAME + 'user-define.partial.html',
                     class: 'panel-default'
                 },
                 {
-                    title: 'Define invoice pipeline',
+                    title: 'Define pipeline',
                     template: DIRNAME + 'pipeline-define.partial.html',
-                    class: 'panel-default'
-                },
-                {
-                    title: 'Update data',
-                    template: DIRNAME + 'update-data.partial.html',
                     class: 'panel-default'
                 }
             ];
@@ -53,8 +69,51 @@ angular.
                 }
             };
 
-            self.submitUserChange = function() {
-                //TODO
+            self.getUserNamesForGroup = function(group) {
+                var users = _.where(self.Users, {_group: group._id});
+
+                return _.pluck(users, 'firstName');
             }
-    	}
+
+            self.submitUserChange = function() {
+                self.isLoading = true;
+
+                //Update each invoice individually
+                _.each(self.Users, function(user) {
+                    user.$update(function() {
+
+                    //When last one complete:
+                    if (_.last(self.Users) == user) {
+                            self.isLoading = false;
+                            self.alertMessage = 'Successfully updated users';
+                            self.Users = api.User.query();
+                        }
+                    });
+                });
+            }
+
+
+
+
+            self.models = {
+                lists: {"A": [], "B": []}
+            };
+
+            // Generate initial model
+            for (var i = 1; i <= 3; ++i) {
+                self.models.lists.A.push({label: "Item A" + i});
+                self.models.lists.B.push({label: "Item B" + i});
+            }
+
+            // Model to JSON for demo purpose
+            // $scope.$watch('models', function(model) {
+            //     $scope.modelAsJson = angular.toJson(model, true);
+            // }, true);
+
+
+
+
+
+
+        }
     });

@@ -58,10 +58,11 @@ var schemas = {
 		_id: { type: String, required: true },
 		firstName: { type: String, required: true },
 		lastName: { type: String, required: true },
-		_invoiceQueue: [String],
+		_invoiceQueue: [reference('invoice')],
 		canCreate: Boolean,
 		canOverride: Boolean,
-		isAdmin: Boolean
+		isAdmin: Boolean,
+		_group: reference('group')
 	}),
 
 	activity: new Schema({
@@ -81,7 +82,7 @@ var schemas = {
 
 	group: new Schema({
 		name: String,
-		nextGroup: reference('group'), // or null for bill
+		_nextGroup: reference('group'), // or null for bill
 		isHead: Boolean
 	})
 }

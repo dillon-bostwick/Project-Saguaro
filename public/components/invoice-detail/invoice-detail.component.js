@@ -41,6 +41,10 @@ angular.
             self.openDate = false;  //Opens datepicker on icon click
             self.showAlert = true;
 
+            //
+            self.isLoading = false;
+            self.alertMessage = $location.search().alert || '';
+
             // Whether the invoice is new:
             self.isNew = $routeParams.id === 'new';
 
