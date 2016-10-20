@@ -89,7 +89,7 @@ var schemas = {
 }
 
 
-schemas['invoice'].virtual('total').get(function() {
+schemas.invoice.virtual('total').get(function() {
 	var total = 0;
 
 	//Have to do it manually

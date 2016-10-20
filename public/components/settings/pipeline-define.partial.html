@@ -8,33 +8,46 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr ng-repeat="group in $ctrl.Groups | orderBy: 'pipelineIndex'"
+			<tr ng-repeat="group in $ctrl.Groups"
 				ng-class="$ctrl.getUserNamesForGroup(group).length == 0 ? 'danger' : ''">
 				<td>{{$index + 1}}</td>
-				<td>{{group.name}}</td>
+				<td><b>{{group.name}}</b></td>
 				<td>{{$ctrl.getUserNamesForGroup(group).join(', ') || '--- Must add members ---'}}</td>
 
-				<td>
-					<button class="btn btn-seconday btn-sm"
-							ng-disabled="$index === 0"
-							ng-click="">
-						&uarr;
-					</button>
+				<td valign="middle">
+						<button class="btn btn-seconday btn-sm"
+								ng-disabled="$index === 0"
+								ng-click="$ctrl.Groups[$index] = $ctrl.Groups.splice($index - 1, 1, $ctrl.Groups[$index])[0]">
+							&uarr;
+						</button>
 
-					<button class="btn btn-seconday btn-sm"
-							ng-disabled="$index === $ctrl.Groups.length - 1"
-						    ng-click="">
-						&darr;
-					</button>
+						<button class="btn btn-seconday btn-sm"
+								ng-disabled="$index === $ctrl.Groups.length - 1"
+							    ng-click="$ctrl.Groups[$index] = $ctrl.Groups.splice($index + 1, 1, $ctrl.Groups[$index])[0]">
+							&darr;
+						</button>
 
-					<button class="btn btn-seconday btn-sm"
-							ng-disabled="$ctrl.Groups.length === 1"
-						    ng-click="$ctrl.Groups.splice($index, 1);">
-						&times;
-					</button>
+						<button uib-btn-checkbox
+								type="button"
+								class="btn btn-seconday btn-sm"
+								ng-model="$ctrl.showDeleter[$index]"
+								ng-disabled="$ctrl.Groups.length === 1">
+							&times;
+						</button>
+					
+						<div horizontal 
+							uib-collapse="!$ctrl.showDeleter[$index]"
+							<button	class="btn btn-success btn-sm"
+									ng-click="$ctrl.showDeleter[$index] = false">
+								Nevermind
+							</button>
+
+							<button class="btn btn-danger btn-sm"
+									ng-click="$ctrl.deleteGroup(group, $index)">
+								Confirm
+							</button>
+						</div>
 				</td>
-
-				<td>
 			</tr>
 		</tbody>
 </table>

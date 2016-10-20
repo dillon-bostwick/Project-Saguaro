@@ -1,10 +1,8 @@
 <div ng-include="'navbar.partial.html'"></div>
 
-<p ng-if="$ctrl.loading">In progress...</p> <!-- Maybe a loading animation -->
-
  <div>
  	<uib-accordion close-others="false">
-    	<div uib-accordion-group
+    	<div
              ng-repeat="viewPanel in $ctrl.viewPanels"
     	     ng-class="viewPanel.class"
     		 heading="{{viewPanel.title}}">

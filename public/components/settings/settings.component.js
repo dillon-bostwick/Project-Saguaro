@@ -1,3 +1,5 @@
+//TODO: Validation
+
 'use strict';
 
 angular.
@@ -20,47 +22,37 @@ angular.
             self.Activities = api.Activity.query();
             self.Invoices = api.Invoice.query();
             self.CurrentUser = api.CurrentUser.get();
-            self.Groups = api.Group.query();
+            self.Groups = api.Group.query(sortGroups());
             self.Users = api.User.query();
+
+            //UI
 
             self.isLoading = false;
             self.alertMessage = ''; //This should never get a alert from a query string as long as in settings - because no redirects to here
 
-            //UI
             self.showAdder = false;
+            self.showDeleter = []
             self.newGroupName = '';
 
             ////////////////////////////////////////////////////////////////////
 
-            // self.viewGroups = [];
-
-            //  Groups are by default structured as a linked list, so that is more efficient
-            //  * when invoices are pushed from user to user. However, we want to restructure
-            //  * as an ordered array so that it can bind to an Angular repeater. Starting where
-            //  * isHead, create realGroups until _nextGroup === null)
-             
-            // self.Groups.$promise.then(function(groups) {
-            //     var currentGroup = _.findWhere(groups, { isHead: true });
-
-            //     while (currentGroup._nextGroup) {
-            //         self.viewGroups.push(currentGroup);
-            //         currentGroup = currentGroup._nextGroup
-            //     }
-            // });
-
-            ////////////////////////////////////////////////////////////////////
+            function sortGroups() {
+                self.Groups = self.Groups.sort(function(a, b) {
+                    return a > b ? 1 : 0;
+                });
+            }
 
             /* .panel-default, .panel-primary, .panel-success, .panel-info, .panel-warning, or .panel-danger */
             self.viewPanels = [
                 {
                     title: 'Define users',
                     template: DIRNAME + 'user-define.partial.html',
-                    class: 'panel-default'
+                    class: 'well well-lg'
                 },
                 {
                     title: 'Define pipeline',
                     template: DIRNAME + 'pipeline-define.partial.html',
-                    class: 'panel-default'
+                    class: 'well well-lg'
                 }
             ];
 
@@ -96,19 +88,80 @@ angular.
                 });
             }
 
-            self.submitGroupChange = function() {
-                //stub
+            self.deleteGroup = function(group, index) {
+                self.isLoading = true;
+
+                self.Groups.splice(index, 1);
+
+                group.$delete(function() {
+                    self.isLoading = false
+                    self.alertMessage = 'Successfully deleted group';
+                });
             }
 
+            /* Push a new group to Groups according to self.newGroupName.
+             * also resets the newGroupName field
+             */
             self.addNewGroup = function() {
-                self.Groups.push({
+                self.Groups.push(new api.Group({
+                    _id: generateMongoObjectId(),
                     name: self.newGroupName,
-                    pipelineIndex: self.Groups.length,
-                    _nextGroup: null,
-                    isHead: false
-                })
+                    pipelineIndex: null
+                    //isHead and _nextGroup get set later
+                }));
+
+                self.newGroupName = '';
             }
 
+            self.submitGroupChange = function() {
+                function andCheckLast(self, i) {
+                    if (i === self.Groups.length - 1) {
+                        self.isLoading = false;
+                        self.alertMessage = 'Successfully updated groups';
+                        self.Groups = api.Group.query();
+                    }
+                }
+
+                self.isLoading = true;
+
+                //set _nextGroup and isHead for each group in Groups
+                for (var i = 0; i < self.Groups.length; i++) {
+                    var group = self.Groups[i]
+
+                    group.isHead = (i === 0);
+
+                    if (i === self.Groups.length - 1) {
+                        group._nextGroup = null;
+                    } else {
+                       group._nextGroup = self.Groups[i + 1]._id;
+                    }
+
+                    if (group.pipelineIndex) { //isn't new in db
+                        group.$update(andCheckLast(self, i));
+                    } else { // must add to db
+                        console.log("msg");
+                        group.$save(andCheckLast(self, i))
+                    }
+                };
+            }
+
+            //Helper for submitGroupChagne
+            
+
+            ////////////////////////////////////////////////////////////////////
+
+            //TODO: Move mongo generator to core
+
+            /* Generate a new MongoDB ObjectId
+             * Coped from user solenoid at:
+             * https://gist.github.com/solenoid/1372386
+             */
+            function generateMongoObjectId() {
+                var timestamp = (new Date().getTime() / 1000 | 0).toString(16);
+                return timestamp + 'xxxxxxxxxxxxxxxx'.replace(/[x]/g, function() {
+                    return (Math.random() * 16 | 0).toString(16);
+                }).toLowerCase();
+            };
 
 
 
