@@ -26,23 +26,27 @@ angular.
             self.isLoading = false;
             self.alertMessage = ''; //This should never get a alert from a query string as long as in settings - because no redirects to here
 
+            //UI
+            self.showAdder = false;
+            self.newGroupName = '';
+
             ////////////////////////////////////////////////////////////////////
 
-            self.viewGroups = [];
+            // self.viewGroups = [];
 
-            /* Groups are by default structured as a linked list, so that is more efficient
-             * when invoices are pushed from user to user. However, we want to restructure
-             * as an ordered array so that it can bind to an Angular repeater. Starting where
-             * isHead, create realGroups until _nextGroup === null)
-             */
-            self.Groups.$promise.then(function(groups) {
-                var currentGroup = _.findWhere(groups, { isHead: true });
+            //  Groups are by default structured as a linked list, so that is more efficient
+            //  * when invoices are pushed from user to user. However, we want to restructure
+            //  * as an ordered array so that it can bind to an Angular repeater. Starting where
+            //  * isHead, create realGroups until _nextGroup === null)
+             
+            // self.Groups.$promise.then(function(groups) {
+            //     var currentGroup = _.findWhere(groups, { isHead: true });
 
-                while (currentGroup._nextGroup) {
-                    self.viewGroups.push(currentGroup);
-                    currentGroup = currentGroup._nextGroup
-                }
-            });
+            //     while (currentGroup._nextGroup) {
+            //         self.viewGroups.push(currentGroup);
+            //         currentGroup = currentGroup._nextGroup
+            //     }
+            // });
 
             ////////////////////////////////////////////////////////////////////
 
@@ -92,25 +96,18 @@ angular.
                 });
             }
 
-
-
-
-            self.models = {
-                lists: {"A": [], "B": []}
-            };
-
-            // Generate initial model
-            for (var i = 1; i <= 3; ++i) {
-                self.models.lists.A.push({label: "Item A" + i});
-                self.models.lists.B.push({label: "Item B" + i});
+            self.submitGroupChange = function() {
+                //stub
             }
 
-            // Model to JSON for demo purpose
-            // $scope.$watch('models', function(model) {
-            //     $scope.modelAsJson = angular.toJson(model, true);
-            // }, true);
-
-
+            self.addNewGroup = function() {
+                self.Groups.push({
+                    name: self.newGroupName,
+                    pipelineIndex: self.Groups.length,
+                    _nextGroup: null,
+                    isHead: false
+                })
+            }
 
 
 

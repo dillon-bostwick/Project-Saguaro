@@ -8,27 +8,28 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr ng-repeat="group in $ctrl.viewGroups">
+			<tr ng-repeat="group in $ctrl.Groups | orderBy: 'pipelineIndex'"
+				ng-class="$ctrl.getUserNamesForGroup(group).length == 0 ? 'danger' : ''">
 				<td>{{$index + 1}}</td>
 				<td>{{group.name}}</td>
-				<td>{{$ctrl.getUserNamesForGroup(group).join(', ')}}</td>
+				<td>{{$ctrl.getUserNamesForGroup(group).join(', ') || '--- Must add members ---'}}</td>
 
 				<td>
 					<button class="btn btn-seconday btn-sm"
 							ng-disabled="$index === 0"
-							ng-click="A[$index] = A.splice($index - 1, 1, $ctrl.viewGroups[$index])[0]">
+							ng-click="">
 						&uarr;
 					</button>
 
 					<button class="btn btn-seconday btn-sm"
-							ng-disabled="$index === $ctrl.viewGroups.length - 1"
+							ng-disabled="$index === $ctrl.Groups.length - 1"
 						    ng-click="">
 						&darr;
 					</button>
 
 					<button class="btn btn-seconday btn-sm"
-							ng-disabled="$ctrl.viewGroups.length === 1"
-						    ng-click="">
+							ng-disabled="$ctrl.Groups.length === 1"
+						    ng-click="$ctrl.Groups.splice($index, 1);">
 						&times;
 					</button>
 				</td>
@@ -38,7 +39,27 @@
 		</tbody>
 </table>
 
+<button uib-btn-checkbox
+		type="button"
+		class="btn btn-primary btn-sm"
+		ng-model="$ctrl.showAdder">
+	Add new group
+</button>
+
+
 <button class="btn btn-primary btn-lg"
-		ng-click="$ctrl.submitUserChange()">
+		ng-click="$ctrl.submitGroupChange()">
 	Submit changes
 </button>
+
+<div></div>
+
+<div uib-collapse="!$ctrl.showAdder" class="well well-lg">
+	<label>Group name:</label>
+	<input type='text' ng-model='$ctrl.newGroupName'>
+
+	<button class="btn btn-primary btn-sm"
+		ng-click="$ctrl.addNewGroup()">
+	Add
+</button>
+</div>

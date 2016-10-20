@@ -82,6 +82,7 @@ var schemas = {
 
 	group: new Schema({
 		name: String,
+		pipelineIndex: Number,
 		_nextGroup: reference('group'), // or null for bill
 		isHead: Boolean
 	})

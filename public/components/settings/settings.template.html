@@ -3,7 +3,7 @@
 <p ng-if="$ctrl.loading">In progress...</p> <!-- Maybe a loading animation -->
 
  <div>
- 	<uib-accordion close-others="true">
+ 	<uib-accordion close-others="false">
     	<div uib-accordion-group
              ng-repeat="viewPanel in $ctrl.viewPanels"
     	     ng-class="viewPanel.class"
