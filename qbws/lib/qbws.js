@@ -94,7 +94,18 @@ function buildRequest() {
     //var requestXML = builder.create(billAddRequestObj, {version: '1.0', encoding: 'UTF-8'}).end({ 'pretty': false });
 
     return [
-        "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n<?qbxml version=\"7.0\"?>\n<QBXML>\n  <QBXMLMsgsRq>\n    <EmployeeQueryRq>\n      <OwnerID>0</OwnerID>\n      <ActiveStatus>All</ActiveStatus>\n    </EmployeeQueryRq>\n  </QBXMLMsgsRq>\n</QBXML>\n"
+        "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
+        "<?qbxml version=\"13.0\"?>\n" +
+            "<QBXML>\n" +
+                "<QBXMLMsgsRq>\n" +
+                    "<VendorQueryRq>\n" +
+                        "<TotalBalanceFilter>" +
+                            "<Operator>&lt</Operator>"
+                            "<Amount>0</amount>" +
+                        "</TotalBalanceFilter>\n" +
+                    "</VendorQueryRq>\n" +
+                "</QBXMLMsgsRq>\n" +
+            "</QBXML>\n"
     ];
 
     //return [requestXML];
