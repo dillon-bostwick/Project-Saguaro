@@ -100,7 +100,6 @@ function buildRequest() {
                 "<QBXMLMsgsRq>\n" +
                     "<VendorQueryRq>\n" +
                         "<TotalBalanceFilter>" +
-                            "<Operator>&lt</Operator>"
                             "<Amount>0</amount>" +
                         "</TotalBalanceFilter>\n" +
                     "</VendorQueryRq>\n" +
