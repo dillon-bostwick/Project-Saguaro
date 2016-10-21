@@ -37,7 +37,7 @@ angular.
             ////////////////////////////////////////////////////////////////////
 
             self.Groups.$promise.then(function() {
-                console.log(self);
+                //BUG
                 self.Groups = self.Groups.sort(function(a, b) {
                     console.log(a);
                     console.log(b);
