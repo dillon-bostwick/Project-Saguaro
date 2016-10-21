@@ -12,7 +12,7 @@ var qbws,
     connectionErrCounter = null,
     username = 'saguaro',
     password = 'saguaro',
-    companyFile = 'Q:\\Brightwater Homes.qbw',
+    companyFile = 'Q:\\Brightwater Homes.QBW',
     log = '',
     req = [];
 
@@ -358,8 +358,10 @@ function (args) {
         request = '';
     }
 
+    console.log("sending requuest: ", request);
+
     return {
-        sendRequestXMLResult: { string: "<?xml version=\"1.0\"><?qbxml version=\"13.0\"?><QBXML></QBXML>" } //TODO: set back to "request" variable
+        sendRequestXMLResult: { string: request }
     };
 };
 
