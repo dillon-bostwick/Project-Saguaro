@@ -95,7 +95,6 @@ function buildRequest() {
 
     //var requestXML = builder.create(billAddRequestObj, {version: '1.0', encoding: 'UTF-8'}).end({ 'pretty': false });
 
-<<<<<<< HEAD
     return [
         "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
         "<?qbxml version=\"13.0\"?>\n" +
@@ -109,11 +108,6 @@ function buildRequest() {
                 "</QBXMLMsgsRq>\n" +
             "</QBXML>\n"
     ];
-=======
-    var sampleXML = "<?xml version=\"1.0\"?><?qbxml version=\"13.0\"?><QBXML><QBXMLMsgsRq onError=\"continueOnError\"><VendorQueryRq requestID=\"1\"><FullName>My Vendor</FullName></VendorQueryRq></QBXMLMsgsRq></QBXML>";
->>>>>>> 2ccc198806963a37cb8bdd13dba0ee16ef03c7da
-
-    return [sampleXML];
 }
 
 /**
