@@ -10,9 +10,9 @@ var qbws,
     server,
     counter = null,
     connectionErrCounter = null,
-    username = 'marsi',
-    password = 'rush',
-    companyFile = 'Q:\\Brightwater Homes.qbw',
+    username = 'saguaro',
+    password = 'saguaro',
+    companyFile = 'Q:\\Brightwater Homes.QBW',
     log = '',
     req = [];
 
@@ -22,9 +22,9 @@ var qbws,
  */
 function buildRequest() {
     // TODO: is 'pretty' false by default? Probably.
-        var strRequestXML,
-        inputXMLDoc,
-        request = [];
+        var strRequestXML;
+        var inputXMLDoc;
+        var request = [];
 
     // // CustomerQuery
     // inputXMLDoc = builder.create('QBXML', { version: '1.0' })
@@ -40,28 +40,30 @@ function buildRequest() {
     // strRequestXML = '';
     // inputXMLDoc = null;
 
-    // // InvoiceQuery
+    // InvoiceQuery
     // inputXMLDoc = builder.create('QBXML', { version: '1.0' })
-    //           .instruction('qbxml', 'version="4.0"')
+    //           .instruction('qbxml', 'version="13.0"')
     //           .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
     //               .ele('InvoiceQueryRq', { 'requestID': '2' })
     //                   .ele('MaxReturned')
     //                       .text('1');
     // strRequestXML = inputXMLDoc.end({ 'pretty': false });
+
+
     // request.push(strRequestXML);
 
     // // clean up
     // strRequestXML = '';
     // inputXMLDoc = null;
 
-    BillQuery
-    billAddRequestObj = builder.create('QBXML', { version: '1.0' })
-              .instruction('qbxml', 'version="4.0"')
-              .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
-                  .ele('BillQueryRq', { 'requestID': '3' })
-                      .ele('MaxReturned')
-                          .text('1');
-    requestXML = inputXMLDoc.end({ 'pretty': false });
+    // BillQuery
+    // billAddRequestObj = builder.create('QBXML', { version: '1.0' })
+    //           .instruction('qbxml', 'version="4.0"')
+    //           .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
+    //               .ele('BillQueryRq', { 'requestID': '3' })
+    //                   .ele('MaxReturned')
+    //                       .text('1');
+    // requestXML = inputXMLDoc.end({ 'pretty': false });
     
 ///////
 
@@ -93,6 +95,7 @@ function buildRequest() {
 
     //var requestXML = builder.create(billAddRequestObj, {version: '1.0', encoding: 'UTF-8'}).end({ 'pretty': false });
 
+<<<<<<< HEAD
     return [
         "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
         "<?qbxml version=\"13.0\"?>\n" +
@@ -106,8 +109,11 @@ function buildRequest() {
                 "</QBXMLMsgsRq>\n" +
             "</QBXML>\n"
     ];
+=======
+    var sampleXML = "<?xml version=\"1.0\"?><?qbxml version=\"13.0\"?><QBXML><QBXMLMsgsRq onError=\"continueOnError\"><VendorQueryRq requestID=\"1\"><FullName>My Vendor</FullName></VendorQueryRq></QBXMLMsgsRq></QBXML>";
+>>>>>>> 2ccc198806963a37cb8bdd13dba0ee16ef03c7da
 
-    //return [requestXML];
+    return [sampleXML];
 }
 
 /**
@@ -368,8 +374,10 @@ function (args) {
         request = '';
     }
 
+    console.log("sending requuest: ", request);
+
     return {
-        sendRequestXMLResult: { string: "<?xml version=\"1.0\"><?qbxml version=\"13.0\"?><QBXML></QBXML>" } //TODO: set back to "request" variable
+        sendRequestXMLResult: { string: request }
     };
 };
 
