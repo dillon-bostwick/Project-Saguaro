@@ -245,7 +245,8 @@
 							ng-model="lineItem.amount"
 							ng-change="$ctrl.updateAmount();"/>
 
-						<button ng-click="$ctrl.evaluateAmount(lineItem)">
+						<button ng-click="$ctrl.evaluateAmount(lineItem)"
+								ng-if="lineItem.amount[1] === '+'">
 							Evaluate
 						</button>
 					</td>
