@@ -22,7 +22,7 @@ angular.
             self.Activities = api.Activity.query();
             self.Invoices = api.Invoice.query();
             self.CurrentUser = api.CurrentUser.get();
-            self.Groups = api.Group.query(sortGroups());
+            self.Groups = api.Group.query();
             self.Users = api.User.query();
 
             //UI
@@ -36,11 +36,14 @@ angular.
 
             ////////////////////////////////////////////////////////////////////
 
-            function sortGroups() {
+            self.Groups.$promise.then(function() {
+                console.log(self);
                 self.Groups = self.Groups.sort(function(a, b) {
+                    console.log(a);
+                    console.log(b);
                     return a > b ? 1 : 0;
                 });
-            }
+            });
 
             /* .panel-default, .panel-primary, .panel-success, .panel-info, .panel-warning, or .panel-danger */
             self.viewPanels = [
