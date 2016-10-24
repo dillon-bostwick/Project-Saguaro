@@ -26,47 +26,47 @@ function buildRequest() {
         var inputXMLDoc;
         var request = [];
 
-    // // CustomerQuery
-    // inputXMLDoc = builder.create('QBXML', { version: '1.0' })
-    //           .instruction('qbxml', 'version="4.0"')
-    //           .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
-    //               .ele('CustomerQueryRq', { 'requestID': '1' })
-    //                   .ele('MaxReturned')
-    //                       .text('1');
-    // strRequestXML = inputXMLDoc.end({ 'pretty': false });
-    // request.push(strRequestXML);
+    // CustomerQuery
+    inputXMLDoc = builder.create('QBXML', { version: '1.0' })
+              .instruction('qbxml', 'version="4.0"')
+              .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
+                  .ele('CustomerQueryRq', { 'requestID': '1' })
+                      .ele('MaxReturned')
+                          .text('1');
+    strRequestXML = inputXMLDoc.end({ 'pretty': false });
+    request.push(strRequestXML);
 
-    // // clean up
-    // strRequestXML = '';
-    // inputXMLDoc = null;
+    // clean up
+    strRequestXML = '';
+    inputXMLDoc = null;
 
     // InvoiceQuery
-    // inputXMLDoc = builder.create('QBXML', { version: '1.0' })
-    //           .instruction('qbxml', 'version="13.0"')
-    //           .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
-    //               .ele('InvoiceQueryRq', { 'requestID': '2' })
-    //                   .ele('MaxReturned')
-    //                       .text('1');
-    // strRequestXML = inputXMLDoc.end({ 'pretty': false });
+    inputXMLDoc = builder.create('QBXML', { version: '1.0' })
+              .instruction('qbxml', 'version="13.0"')
+              .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
+                  .ele('InvoiceQueryRq', { 'requestID': '2' })
+                      .ele('MaxReturned')
+                          .text('1');
+    strRequestXML = inputXMLDoc.end({ 'pretty': false });
 
+    request.push(strRequestXML);
 
-    // request.push(strRequestXML);
-
-    // // clean up
-    // strRequestXML = '';
-    // inputXMLDoc = null;
+    // clean up
+    strRequestXML = '';
+    inputXMLDoc = null;
 
     // BillQuery
-    // billAddRequestObj = builder.create('QBXML', { version: '1.0' })
-    //           .instruction('qbxml', 'version="4.0"')
-    //           .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
-    //               .ele('BillQueryRq', { 'requestID': '3' })
-    //                   .ele('MaxReturned')
-    //                       .text('1');
-    // requestXML = inputXMLDoc.end({ 'pretty': false });
-    
-///////
+    billAddRequestObj = builder.create('QBXML', { version: '1.0' })
+              .instruction('qbxml', 'version="4.0"')
+              .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
+                  .ele('BillQueryRq', { 'requestID': '3' })
+                      .ele('MaxReturned')
+                          .text('1');
+    strRequestXML = inputXMLDoc.end({ 'pretty': false });
 
+    request.push(strRequestXML);
+    
+    // Not sure what I was doing here but leave it commented
     // var requestID = 111;
     // var vendorName = 'Bob the builder';
     // var refNumber = 222;
@@ -92,16 +92,15 @@ function buildRequest() {
     //         }
     //     }
     // };
-
     //var requestXML = builder.create(billAddRequestObj, {version: '1.0', encoding: 'UTF-8'}).end({ 'pretty': false });
 
-    return [
+    request = request.concat([
         //1
         "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
         "<?qbxml version=\"13.0\"?>\n" +
         "<QBXML>\n" +
-            "<QBXMLMsgsRq>\n" +
-                "<VendorQueryRq requestID=\"1\">\n" +
+            "<QBXMLMsgsRq onError=\"stopOnError\">\n" +
+                "<VendorQueryRq requestID=\"4\">\n" +
                     "<FullName>A Gotham Project</FullName>" +
                 "</VendorQueryRq>\n" +
             "</QBXMLMsgsRq>\n" +
@@ -111,8 +110,8 @@ function buildRequest() {
         "<?xml version=\"1.0\"?>\n" +
         "<?qbxml version=\"13.0\"?>\n" +
         "<QBXML>\n" +
-            "<QBXMLMsgsRq>\n" +
-                "<VendorQueryRq requestID=\"2\">\n" +
+            "<QBXMLMsgsRq onError=\"stopOnError\">\n" +
+                "<VendorQueryRq requestID=\"5\">\n" +
                     "<TotalBalanceFilter>" +
                         "<Operator>\"oLessThan\"</Operator>" +
                         "<Amount>0</amount>" +
@@ -125,7 +124,7 @@ function buildRequest() {
         "<?qbxml version=\"13.0\"?>\n" +
         "<QBXML>\n" +
             "<QBXMLMsgsRq>\n" +
-                "<VendorQueryRq requestID=\"3\">\n" +
+                "<VendorQueryRq requestID=\"6\">\n" +
                     "<TotalBalanceFilter>" +
                         "<Amount>0</amount>" +
                     "</TotalBalanceFilter>\n" +
@@ -137,11 +136,13 @@ function buildRequest() {
         "<?qbxml version=\"13.0\"?>\n" +
         "<QBXML>\n" +
             "<QBXMLMsgsRq>\n" +
-                "<VendorQueryRq requestID=\"4\">\n" +
+                "<VendorQueryRq requestID=\"7\">\n" +
                 "</VendorQueryRq>\n" +
             "</QBXMLMsgsRq>\n" +
         "</QBXML>\n"
-    ];
+    ]);
+
+    return request;
 }
 
 /**
