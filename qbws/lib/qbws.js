@@ -142,6 +142,8 @@ function buildRequest() {
         "</QBXML>\n"
     ]);
 
+    console.log("Request:" + JSON.stringify(request));
+
     return request;
 }
 
