@@ -96,15 +96,51 @@ function buildRequest() {
     //var requestXML = builder.create(billAddRequestObj, {version: '1.0', encoding: 'UTF-8'}).end({ 'pretty': false });
 
     return [
+        //1
         "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
         "<?qbxml version=\"13.0\"?>\n" +
         "<QBXML>\n" +
             "<QBXMLMsgsRq>\n" +
-                "<VendorQueryRq>\n" +
+                "<VendorQueryRq requestID="1">\n" +
                     "<TotalBalanceFilter>" +
                         "<Operator>oLessThan</Operator>" +
                         "<Amount>0</amount>" +
                     "</TotalBalanceFilter>\n" +
+                "</VendorQueryRq>\n" +
+            "</QBXMLMsgsRq>\n" +
+        "</QBXML>\n",
+
+        //2
+        "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
+        "<?qbxml version=\"13.0\"?>\n" +
+        "<QBXML>\n" +
+            "<QBXMLMsgsRq>\n" +
+                "<VendorQueryRq requestID="2">\n" +
+                    "<TotalBalanceFilter>" +
+                        "<Operator>\"oLessThan\"</Operator>" +
+                        "<Amount>0</amount>" +
+                    "</TotalBalanceFilter>\n" +
+                "</VendorQueryRq>\n" +
+            "</QBXMLMsgsRq>\n" +
+        "</QBXML>\n",
+
+        "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
+        "<?qbxml version=\"13.0\"?>\n" +
+        "<QBXML>\n" +
+            "<QBXMLMsgsRq>\n" +
+                "<VendorQueryRq requestID="3">\n" +
+                    "<TotalBalanceFilter>" +
+                        "<Amount>0</amount>" +
+                    "</TotalBalanceFilter>\n" +
+                "</VendorQueryRq>\n" +
+            "</QBXMLMsgsRq>\n" +
+        "</QBXML>\n",
+
+        "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
+        "<?qbxml version=\"13.0\"?>\n" +
+        "<QBXML>\n" +
+            "<QBXMLMsgsRq>\n" +
+                "<VendorQueryRq requestID="4">\n" +
                 "</VendorQueryRq>\n" +
             "</QBXMLMsgsRq>\n" +
         "</QBXML>\n"
