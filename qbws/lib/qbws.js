@@ -402,14 +402,18 @@ function (args) {
 
     if (counter < total) {
         request = req[counter];
-        serviceLog('    Sending request no = ' + (counter + 1));
+
+
+        serviceLog('\n\n\n----------Sending request no = ' + (counter + 1)) + ' ----------\n\n\n';
+
+
         counter = counter + 1;
     } else {
         counter = 0;
         request = '';
     }
 
-    console.log("sending requuest: ", request);
+    console.log("sending request: ", request);
 
     return {
         sendRequestXMLResult: { string: request }
@@ -649,7 +653,7 @@ function (args) {
         retVal = percentage.toFixed();
     }
 
-    console.log('\n\n\n----------RESPONSE----------: \n\n\n' + JSON.stringify(args, null, '\t') + '\n\n\n----------END RESPONSE----------\n\n\n');
+    console.log('\n\n\n----------RESPONSE---------- \n\n\n' + JSON.stringify(args, null, '\t') + '\n\n\n----------END RESPONSE----------\n\n\n');
 
     return {
         receiveResponseXMLResult: { string: retVal }
