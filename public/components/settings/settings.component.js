@@ -36,6 +36,8 @@ angular.
 
             ////////////////////////////////////////////////////////////////////
 
+<<<<<<< HEAD
+=======
             self.Groups.$promise.then(function() {
                 //BUG
                 self.Groups = self.Groups.sort(function(a, b) {
@@ -44,6 +46,7 @@ angular.
                     return a > b ? 1 : 0;
                 });
             });
+>>>>>>> 2ccc198806963a37cb8bdd13dba0ee16ef03c7da
 
             /* .panel-default, .panel-primary, .panel-success, .panel-info, .panel-warning, or .panel-danger */
             self.viewPanels = [

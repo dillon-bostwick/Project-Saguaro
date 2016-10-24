@@ -4,7 +4,7 @@ angular.
     module('invoiceDetail', ['ngInputModified', 'ui.bootstrap']).
     component('invoiceDetail', {
         templateUrl: 'components/invoice-detail/invoice-detail.template.html',
-        controller: function InvoiceDetailController(api, $routeParams, $window, $filter, $scope) {
+        controller: function InvoiceDetailController(api, $routeParams, $window, $filter, $scope, $location) {
             var self = this;
             window.ctrl = self;
             self.path = $window.location.hash

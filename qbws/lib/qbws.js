@@ -95,10 +95,20 @@ function buildRequest() {
 
     //var requestXML = builder.create(billAddRequestObj, {version: '1.0', encoding: 'UTF-8'}).end({ 'pretty': false });
 
-    var sampleXML = "<?xml version=\"1.0\"?><?qbxml version=\"13.0\"?><QBXML><QBXMLMsgsRq onError=\"continueOnError\"><VendorQueryRq requestID= \"1\"><TotalBalanceFilter><Operator>oLessThan</Operator><Amount>0</Amount></TotalBalanceFilter></VendorQueryRq></QBXMLMsgsRq></QBXML>";
-
-    return [sampleXML];
-}
+    return [
+        "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
+        "<?qbxml version=\"13.0\"?>\n" +
+        "<QBXML>\n" +
+            "<QBXMLMsgsRq>\n" +
+                "<VendorQueryRq>\n" +
+                    "<TotalBalanceFilter>" +
+                        "<Operator>oLessThan</Operator>" +
+                        "<Amount>0</amount>" +
+                    "</TotalBalanceFilter>\n" +
+                "</VendorQueryRq>\n" +
+            "</QBXMLMsgsRq>\n" +
+        "</QBXML>\n"
+    ];
 
 /**
  * Parses the first two version components out of the standard four component
