@@ -21,132 +21,59 @@ var qbws,
  * @returns {String|Array} QBXML requests: CustomerQuery, InvoiceQuery and BillQuery
  */
 function buildRequest() {
-    // TODO: is 'pretty' false by default? Probably.
-        var strRequestXML;
-        var inputXMLDoc;
-        var request = [];
+    var inputXML;
+    var request = [];
 
     // CustomerQuery
-    inputXMLDoc = builder.create('QBXML', { version: '1.0' })
-              .instruction('qbxml', 'version="4.0"')
-              .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
-                  .ele('CustomerQueryRq', { 'requestID': '1' })
-                      .ele('MaxReturned')
-                          .text('1');
+    inputXM = builder.create('QBXML', { version: '1.0' })
+                .instruction('qbxml', 'version="13.0"')
+                .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
+                      .ele('CustomerQueryRq', { 'requestID': '1' })
+                          .ele('MaxReturned')
+                              .text('1')
+                .end();
 
-    strRequestXML = inputXMLDoc.end({ 'pretty': false });
-
-    request.push(strRequestXML);
-
-    // clean up
-    strRequestXML = '';
-    inputXMLDoc = null;
+    request.push(inputXML);
 
     // InvoiceQuery
     inputXMLDoc = builder.create('QBXML', { version: '1.0' })
-              .instruction('qbxml', 'version="13.0"')
-              .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
-                  .ele('InvoiceQueryRq', { 'requestID': '2' })
-                      .ele('MaxReturned')
-                          .text('1');
+                    .instruction('qbxml', 'version="13.0"')
+                    .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
+                      .ele('InvoiceQueryRq', { 'requestID': '2' })
+                          .ele('MaxReturned')
+                              .text('1')
+                    .end();
 
-    strRequestXML = inputXMLDoc.end({ 'pretty': false });
-
-    request.push(strRequestXML);
-
-    // clean up
-    strRequestXML = '';
-    inputXMLDoc = null;
+    request.push(inputXML);
 
     // BillQuery
     inputXMLDoc = builder.create('QBXML', { version: '1.0' })
-              .instruction('qbxml', 'version="4.0"')
-              .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
-                  .ele('BillQueryRq', { 'requestID': '3' })
-                      .ele('MaxReturned')
-                          .text('1');
+                    .instruction('qbxml', 'version="13.0"')
+                    .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
+                        .ele('BillQueryRq', { 'requestID': '3' })
+                            .ele('MaxReturned')
+                                .text('1')
+                    .end();
 
-    strRequestXML = inputXMLDoc.end({ 'pretty': false });
+    request.push(inputXML);
 
-    request.push(strRequestXML);
-    
-    // Not sure what I was doing here but leave it commented
-    // var requestID = 111;
-    // var vendorName = 'Bob the builder';
-    // var refNumber = 222;
-    // var amt = 333;
+    // IBillAdd
+    inputXMLDoc = builder.create('QBXML', { version: '1.0'})
+                    .instruction('qbxml', 'version=13.0')
+                    .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
+                        .ele('IBillAdd', { 'requestID': '4' })
+                            .ele('VendorRef')
+                                .ele('FullName')
+                                    .text('A Gotham Project')
+                            .ele('memo')
+                                .text('Hello World')
+                    .end();
 
-    // var billAddRequestObj = {
-    //     QBXML: {
-    //         "?qbxml": "version=4.0",
-    //         QBXMLMsgsRq: {
-    //             "@onError": "continueOnError",
-    //             BillAddRq: {
-    //                 "@requestID": requestID.toString(),
-    //                 BillAdd: {
-    //                     VendorRef: {
-    //                         FullName: vendorName
-    //                     },
-    //                     RefNumber: refNumber,
-    //                     itemLineAdd: {
-    //                         amount: amt
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    // };
-    //var requestXML = builder.create(billAddRequestObj, {version: '1.0', encoding: 'UTF-8'}).end({ 'pretty': false });
+    request.push(inputXML);
 
-    request = request.concat([
-        //1
-        "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
-        "<?qbxml version=\"13.0\"?>\n" +
-        "<QBXML>\n" +
-            "<QBXMLMsgsRq onError=\"stopOnError\">\n" +
-                "<VendorQueryRq requestID=\"4\">\n" +
-                    "<FullName>A Gotham Project</FullName>" +
-                "</VendorQueryRq>\n" +
-            "</QBXMLMsgsRq>\n" +
-        "</QBXML>\n",
-
-        //2 no encoding specified
-        "<?xml version=\"1.0\" ?>\n" +
-        "<?qbxml version=\"13.0\"?>\n" +
-        "<QBXML>\n" +
-            "<QBXMLMsgsRq onError=\"stopOnError\">\n" +
-                "<VendorQueryRq requestID=\"5\">\n" +
-                    "<TotalBalanceFilter>" +
-                        "<Operator>\"oLessThan\"</Operator>" +
-                        "<Amount>0</amount>" +
-                    "</TotalBalanceFilter>\n" +
-                "</VendorQueryRq>\n" +
-            "</QBXMLMsgsRq>\n" +
-        "</QBXML>\n",
-
-        "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
-        "<?qbxml version=\"13.0\"?>\n" +
-        "<QBXML>\n" +
-            "<QBXMLMsgsRq>\n" +
-                "<VendorQueryRq requestID=\"6\">\n" +
-                    "<TotalBalanceFilter>" +
-                        "<Amount>0</amount>" +
-                    "</TotalBalanceFilter>\n" +
-                "</VendorQueryRq>\n" +
-            "</QBXMLMsgsRq>\n" +
-        "</QBXML>\n",
-
-        "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
-        "<?qbxml version=\"13.0\"?>\n" +
-        "<QBXML>\n" +
-            "<QBXMLMsgsRq>\n" +
-                "<VendorQueryRq requestID=\"7\">\n" +
-                "</VendorQueryRq>\n" +
-            "</QBXMLMsgsRq>\n" +
-        "</QBXML>\n"
-    ]);
-
-    console.log("Request:" + JSON.stringify(request));
+    for (var i = 0; i < request.length; i++) {
+        console.log('\n-----\n\nRequest #' + i + ': ' + request[i] + '\n-----\n\n');
+    }
 
     return request;
 }
@@ -404,7 +331,7 @@ function (args) {
         request = req[counter];
 
 
-        serviceLog('\n\n\n----------Sending request no = ' + (counter + 1)) + ' ----------\n\n\n';
+        serviceLog('\n\n\n---------- Sending request no = ' + (counter + 1) + ' ----------\n\n\n');
 
 
         counter = counter + 1;
