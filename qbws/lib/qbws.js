@@ -649,17 +649,7 @@ function (args) {
         retVal = percentage.toFixed();
     }
 
-
-    console.log("xxxxxxxxxxRECEIVED RESPONSE");
-    console.log('xxxxxxxxxxARGS JSON: \n\n' + JSON.stringify(args) + '\n\n\n');
-    console.log("xxxxxxxxxxRESPONSE: ", response);
-    console.log("xxxxxxxxxxHRESULT: ", hresult);
-    console.log("xxxxxxxxxxMESSAGE: ", message);
-
-
-
-
-    serviceLog('        Number retVal = ' + retVal);
+    console.log('\n\n\n----------RESPONSE----------: \n\n\n' + JSON.stringify(args, null, '\t') + '\n\n\n----------END RESPONSE----------\n\n\n');
 
     return {
         receiveResponseXMLResult: { string: retVal }
