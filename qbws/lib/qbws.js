@@ -109,6 +109,7 @@ function buildRequest() {
             "</QBXMLMsgsRq>\n" +
         "</QBXML>\n"
     ];
+}
 
 /**
  * Parses the first two version components out of the standard four component
