@@ -102,13 +102,13 @@ function buildRequest() {
         "<QBXML>\n" +
             "<QBXMLMsgsRq>\n" +
                 "<VendorQueryRq requestID=\"1\">\n" +
-                    "<FullName>A Gothan Project</FullName>" +
+                    "<FullName>A Gotham Project</FullName>" +
                 "</VendorQueryRq>\n" +
             "</QBXMLMsgsRq>\n" +
         "</QBXML>\n",
 
-        //2
-        "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
+        //2 no encoding specified
+        "<?xml version=\"1.0\"?>\n" +
         "<?qbxml version=\"13.0\"?>\n" +
         "<QBXML>\n" +
             "<QBXMLMsgsRq>\n" +
