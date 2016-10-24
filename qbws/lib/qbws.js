@@ -102,10 +102,7 @@ function buildRequest() {
         "<QBXML>\n" +
             "<QBXMLMsgsRq>\n" +
                 "<VendorQueryRq requestID=\"1\">\n" +
-                    "<TotalBalanceFilter>" +
-                        "<Operator>oLessThan</Operator>" +
-                        "<Amount>0</amount>" +
-                    "</TotalBalanceFilter>\n" +
+                    "<FullName>A Gothan Project</FullName>" +
                 "</VendorQueryRq>\n" +
             "</QBXMLMsgsRq>\n" +
         "</QBXML>\n",
