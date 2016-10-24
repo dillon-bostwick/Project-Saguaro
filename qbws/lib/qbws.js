@@ -33,7 +33,9 @@ function buildRequest() {
                   .ele('CustomerQueryRq', { 'requestID': '1' })
                       .ele('MaxReturned')
                           .text('1');
+                          
     strRequestXML = inputXMLDoc.end({ 'pretty': false });
+
     request.push(strRequestXML);
 
     // clean up
@@ -47,6 +49,7 @@ function buildRequest() {
                   .ele('InvoiceQueryRq', { 'requestID': '2' })
                       .ele('MaxReturned')
                           .text('1');
+
     strRequestXML = inputXMLDoc.end({ 'pretty': false });
 
     request.push(strRequestXML);
@@ -56,12 +59,13 @@ function buildRequest() {
     inputXMLDoc = null;
 
     // BillQuery
-    billAddRequestObj = builder.create('QBXML', { version: '1.0' })
+    inputXMLDoc = builder.create('QBXML', { version: '1.0' })
               .instruction('qbxml', 'version="4.0"')
               .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
                   .ele('BillQueryRq', { 'requestID': '3' })
                       .ele('MaxReturned')
                           .text('1');
+
     strRequestXML = inputXMLDoc.end({ 'pretty': false });
 
     request.push(strRequestXML);
