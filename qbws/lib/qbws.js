@@ -95,7 +95,7 @@ function buildRequest() {
 
     //var requestXML = builder.create(billAddRequestObj, {version: '1.0', encoding: 'UTF-8'}).end({ 'pretty': false });
 
-    var sampleXML = "<?xml version=\"1.0\"?><?qbxml version=\"13.0\"?><QBXML><QBXMLMsgsRq onError=\"continueOnError\"><VendorQueryRq requestID=\"1\"><FullName>My Vendor</FullName></VendorQueryRq></QBXMLMsgsRq></QBXML>";
+    var sampleXML = "<?xml version=\"1.0\"?><?qbxml version=\"13.0\"?><QBXML><QBXMLMsgsRq onError=\"continueOnError\"><VendorQueryRq requestID= \"1\"><TotalBalanceFilter><Operator>oLessThan</Operator><Amount>0</Amount></TotalBalanceFilter></VendorQueryRq></QBXMLMsgsRq></QBXML>";
 
     return [sampleXML];
 }
