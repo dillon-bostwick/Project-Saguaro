@@ -33,7 +33,7 @@ function buildRequest() {
                   .ele('CustomerQueryRq', { 'requestID': '1' })
                       .ele('MaxReturned')
                           .text('1');
-                          
+
     strRequestXML = inputXMLDoc.end({ 'pretty': false });
 
     request.push(strRequestXML);
@@ -111,7 +111,7 @@ function buildRequest() {
         "</QBXML>\n",
 
         //2 no encoding specified
-        "<?xml version=\"1.0\"?>\n" +
+        "<?xml version=\"1.0\" ?>\n" +
         "<?qbxml version=\"13.0\"?>\n" +
         "<QBXML>\n" +
             "<QBXMLMsgsRq onError=\"stopOnError\">\n" +
@@ -476,6 +476,8 @@ function (args) {
     announceMethod('connectionError', args);
 
     // TODO: Why is the same code repeated thrice? Switch statement instead?
+    // REFACTOR THIS SO BADLY - Dillon
+
     if (hresult.trim() === QB_ERROR_WHEN_PARSING) {
         serviceLog('    HRESULT = ' + hresult);
         serviceLog('    Message = ' + message);
@@ -647,7 +649,16 @@ function (args) {
         retVal = percentage.toFixed();
     }
 
-    serviceLog('    Return values: ');
+
+    console.log("xxxxxxxxxxRECEIVED RESPONSE");
+    console.log('xxxxxxxxxxARGS JSON: \n\n' + JSON.stringify(args) + '\n\n\n');
+    console.log("xxxxxxxxxxRESPONSE: ", response);
+    console.log("xxxxxxxxxxHRESULT: ", hresult);
+    console.log("xxxxxxxxxxMESSAGE: ", message);
+
+
+
+
     serviceLog('        Number retVal = ' + retVal);
 
     return {
