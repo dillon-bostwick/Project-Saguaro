@@ -101,7 +101,7 @@ function buildRequest() {
         "<?qbxml version=\"13.0\"?>\n" +
         "<QBXML>\n" +
             "<QBXMLMsgsRq>\n" +
-                "<VendorQueryRq requestID="1">\n" +
+                "<VendorQueryRq requestID=\"1\">\n" +
                     "<TotalBalanceFilter>" +
                         "<Operator>oLessThan</Operator>" +
                         "<Amount>0</amount>" +
@@ -115,7 +115,7 @@ function buildRequest() {
         "<?qbxml version=\"13.0\"?>\n" +
         "<QBXML>\n" +
             "<QBXMLMsgsRq>\n" +
-                "<VendorQueryRq requestID="2">\n" +
+                "<VendorQueryRq requestID=\"2\">\n" +
                     "<TotalBalanceFilter>" +
                         "<Operator>\"oLessThan\"</Operator>" +
                         "<Amount>0</amount>" +
@@ -128,7 +128,7 @@ function buildRequest() {
         "<?qbxml version=\"13.0\"?>\n" +
         "<QBXML>\n" +
             "<QBXMLMsgsRq>\n" +
-                "<VendorQueryRq requestID="3">\n" +
+                "<VendorQueryRq requestID=\"3\">\n" +
                     "<TotalBalanceFilter>" +
                         "<Amount>0</amount>" +
                     "</TotalBalanceFilter>\n" +
@@ -140,7 +140,7 @@ function buildRequest() {
         "<?qbxml version=\"13.0\"?>\n" +
         "<QBXML>\n" +
             "<QBXMLMsgsRq>\n" +
-                "<VendorQueryRq requestID="4">\n" +
+                "<VendorQueryRq requestID=\"4\">\n" +
                 "</VendorQueryRq>\n" +
             "</QBXMLMsgsRq>\n" +
         "</QBXML>\n"
