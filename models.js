@@ -45,8 +45,12 @@ var schemas = {
 			comment: String,
 			date: Now,
 			_user: String // ref
-		}]
-		//pdf or image upload - or link to dropbox file?
+		}],
+		file: {
+			data: String, //data uri goes here
+			name: String,
+			type: String
+		}
 	}),
 
 	vendor: new Schema({

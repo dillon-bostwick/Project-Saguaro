@@ -1,7 +1,7 @@
 'use strict';
 
 angular.
-    module('invoiceDetail', ['ngInputModified', 'ui.bootstrap']).
+    module('invoiceDetail', ['ngInputModified', 'ui.bootstrap', 'ng-file-model']).
     component('invoiceDetail', {
         templateUrl: 'components/invoice-detail/invoice-detail.template.html',
         controller: function InvoiceDetailController(api, $routeParams, $window, $filter, $scope, $location) {
@@ -10,15 +10,6 @@ angular.
             self.path = $window.location.hash
 
             ////////////////////////////////////////////////////////////////////
-            //Constants:
-
-            self.PIPELINE = {
-                DATAENTRY: ['64374526'],
-                QUALITYCONTROL: [],
-                BUILDER: [],
-                EXEC: []
-            };
-
             ////////////////////////////////////////////////////////////////////
 
             // External requests:
@@ -28,6 +19,7 @@ angular.
             self.Activities = api.Activity.query();
             self.Users = api.User.query();
             self.CurrentUser = api.CurrentUser.get()
+
 
             //Used for adding new changes to Invoice.actions when it is being
             //edited:
@@ -69,7 +61,8 @@ angular.
                         comment: '',
                         date: new Date,
                         _user: undefined // Wait for CurrentUser promise resolution to fill
-                    }]
+                    }],
+                    file: null
                 })
                 : api.Invoice.get({ id: $routeParams.id });
 
@@ -235,6 +228,12 @@ angular.
                     return Number(a) + Number(b);
                 }, 0);
             }
+
+            self.readFile = function() {
+                console.log("msg");
+            }
+
+            $("input").change(function(e) { console.log("foo") });
 
             ////////////////////////////////////////////////////////////////////
             // BOTTOM OF FORM BUTTONS
