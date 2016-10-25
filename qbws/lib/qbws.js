@@ -25,7 +25,7 @@ function buildRequest() {
     var request = [];
 
     // CustomerQuery
-    inputXM = builder.create('QBXML', { version: '1.0' })
+    inputXML = builder.create('QBXML', { version: '1.0' })
                 .instruction('qbxml', 'version="13.0"')
                 .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
                       .ele('CustomerQueryRq', { 'requestID': '1' })
@@ -36,7 +36,7 @@ function buildRequest() {
     request.push(inputXML);
 
     // InvoiceQuery
-    inputXMLDoc = builder.create('QBXML', { version: '1.0' })
+    inputXML = builder.create('QBXML', { version: '1.0' })
                     .instruction('qbxml', 'version="13.0"')
                     .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
                       .ele('InvoiceQueryRq', { 'requestID': '2' })
@@ -47,7 +47,7 @@ function buildRequest() {
     request.push(inputXML);
 
     // BillQuery
-    inputXMLDoc = builder.create('QBXML', { version: '1.0' })
+    inputXML = builder.create('QBXML', { version: '1.0' })
                     .instruction('qbxml', 'version="13.0"')
                     .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
                         .ele('BillQueryRq', { 'requestID': '3' })
@@ -58,7 +58,7 @@ function buildRequest() {
     request.push(inputXML);
 
     // IBillAdd
-    inputXMLDoc = builder.create('QBXML', { version: '1.0'})
+    inputXML = builder.create('QBXML', { version: '1.0'})
                     .instruction('qbxml', 'version=13.0')
                     .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
                         .ele('IBillAdd', { 'requestID': '4' })
