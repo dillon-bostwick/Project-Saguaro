@@ -1,12 +1,18 @@
+/*
+    getters return promises
+
+ */
+
 'use strict';
 
 angular.
     module('core.dropboxWrapper')
-    .factory('dropboxWrapper', function($http) {
+    .factory('dropboxWrapper', function($http, $q) {
         var token = '';
 
         var logFailure = function(error) {
             console.log("dropboxWrapper - Something went wrong: ", error);
+            return error;
         }
 
         return {
@@ -15,7 +21,7 @@ angular.
             },
 
             getFile: function(pathParam) {
-                $http({
+                return $http({
                     url: 'https://content.dropboxapi.com/2/files/download',
                     method: 'POST',
                     headers: {
@@ -26,10 +32,6 @@ angular.
                     //     path: pathParam
                     // })
                 })
-                .then(function(response) {
-                    console.log(response);
-                },
-                logFailure)
             },
 
             addFile: function(file) {

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.
-    module('invoiceDetail', ['ngInputModified', 'ui.bootstrap']).
+    module('invoiceDetail', ['ngInputModified', 'ui.bootstrap', 'ng-file-model']).
     component('invoiceDetail', {
         templateUrl: 'components/invoice-detail/invoice-detail.template.html',
         controller: function InvoiceDetailController(api, dropboxWrapper, $routeParams, $window, $filter, $scope, $location) {
@@ -12,10 +12,6 @@ angular.
             ////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////
 
-            
-
-            //////
-
             // External requests:
             self.Vendors = api.Vendor.query();
             self.Hoods = api.Hood.query();
@@ -23,7 +19,6 @@ angular.
             self.Activities = api.Activity.query();
             self.Users = api.User.query();
             self.CurrentUser = api.CurrentUser.get()
-
 
             //Used for adding new changes to Invoice.actions when it is being
             //edited:
@@ -94,7 +89,7 @@ angular.
                     self.Invoice.actions[0]._user = currentUser._id;
                 }
 
-                dropboxWrapper.getFile('/Accounting Test/sampleinvoice.pdf');
+                console.log(dropboxWrapper.getFile('/Accounting Test/sampleinvoice.pdf'));
 
                 return currentUser;
             });
@@ -237,12 +232,6 @@ angular.
                     return Number(a) + Number(b);
                 }, 0);
             }
-
-            self.readFile = function() {
-                console.log("msg");
-            }
-
-            $("input").change(function(e) { console.log("foo") });
 
             ////////////////////////////////////////////////////////////////////
             // BOTTOM OF FORM BUTTONS

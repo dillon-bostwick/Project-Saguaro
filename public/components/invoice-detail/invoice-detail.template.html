@@ -35,13 +35,6 @@
 		 ng-src="{{$ctrl.Invoice.file.data}}"
 		 alt="{{$ctrl.Invoice.file.name}}">
 
-	<!-- <iframe ng-if="$ctrl.File && $ctrl.File.type === 'application/pdf'"
-		   ng-src="{{$ctrl.File.data}}"
-		   alt="{{$ctrl.File.name}}"
-		   width="640"
-		   height="480"></iframe>
- -->
-
  	<object ng-if="$ctrl.Invoice.file && $ctrl.Invoice.file.type === 'application/pdf'"
  			ng-attr-data="{{$ctrl.Invoice.file.data}}"
  			type="application/pdf">
@@ -71,7 +64,7 @@
 					<td>
 						<input
 							ng-if="$ctrl.canEdit" 
-							type="file" 
+							type="file"
 							ng-file-model="$ctrl.Invoice.file"
 							name="File Upload"
 							accept="image/*,application/pdf"> <!-- allow pdfs or images -->

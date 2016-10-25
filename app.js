@@ -64,23 +64,23 @@ passport.use(
     DBSTRATEGYOPTIONS,
     function(accessToken, refreshToken, profile, done) {
       if (!profile._json.team || profile._json.team.id != BRIGHTWATERDROPBOXTEAMID) {
-        return done('ERROR: User is valid Dropbox user but does not belong to the Brightwater Homes team', false);
-      }
-
-      User.findByIdAndUpdate(
-        profile._json.account_id,
-        { currentToken: accessToken },
-        { upsert: true }, //i.e. creates element if not existing
-        function(err, data) {
+        done('ERROR: User is valid Dropbox user but does not belong to the Brightwater Homes team', false);
+      } else {
+        User.findById(profile._json.account_id, function(err, data) {
           if (err) {
-            done('An error occured retrieving from database:\n\n\n' + 
-            JSON.stringify(err) + '\n\n\nYour unique Dropbox user ID: ' +
+            done('An error occured while retrieving user from database:\n\n\n' + 
+            JSON.stringify(err) + '\n\n\nYour Dropbox user ID: ' +
             profile._json.account_id, false);
-
           } else {
-            return done(null, data); //set for currentuser
+            data.currentToken = accessToken;
+
+            data.save(function() {
+              console.log(data);
+              done(null, data);
+            }); //end save
           } //end if
         }); //end findByIdandUpdate
+      } //end if
     }) //end dropboxStrategy constructor
 ); //end passport.use
 
