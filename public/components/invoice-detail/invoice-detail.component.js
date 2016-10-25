@@ -4,22 +4,17 @@ angular.
     module('invoiceDetail', ['ngInputModified', 'ui.bootstrap']).
     component('invoiceDetail', {
         templateUrl: 'components/invoice-detail/invoice-detail.template.html',
-        controller: function InvoiceDetailController(api, $routeParams, $window, $filter, $scope, $location) {
+        controller: function InvoiceDetailController(api, dropboxWrapper, $routeParams, $window, $filter, $scope, $location) {
             var self = this;
             window.ctrl = self;
             self.path = $window.location.hash
 
             ////////////////////////////////////////////////////////////////////
-            //Constants:
-
-            self.PIPELINE = {
-                DATAENTRY: ['64374526'],
-                QUALITYCONTROL: [],
-                BUILDER: [],
-                EXEC: []
-            };
-
             ////////////////////////////////////////////////////////////////////
+
+            
+
+            //////
 
             // External requests:
             self.Vendors = api.Vendor.query();
@@ -28,6 +23,7 @@ angular.
             self.Activities = api.Activity.query();
             self.Users = api.User.query();
             self.CurrentUser = api.CurrentUser.get()
+
 
             //Used for adding new changes to Invoice.actions when it is being
             //edited:
@@ -69,7 +65,8 @@ angular.
                         comment: '',
                         date: new Date,
                         _user: undefined // Wait for CurrentUser promise resolution to fill
-                    }]
+                    }],
+                    file: null
                 })
                 : api.Invoice.get({ id: $routeParams.id });
 
@@ -85,6 +82,9 @@ angular.
              * bind to the view (which obviously Angular knows when to update).
              */
             self.CurrentUser.$promise.then(function(currentUser) {
+                //give token to dropbox handler
+                dropboxWrapper.setToken(currentUser.currentToken);
+
                 // Whether is in the current user's queue:
                 self.canReview = _.contains(currentUser._invoiceQueue, $routeParams.id);
                 // Whether it can be edited at all:
@@ -93,6 +93,8 @@ angular.
                 if (self.isNew) {
                     self.Invoice.actions[0]._user = currentUser._id;
                 }
+
+                dropboxWrapper.getFile('/Accounting Test/sampleinvoice.pdf');
 
                 return currentUser;
             });
@@ -235,6 +237,12 @@ angular.
                     return Number(a) + Number(b);
                 }, 0);
             }
+
+            self.readFile = function() {
+                console.log("msg");
+            }
+
+            $("input").change(function(e) { console.log("foo") });
 
             ////////////////////////////////////////////////////////////////////
             // BOTTOM OF FORM BUTTONS
@@ -384,6 +392,10 @@ angular.
                     return (Math.random() * 16 | 0).toString(16);
                 }).toLowerCase();
             };
+
+
+
+
 
         } // end controller
     }); // end component

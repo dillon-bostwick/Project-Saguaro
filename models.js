@@ -45,8 +45,12 @@ var schemas = {
 			comment: String,
 			date: Now,
 			_user: String // ref
-		}]
-		//pdf or image upload - or link to dropbox file?
+		}],
+		file: {
+			data: String, //data uri goes here
+			name: String,
+			type: String
+		}
 	}),
 
 	vendor: new Schema({
@@ -62,7 +66,8 @@ var schemas = {
 		canCreate: Boolean,
 		canOverride: Boolean,
 		isAdmin: Boolean,
-		_group: reference('group')
+		_group: reference('group'),
+		currentToken: String
 	}),
 
 	activity: new Schema({

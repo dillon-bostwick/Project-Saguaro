@@ -21,93 +21,61 @@ var qbws,
  * @returns {String|Array} QBXML requests: CustomerQuery, InvoiceQuery and BillQuery
  */
 function buildRequest() {
-    // TODO: is 'pretty' false by default? Probably.
-        var strRequestXML;
-        var inputXMLDoc;
-        var request = [];
+    var inputXML;
+    var request = [];
 
-    // // CustomerQuery
-    // inputXMLDoc = builder.create('QBXML', { version: '1.0' })
-    //           .instruction('qbxml', 'version="4.0"')
-    //           .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
-    //               .ele('CustomerQueryRq', { 'requestID': '1' })
-    //                   .ele('MaxReturned')
-    //                       .text('1');
-    // strRequestXML = inputXMLDoc.end({ 'pretty': false });
-    // request.push(strRequestXML);
+    // CustomerQuery
+    inputXML = builder.create('QBXML', { version: '1.0' })
+                .instruction('qbxml', 'version="13.0"')
+                .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
+                      .ele('CustomerQueryRq', { 'requestID': '1' })
+                          .ele('MaxReturned')
+                              .text('1')
+                .end();
 
-    // // clean up
-    // strRequestXML = '';
-    // inputXMLDoc = null;
+    request.push(inputXML);
 
     // InvoiceQuery
-    // inputXMLDoc = builder.create('QBXML', { version: '1.0' })
-    //           .instruction('qbxml', 'version="13.0"')
-    //           .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
-    //               .ele('InvoiceQueryRq', { 'requestID': '2' })
-    //                   .ele('MaxReturned')
-    //                       .text('1');
-    // strRequestXML = inputXMLDoc.end({ 'pretty': false });
+    inputXML = builder.create('QBXML', { version: '1.0' })
+                    .instruction('qbxml', 'version="13.0"')
+                    .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
+                      .ele('InvoiceQueryRq', { 'requestID': '2' })
+                          .ele('MaxReturned')
+                              .text('1')
+                    .end();
 
-
-    // request.push(strRequestXML);
-
-    // // clean up
-    // strRequestXML = '';
-    // inputXMLDoc = null;
+    request.push(inputXML);
 
     // BillQuery
-    // billAddRequestObj = builder.create('QBXML', { version: '1.0' })
-    //           .instruction('qbxml', 'version="4.0"')
-    //           .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
-    //               .ele('BillQueryRq', { 'requestID': '3' })
-    //                   .ele('MaxReturned')
-    //                       .text('1');
-    // requestXML = inputXMLDoc.end({ 'pretty': false });
-    
-///////
+    inputXML = builder.create('QBXML', { version: '1.0' })
+                    .instruction('qbxml', 'version="13.0"')
+                    .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
+                        .ele('BillQueryRq', { 'requestID': '3' })
+                            .ele('MaxReturned')
+                                .text('1')
+                    .end();
 
-    // var requestID = 111;
-    // var vendorName = 'Bob the builder';
-    // var refNumber = 222;
-    // var amt = 333;
+    request.push(inputXML);
 
-    // var billAddRequestObj = {
-    //     QBXML: {
-    //         "?qbxml": "version=4.0",
-    //         QBXMLMsgsRq: {
-    //             "@onError": "continueOnError",
-    //             BillAddRq: {
-    //                 "@requestID": requestID.toString(),
-    //                 BillAdd: {
-    //                     VendorRef: {
-    //                         FullName: vendorName
-    //                     },
-    //                     RefNumber: refNumber,
-    //                     itemLineAdd: {
-    //                         amount: amt
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    // };
+    // IBillAdd
+    inputXML = builder.create('QBXML', { version: '1.0'})
+                    .instruction('qbxml', 'version=13.0')
+                    .ele('QBXMLMsgsRq', { 'onError': 'stopOnError' })
+                        .ele('IBillAdd', { 'requestID': '4' })
+                            .ele('VendorRef')
+                                .ele('FullName')
+                                    .text('A Gotham Project')
+                            .ele('memo')
+                                .text('Hello World')
+                    .end();
 
-    //var requestXML = builder.create(billAddRequestObj, {version: '1.0', encoding: 'UTF-8'}).end({ 'pretty': false });
+    request.push(inputXML);
 
-    return [
-        "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
-        "<?qbxml version=\"13.0\"?>\n" +
-            "<QBXML>\n" +
-                "<QBXMLMsgsRq>\n" +
-                    "<VendorQueryRq>\n" +
-                        "<TotalBalanceFilter>" +
-                            "<Amount>0</amount>" +
-                        "</TotalBalanceFilter>\n" +
-                    "</VendorQueryRq>\n" +
-                "</QBXMLMsgsRq>\n" +
-            "</QBXML>\n"
-    ];
+    for (var i = 0; i < request.length; i++) {
+        console.log('\n-----\n\nRequest #' + i + ': ' + request[i] + '\n-----\n\n');
+    }
+
+    return request;
 }
 
 /**
@@ -361,14 +329,18 @@ function (args) {
 
     if (counter < total) {
         request = req[counter];
-        serviceLog('    Sending request no = ' + (counter + 1));
+
+
+        serviceLog('\n\n\n---------- Sending request no = ' + (counter + 1) + ' ----------\n\n\n');
+
+
         counter = counter + 1;
     } else {
         counter = 0;
         request = '';
     }
 
-    console.log("sending requuest: ", request);
+    console.log("sending request: ", request);
 
     return {
         sendRequestXMLResult: { string: request }
@@ -435,6 +407,8 @@ function (args) {
     announceMethod('connectionError', args);
 
     // TODO: Why is the same code repeated thrice? Switch statement instead?
+    // REFACTOR THIS SO BADLY - Dillon
+
     if (hresult.trim() === QB_ERROR_WHEN_PARSING) {
         serviceLog('    HRESULT = ' + hresult);
         serviceLog('    Message = ' + message);
@@ -606,8 +580,7 @@ function (args) {
         retVal = percentage.toFixed();
     }
 
-    serviceLog('    Return values: ');
-    serviceLog('        Number retVal = ' + retVal);
+    console.log('\n\n\n----------RESPONSE---------- \n\n\n' + JSON.stringify(args, null, '\t') + '\n\n\n----------END RESPONSE----------\n\n\n');
 
     return {
         receiveResponseXMLResult: { string: retVal }

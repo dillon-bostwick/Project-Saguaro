@@ -142,14 +142,30 @@ angular.
                     if (group.pipelineIndex) { //isn't new in db
                         group.$update(andCheckLast(self, i));
                     } else { // must add to db
-                        console.log("msg");
                         group.$save(andCheckLast(self, i))
                     }
                 };
             }
 
-            //Helper for submitGroupChagne
-            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
             ////////////////////////////////////////////////////////////////////
 

@@ -1,5 +1,5 @@
 /* TODO FINAL:
- * - reinsert ensureLoggedIn('/') as middleware (second argument) for get/post/put methods
+ * - https://github.com/jaredhanson/passport-dropbox as middleware (second argument) for get/post/put methods
  * to ensure all backend validation
  */
 
@@ -12,16 +12,16 @@ var models = require('./models');
 
 var router = express.Router();
 
-var userModel = _.find(models, function(model) { return model.modelName === 'user'})
+var userModel = _.find(models, function(model) { return model.modelName === 'user' })
 
 ////////////////////////////////////////////////////////////////////////
 
 //initial authentication send
-router.get('/auth/dropbox', passport.authenticate('dropbox'));
+router.get('/auth/dropbox', passport.authenticate('dropbox-oauth2'));
 
 //callback from dropbox after authentication
 router.get('/auth/dropbox/callback',
-           passport.authenticate('dropbox',
+           passport.authenticate('dropbox-oauth2',
                                  {
                                     successRedirect: '/#!/dashboard',
                                     failureRedirect: '/#!/404'
@@ -34,17 +34,10 @@ router.get('/auth/dropbox/callback',
  * Note: you can check success with returnedObject.error == false
  */
 router.get('/api/currentuser', function(req, res) {
-    // In this case, req.user is actually the _id of the current user
-    if (req.user === undefined) {
-        res.send({ loggedIn: false }); // The user is not logged in
+    if (req.user == undefined) {
+        res.sendStatus(401);
     } else {
-        userModel.findById(req.user, function(error, data) { // (async)
-            if (error) {
-                res.send({ error: error }) // User id missing from DB
-            } else {
-                res.send(data);
-            }
-        });        
+        res.send(req.user);   
     }
 });
 

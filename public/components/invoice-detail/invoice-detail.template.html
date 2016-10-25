@@ -27,6 +27,29 @@
 	</table>
 </div>
 
+<!-- File view
+	TODO: Note very hacky way to tell whether the file is a pdf (i.e. first letter 'a') or an image (i.e. first letter 'i') - this is because Angular watcher doesn't like running the prototypal match() function against the full substring. Find an unhacky refactor asap -->
+<div class="well well-lg">
+
+	<img ng-if="$ctrl.Invoice.file && $ctrl.Invoice.file.type[0] === 'i'"
+		 ng-src="{{$ctrl.Invoice.file.data}}"
+		 alt="{{$ctrl.Invoice.file.name}}">
+
+	<!-- <iframe ng-if="$ctrl.File && $ctrl.File.type === 'application/pdf'"
+		   ng-src="{{$ctrl.File.data}}"
+		   alt="{{$ctrl.File.name}}"
+		   width="640"
+		   height="480"></iframe>
+ -->
+
+ 	<object ng-if="$ctrl.Invoice.file && $ctrl.Invoice.file.type === 'application/pdf'"
+ 			ng-attr-data="{{$ctrl.Invoice.file.data}}"
+ 			type="application/pdf">
+	</object>
+
+</div>
+
+
 <!-- if bs-modfiable is true, form changes tracked with AIM -->
 <form name="Form" bs-modifiable="{{$ctrl.canReview && $ctrl.enableAim}}" novalidate>
 	<div class="well well-lg">
@@ -35,7 +58,7 @@
 		<table class="table table-hover">
 			<thead>
 				<tr>
-					<th>File upload</th>
+					<th>File upload (pdf or image)</th>
 					<th>Service date</th>
 					<th>Vendor</th>
 					<th>Invoice #</th>
@@ -49,7 +72,9 @@
 						<input
 							ng-if="$ctrl.canEdit" 
 							type="file" 
-							accept="image/*,application/pdf">
+							ng-file-model="$ctrl.Invoice.file"
+							name="File Upload"
+							accept="image/*,application/pdf"> <!-- allow pdfs or images -->
 					</td>
 
 					<!-- TODO: date picker -->

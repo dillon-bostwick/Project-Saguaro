@@ -18,7 +18,7 @@ angular.
           template: '<invoice-detail></invoice-detail>'
         })
         .when('/', {
-          templateUrl: 'login.html'
+          templateUrl: 'login.template.html'
         })
         .when('/404', {
           template: '<h2>404</h2><p>I can\'t find what you\'re looking for</p>'
