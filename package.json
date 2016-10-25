@@ -11,9 +11,9 @@
     "path": "latest",
     "angular": "1.5.8",
     "underscore": "latest",
-    "express-restify-mongoose": "latest",
-    "passport-dropbox": "latest",
     "express-session": "latest",
-    "connect-ensure-login": "latest"
+    "connect-ensure-login": "latest",
+    "dropbox": "latest",
+    "passport-dropbox-oauth2": "latest"
   }
 }

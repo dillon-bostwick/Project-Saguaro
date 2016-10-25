@@ -1,4 +1,3 @@
 'use strict';
 
-// Define the `core` module
-angular.module('core', ['core.api']);
+angular.module('core', ['core.api', 'core.dropboxWrapper']);

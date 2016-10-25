@@ -6,4 +6,4 @@ angular.module('saguaro', [
 	'invoiceDetail',
 	'settings',
 	'core'
-	]);
+]);

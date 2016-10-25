@@ -66,7 +66,8 @@ var schemas = {
 		canCreate: Boolean,
 		canOverride: Boolean,
 		isAdmin: Boolean,
-		_group: reference('group')
+		_group: reference('group'),
+		currentToken: String
 	}),
 
 	activity: new Schema({

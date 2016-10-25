@@ -19,21 +19,25 @@ var path = require('path');
 var passport = require('passport');
 var expressSession = require('express-session');
 var _ = require('underscore');
-var dropboxStrategy = require('passport-dropbox').Strategy;
+var dropboxStrategy = require('passport-dropbox-oauth2').Strategy;
 
 //local modules
 var qbws   = require('./qbws');
 var router = require('./routes');
-var userModel = _.find(require('./models'), function(model) { return model.modelName === 'user'});
+var User = _.find(require('./models'), function(model) { return model.modelName === 'user'});
 
 //CONSTANTS:
 
 var BRIGHTWATERDROPBOXTEAMID = 'dbtid:AADIihV4QHYt6wCTX1MN2VVwJmdBDiv7tc4';
-
-var CONSUMERKEY = 'o2h3e5h6mytkwvg';
-var CONSUMERSECRET = 'n59fazsvvrs7708';
 var LOCALHOSTCALLBACK = 'http://localhost:5000/auth/dropbox/callback';
 var HEROKUCALLBACK = 'http://saguaroqbtester.herokuapp.com/auth/dropbox/callback';
+
+var DBSTRATEGYOPTIONS = {
+  apiVersion: '2',
+  clientID: 'o2h3e5h6mytkwvg',
+  clientSecret: 'n59fazsvvrs7708',
+  callbackURL: process.env.PORT ? HEROKUCALLBACK : LOCALHOSTCALLBACK //assuming that if process.env.PORT is truthy we're on heroku...
+}
 
 ////////////////////////////////////
 //DATABASE SETUP////////////////////
@@ -55,32 +59,37 @@ db.once("open", function(callback) {
 //OAUTH SETUP///////////////////////
 ////////////////////////////////////
 
-passport.use(new dropboxStrategy({
-    consumerKey: CONSUMERKEY,
-    consumerSecret: CONSUMERSECRET,
-    callbackURL: process.env.PORT ? HEROKUCALLBACK : LOCALHOSTCALLBACK //assuming that if process.env.PORT is truthy we're on heroku...
-  },
-  function(token, tokenSecret, profile, done) {
-    // First possible error: user is not a member of the team
-    if (profile._json.team == null || profile._json.team.team_id != BRIGHTWATERDROPBOXTEAMID) {
-      return done('ERROR: User is valid Dropbox user but does not belong to the Brightwater Homes team', false);
-    }
-    
-    // Now we query the db to see if there's a match
-    userModel.findById(profile._json.uid, function(error, data) {
-      return error
-        ? done('ERROR: Welcome Brightwater member. You don\'t have an account with Saguaro yet. Your unique Dropbox UID is: ' + profile._json.uid, false)
-        : done(null, data._id);
-    }); 
-}));
+passport.use(
+  new dropboxStrategy(
+    DBSTRATEGYOPTIONS,
+    function(accessToken, refreshToken, profile, done) {
+      if (!profile._json.team || profile._json.team.id != BRIGHTWATERDROPBOXTEAMID) {
+        return done('ERROR: User is valid Dropbox user but does not belong to the Brightwater Homes team', false);
+      }
 
-//Serialize user by 
-passport.serializeUser(function(user, cb) {
-  cb(null, user);
+      User.findByIdAndUpdate(
+        profile._json.account_id,
+        { currentToken: accessToken },
+        { upsert: true }, //i.e. creates element if not existing
+        function(err, data) {
+          if (err) {
+            done('An error occured retrieving from database:\n\n\n' + 
+            JSON.stringify(err) + '\n\n\nYour unique Dropbox user ID: ' +
+            profile._json.account_id, false);
+
+          } else {
+            return done(null, data); //set for currentuser
+          } //end if
+        }); //end findByIdandUpdate
+    }) //end dropboxStrategy constructor
+); //end passport.use
+
+passport.serializeUser(function(user, done) {
+  done(null, user);
 });
 
-passport.deserializeUser(function(obj, cb) {
-    cb(null, obj);
+passport.deserializeUser(function(user, done) {
+  done(null, user);
 });
 
 //Declaring app after Oauth setup - see https://github.com/passport/express-4.x-twitter-example/blob/master/server.js
@@ -108,7 +117,7 @@ app.use('/', router); // routes must declare after passport
 ////////////////////////////////////
 
 //qbws takes care of linking the server to the soap at '/wsdl'...
-//The server must get passd to run so that qbws knows
+//The server must get passed to run so that qbws knows
 //where to listen
 
 var server = http.createServer(app);

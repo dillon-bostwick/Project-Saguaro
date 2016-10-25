@@ -1,16 +1,20 @@
 'use strict';
 
 angular.
-    module('invoiceDetail', ['ngInputModified', 'ui.bootstrap', 'ng-file-model']).
+    module('invoiceDetail', ['ngInputModified', 'ui.bootstrap']).
     component('invoiceDetail', {
         templateUrl: 'components/invoice-detail/invoice-detail.template.html',
-        controller: function InvoiceDetailController(api, $routeParams, $window, $filter, $scope, $location) {
+        controller: function InvoiceDetailController(api, dropboxWrapper, $routeParams, $window, $filter, $scope, $location) {
             var self = this;
             window.ctrl = self;
             self.path = $window.location.hash
 
             ////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////
+
+            
+
+            //////
 
             // External requests:
             self.Vendors = api.Vendor.query();
@@ -78,6 +82,9 @@ angular.
              * bind to the view (which obviously Angular knows when to update).
              */
             self.CurrentUser.$promise.then(function(currentUser) {
+                //give token to dropbox handler
+                dropboxWrapper.setToken(currentUser.currentToken);
+
                 // Whether is in the current user's queue:
                 self.canReview = _.contains(currentUser._invoiceQueue, $routeParams.id);
                 // Whether it can be edited at all:
@@ -86,6 +93,8 @@ angular.
                 if (self.isNew) {
                     self.Invoice.actions[0]._user = currentUser._id;
                 }
+
+                dropboxWrapper.getFile('/Accounting Test/sampleinvoice.pdf');
 
                 return currentUser;
             });
@@ -383,6 +392,10 @@ angular.
                     return (Math.random() * 16 | 0).toString(16);
                 }).toLowerCase();
             };
+
+
+
+
 
         } // end controller
     }); // end component

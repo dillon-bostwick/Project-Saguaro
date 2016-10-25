@@ -11,7 +11,7 @@
 	<UserName>saguaro</UserName>
 	<QBType>QBFS</QBType>
 	<Scheduler>
-		<RunEveryNMinutes>1</RunEveryNMinutes> <!-- best use 1 for testing -->
+		<RunEveryNMinutes>1</RunEveryNMinutes>
 	</Scheduler>
 	<IsReadOnly>false</IsReadOnly>
 </QBWCXML>
