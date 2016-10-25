@@ -12,7 +12,7 @@ var qbws,
     connectionErrCounter = null,
     username = 'saguaro',
     password = 'saguaro',
-    companyFile = 'Q:\\Brightwater Homes.QBW',
+    companyFile = '', //Q:\\Brightwater Homes.QBW
     log = '',
     req = [];
 
