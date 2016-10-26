@@ -31,14 +31,21 @@
 	TODO: Note very hacky way to tell whether the file is a pdf (i.e. first letter 'a') or an image (i.e. first letter 'i') - this is because Angular watcher doesn't like running the prototypal match() function against the full substring. Find an unhacky refactor asap -->
 <div class="well well-lg">
 
-	<img ng-if="$ctrl.Invoice.file && $ctrl.Invoice.file.type[0] === 'i'"
-		 ng-src="{{$ctrl.Invoice.file.data}}"
-		 alt="{{$ctrl.Invoice.file.name}}">
+	<img ng-if="$ctrl.File && $ctrl.File.type[0] === 'i'"
+		 ng-src="{{$ctrl.File.data}}"
+		 alt="{{$ctrl.File.name}}">
 
- 	<object ng-if="$ctrl.Invoice.file && $ctrl.Invoice.file.type === 'application/pdf'"
- 			ng-attr-data="{{$ctrl.Invoice.file.data}}"
+ 	<object ng-if="$ctrl.File && $ctrl.File.type === 'application/pdf'"
+ 			ng-attr-data="{{$ctrl.File.data}}"
  			type="application/pdf">
 	</object>
+
+	<br>
+
+	<button class="btn btn-sm" 
+		    ng-click="$ctrl.downloadFile()">
+		Download file
+	</button>
 
 </div>
 
@@ -65,9 +72,9 @@
 						<input
 							ng-if="$ctrl.canEdit" 
 							type="file"
-							ng-file-model="$ctrl.Invoice.file"
+							ng-file-model="$ctrl.File"
 							name="File Upload"
-							accept="image/*,application/pdf"> <!-- allow pdfs or images -->
+							accept="image/*,application/pdf"
 					</td>
 
 					<!-- TODO: date picker -->

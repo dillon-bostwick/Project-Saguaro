@@ -61,7 +61,7 @@ angular.
                         date: new Date,
                         _user: undefined // Wait for CurrentUser promise resolution to fill
                     }],
-                    file: null
+                    filePath: null
                 })
                 : api.Invoice.get({ id: $routeParams.id });
 
@@ -80,6 +80,17 @@ angular.
                 //give token to dropbox handler
                 dropboxWrapper.setToken(currentUser.currentToken);
 
+                var path = '/Accounting Test/sampleimage.png';
+
+                // Assign FileStream from dropbox
+                dropboxWrapper.getLink(path)
+                .then(function (res) {
+                    self.File = {
+                        data: res.data.link,
+                        type: getFileType(path)
+                    }
+                });
+
                 // Whether is in the current user's queue:
                 self.canReview = _.contains(currentUser._invoiceQueue, $routeParams.id);
                 // Whether it can be edited at all:
@@ -88,8 +99,6 @@ angular.
                 if (self.isNew) {
                     self.Invoice.actions[0]._user = currentUser._id;
                 }
-
-                console.log(dropboxWrapper.getFile('/Accounting Test/sampleinvoice.pdf'));
 
                 return currentUser;
             });
@@ -186,17 +195,7 @@ angular.
                         });
                 }
 
-                //Remove currently selected options EXCEPT for the currently
-                //selected item itself
-                // activityOptions = activityOptions.filter(function(option) {
-
-                //     //option is not in activities unless it is current activity
-                //     return $.inArray(option._id, lineItem._activities) === -1 ||
-                //            option._id === lineItem._activities[currentIndex];
-                // });
-
-                // console.log(currentIndex, activityOptions.length);
-                return activityOptions;
+                return activityOptions
             }
 
             /* Given a lineItem, runs the JS native eval() function on the
@@ -233,7 +232,23 @@ angular.
                 }, 0);
             }
 
+            self.downloadFile = function() {
+                $window.open(self.File.data)
+            }
+
             ////////////////////////////////////////////////////////////////////
+
+
+
+
+
+            //Move everything below to either server or to core:
+
+
+
+
+
+
             // BOTTOM OF FORM BUTTONS
 
             /* When a new invoice is submitted, many actions occur:
@@ -371,6 +386,19 @@ angular.
                 });
             }
 
+            function getFileType(path) {
+                //TODO
+                var IMAGETYPES = [];
+
+                switch (path.slice(1).slice(-3)) {
+                    case 'pdf':
+                        return 'application/pdf'
+                        break;
+                    case 'png'
+
+                }
+            }
+
             /* Generate a new MongoDB ObjectId
              * Coped from user solenoid at:
              * https://gist.github.com/solenoid/1372386
@@ -381,9 +409,6 @@ angular.
                     return (Math.random() * 16 | 0).toString(16);
                 }).toLowerCase();
             };
-
-
-
 
 
         } // end controller

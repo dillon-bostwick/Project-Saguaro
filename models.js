@@ -46,11 +46,7 @@ var schemas = {
 			date: Now,
 			_user: String // ref
 		}],
-		file: {
-			data: String, //data uri goes here
-			name: String,
-			type: String
-		}
+		filePath: String
 	}),
 
 	vendor: new Schema({

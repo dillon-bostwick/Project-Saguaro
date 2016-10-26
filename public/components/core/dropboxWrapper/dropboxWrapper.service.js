@@ -34,6 +34,20 @@ angular.
                 })
             },
 
+            getLink: function(pathParam) {
+                return $http({
+                    url: 'https://api.dropboxapi.com/2/files/get_temporary_link',
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + this.token,
+                        'Content-Type': 'application/json'
+                    },
+                    data: JSON.stringify({
+                        path: pathParam
+                    })
+                })
+            },
+
             addFile: function(file) {
                 return 'stub';
             },
@@ -44,31 +58,5 @@ angular.
         };
     });
 
-
-
-            // $.ajax({
-            //     url: 'https://api.dropboxapi.com/2/files/list_folder',
-            //     method: 'POST',
-            //     dataType: 'json',
-
-            //     data: JSON.stringify({
-            //         path: '',
-            //         recursive: false,
-            //         include_media_info: false,
-            //         include_deleted: false,
-            //         include_has_explicit_shared_members: false
-            //     }),
-
-            //     headers: {
-            //         "Authorization": "Bearer 3uSEkSqtVsEAAAAAAAAXd-5yT8CClQxvZZjgCvcqcaXEXKTD0m4N8Abiv0PcfpTR",
-            //         "Content-Type": "application/json"
-            //     }
-            // })
-            // .done(function(data) {
-            //     console.log("Successful dropbox connection returned: ", data);
-            // })
-            // .fail(function(data) {
-            //     console.log("Connection to Dropbox failed. Payload from server: ", data);
-            // });
 
 
