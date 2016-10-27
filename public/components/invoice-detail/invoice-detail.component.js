@@ -4,7 +4,7 @@ angular.
     module('invoiceDetail', ['ngInputModified', 'ui.bootstrap', 'ng-file-model']).
     component('invoiceDetail', {
         templateUrl: 'components/invoice-detail/invoice-detail.template.html',
-        controller: function InvoiceDetailController(api, dropboxWrapper, $routeParams, $window, $filter, $scope, $location) {
+        controller: function InvoiceDetailController(api, $routeParams, $window, $filter, $scope, $location) {
             var self = this;
             window.ctrl = self;
             self.path = $window.location.hash
@@ -49,7 +49,6 @@ angular.
             // Either Invoice is retrived from DB or it gets a starter template:
             self.Invoice = self.isNew
                 ? new api.Invoice({
-                    _id: generateMongoObjectId(),
                     serviceDate: new Date,
                     invNum: '',
                     _vendor: '',
@@ -77,19 +76,6 @@ angular.
              * bind to the view (which obviously Angular knows when to update).
              */
             self.CurrentUser.$promise.then(function(currentUser) {
-                //give token to dropbox handler
-                dropboxWrapper.setToken(currentUser.currentToken);
-
-                var path = '/Accounting Test/sampleimage.png';
-
-                // Assign FileStream from dropbox
-                dropboxWrapper.getLink(path)
-                .then(function (res) {
-                    self.File = {
-                        data: res.data.link,
-                        type: getFileType(path)
-                    }
-                });
 
                 // Whether is in the current user's queue:
                 self.canReview = _.contains(currentUser._invoiceQueue, $routeParams.id);
@@ -387,16 +373,10 @@ angular.
             }
 
             function getFileType(path) {
-                //TODO
-                var IMAGETYPES = [];
+                var re = /(?:\.([^.]+))?$/;
+                var extension = re.exec(path)[1];
 
-                switch (path.slice(1).slice(-3)) {
-                    case 'pdf':
-                        return 'application/pdf'
-                        break;
-                    case 'png'
-
-                }
+                return extension === 'pdf' ? 'application/pdf' : 'image/' + extension;
             }
 
             /* Generate a new MongoDB ObjectId

@@ -22,7 +22,7 @@ var _ = require('underscore');
 var dropboxStrategy = require('passport-dropbox-oauth2').Strategy;
 
 //local modules
-var qbws   = require('./qbws');
+var qbws   = require('./lib/qbws');
 var router = require('./routes');
 var User = _.find(require('./models'), function(model) { return model.modelName === 'user'});
 

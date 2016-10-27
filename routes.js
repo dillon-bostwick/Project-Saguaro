@@ -43,9 +43,12 @@ router.get('/api/currentuser', function(req, res) {
 
 ////////////////////////////////////////////////////////////////////////
 
-/* RESTful endpoints manually created for each database collections.
- * Automated routing for each model in the models object
- */
+router.post('api/updateinvoice', function(req, res) {
+    
+})
+
+////////////////////////////////////////////////////////////////////////
+
 _.map(models, function(model) { return model; }).forEach(function(model) {
 
     /* POST (CREATE)
