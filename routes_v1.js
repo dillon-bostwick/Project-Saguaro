@@ -1,6 +1,8 @@
 /* TODO FINAL:
  * - https://github.com/jaredhanson/passport-dropbox as middleware (second argument) for get/post/put methods
  * to ensure all backend validation
+ *
+ * Even if you do deprecate this API, still have to ensure login above
  */
 
 var express = require('express');
@@ -8,7 +10,7 @@ var _ = require('underscore');
 var mongoose = require('mongoose');
 var passport = require('passport');
 var ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
-var models = require('./models');
+var models = require('./lib/models');
 
 var router = express.Router();
 
@@ -24,28 +26,22 @@ router.get('/auth/dropbox/callback',
            passport.authenticate('dropbox-oauth2',
                                  {
                                     successRedirect: '/#!/dashboard',
-                                    failureRedirect: '/#!/404'
+                                    failureRedirect: '/#!/login'
                                  }));
 
 ////////////////////////////////////////////////////////////////////////
 
-/* get user data from cookie (requires round trip due to sid instead of jwt).
+/*
  * Returns entire user document, not just the _id
  * Note: you can check success with returnedObject.error == false
  */
-router.get('/api/currentuser', function(req, res) {
+router.get('/currentuser', function(req, res) {
     if (req.user == undefined) {
         res.sendStatus(401);
     } else {
         res.send(req.user);   
     }
 });
-
-////////////////////////////////////////////////////////////////////////
-
-router.post('api/updateinvoice', function(req, res) {
-    
-})
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -56,7 +52,7 @@ _.map(models, function(model) { return model; }).forEach(function(model) {
      * Nothing is sent back.
      * anything as an extram URI param has no effect (wildcard)
      */
-    router.post('/api/' + model.modelName + '/:wildcard', function(req, res) {
+    router.post('/' + model.modelName + '/:wildcard', function(req, res) {
         model(req.body).save(function(error) {
             if (error) {
                 console.log(error);
@@ -71,7 +67,7 @@ _.map(models, function(model) { return model; }).forEach(function(model) {
      * Pass a standard MongoDB query as params
      * The entire object is sent back.
      */
-    router.get('/api/' + model.modelName, function(req, res) {
+    router.get('/' + model.modelName, function(req, res) {
         model.find(req.query, function(error, data) {
             if (error) {
                 console.log(error);
@@ -85,7 +81,7 @@ _.map(models, function(model) { return model; }).forEach(function(model) {
     /* GET by id
      * same as get by query except the id is passed as part of the URI
      */
-    router.get('/api/' + model.modelName + '/:id', function(req, res) {
+    router.get('/' + model.modelName + '/:id', function(req, res) {
         model.findById(req.params.id, function(error, data) {
             if (error) {
                 console.log(error);
@@ -102,7 +98,7 @@ _.map(models, function(model) { return model; }).forEach(function(model) {
     *
     * Nothing is sent back.
     */
-    router.put('/api/' + model.modelName + '/:id', function(req, res) {
+    router.put('/' + model.modelName + '/:id', function(req, res) {
         model.findById(req.params.id, function(error, data) {
             if (error) {
                 console.log("Error with finding id:\n" + error);
@@ -125,7 +121,7 @@ _.map(models, function(model) { return model; }).forEach(function(model) {
     * Pass a standard MongoDB query as params
     * Nothing is sent back.
     */
-    router.delete('/api/' + model.modelName + '/:id', function(req, res) {
+    router.delete('/' + model.modelName + '/:id', function(req, res) {
         model.findByIdAndRemove(req.params.id, function(error) {
             console.log(error);
             if (error) {

@@ -1,15 +1,15 @@
 /* Dillon Bostwick 2016
  * 
- * app.js establishes router with express.
+ * app.js
+ *
  * 
- * Serves:
- * /api/... - RESTful connection to db
+ * /api/v1/... - RESTful connection with basic 1:1 mapping to db
+ * /api/v2/... - RESTful connection to db
  * /wsdl - SOAP connection to qbwc
- * /#!/... - Angular app
+ * /#!/... - Angular routes
  * mongoDB connection on port 27017
  */
 
-//imported modules
 var express = require('express');
 var bodyParser = require('body-parser');
 var http = require('http');
@@ -21,22 +21,19 @@ var expressSession = require('express-session');
 var _ = require('underscore');
 var dropboxStrategy = require('passport-dropbox-oauth2').Strategy;
 
-//local modules
+var globals = require('./lib/globals')
 var qbws   = require('./lib/qbws');
-var router = require('./routes');
-var User = _.find(require('./models'), function(model) { return model.modelName === 'user'});
+var v1ApiRouter = require('./routes_v1');
+var v2ApiRouter = require('./routes_v2');
+var User = _.find(require('./lib/models'), function(model) { return model.modelName === 'user'});
 
-//CONSTANTS:
 
-var BRIGHTWATERDROPBOXTEAMID = 'dbtid:AADIihV4QHYt6wCTX1MN2VVwJmdBDiv7tc4';
-var LOCALHOSTCALLBACK = 'http://localhost:5000/auth/dropbox/callback';
-var HEROKUCALLBACK = 'http://saguaroqbtester.herokuapp.com/auth/dropbox/callback';
 
-var DBSTRATEGYOPTIONS = {
+var dbStrategyOptions = {
   apiVersion: '2',
   clientID: 'o2h3e5h6mytkwvg',
   clientSecret: 'n59fazsvvrs7708',
-  callbackURL: process.env.PORT ? HEROKUCALLBACK : LOCALHOSTCALLBACK //assuming that if process.env.PORT is truthy we're on heroku...
+  callbackURL: process.env.PORT ? globals.herokuCallback : globals.localCallback
 }
 
 ////////////////////////////////////
@@ -45,14 +42,14 @@ var DBSTRATEGYOPTIONS = {
 
 mongoose.Promise = global.Promise;
 
-mongoose.connect("mongodb://localhost:27017/saguaro"); // db is called 'saguaro'
+mongoose.connect(globals.mongoUri); // db is called 'saguaro'
 
 var db = mongoose.connection;
 
 db.on("error", console.error.bind(console, "Connection to MongoDB failed"));
 
 db.once("open", function(callback) {
-  console.log("Connection to MongoDB successful, running on 27017");
+  console.log("Connection to MongoDB successful, running on " + globals.mongoPort);
 });
 
 ////////////////////////////////////
@@ -61,9 +58,9 @@ db.once("open", function(callback) {
 
 passport.use(
   new dropboxStrategy(
-    DBSTRATEGYOPTIONS,
+    dbStrategyOptions,
     function(accessToken, refreshToken, profile, done) {
-      if (!profile._json.team || profile._json.team.id != BRIGHTWATERDROPBOXTEAMID) {
+      if (!profile._json.team || profile._json.team.id != globals.brightwaterDropboxTeamId) {
         done('ERROR: User is valid Dropbox user but does not belong to the Brightwater Homes team', false);
       } else {
         User.findById(profile._json.account_id, function(err, data) {
@@ -75,7 +72,6 @@ passport.use(
             data.currentToken = accessToken;
 
             data.save(function() {
-              console.log(data);
               done(null, data);
             }); //end save
           } //end if
@@ -95,8 +91,8 @@ passport.deserializeUser(function(user, done) {
 //Declaring app after Oauth setup - see https://github.com/passport/express-4.x-twitter-example/blob/master/server.js
 var app = express();
 
-app.set('port', (process.env.PORT || 5000));
-console.log('Express server running on 5000');
+app.set('port', (process.env.PORT || globals.localPort));
+console.log('Express server running on ' + globals.localPort);
 
 ////////////////////////////////////
 //MIDDLEWARE////////////////////////
@@ -109,11 +105,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(passport.initialize());
 app.use(passport.session());
-app.use('/', router); // routes must declare after passport
+app.use('/api/v1', v1ApiRouter);
+app.use('/api/v2', v2ApiRouter);
 
 
 ////////////////////////////////////
-//SERVER SETUP//////////////////////
+//SERVER LINK TO QBWS///////////////
 ////////////////////////////////////
 
 //qbws takes care of linking the server to the soap at '/wsdl'...
@@ -122,8 +119,6 @@ app.use('/', router); // routes must declare after passport
 
 var server = http.createServer(app);
 qbws.run(server);
-
-module.exports = app;
 
 ////////////////////////////////////
 
@@ -139,3 +134,11 @@ function getUserIdByDropboxId(dropboxUid) {
     return error ? null : data._id
   });
 }
+
+
+
+
+
+
+
+module.exports = app;
