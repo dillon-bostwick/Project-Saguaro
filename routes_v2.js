@@ -7,6 +7,7 @@
 
 var express = require('express');
 var passport = require('passport');
+var _ = require('underscore');
 
 var TESTINGMODE = require('./lib/globals').testingMode;  //allows routes to be accessed without a session id (otherwise sends 401)
 var RouteHandler = require('./lib/requestHandler')
@@ -44,24 +45,26 @@ function doRequest(handlerFunc) {
 	return function(req, res) {
 		var handlerResult
 
+		//req.user==undefined means sid signature failed
 		if (!req.user && !TESTINGMODE) {
 			res.sendStatus(401);
 			return;
 		}
 
-		handlerResult = handlerFunc(req.body);
+		handlerResult = handlerFunc(req.body, req.user);
 
 		if (handlerResult.statusCode === 200) {
 			res.json({
-				user: req.user,
+				user: req.user || null,
 				data: handlerResult.data,
 				errors: handlerResult.errors
 			});
 		} else {
-			if (handlerResult.errors == []) {
+			if (_.isEmpty(handlerResult.errors)) {
 				res.sendStatus(handlerResult.statusCode)
 			} else {
-				res.status(handlerResult.statusCode).send(errors)
+				res.status(handlerResult.statusCode)
+				   .json({ errors: handlerResult.errors });
 			}
 		}
 	}
