@@ -40,6 +40,8 @@ router.post('/submitinvoice', doRequest(RouteHandler.submitInvoice));
  * 		user {Object}
  * 		errors {array of Strings}
  * 		data {Object}
+ *
+ * TODO: Abstract the try-catch for internal server errors to here - just put the 500 here
  */
 function doRequest(handlerFunc) {
 	return function(req, res) {
@@ -51,7 +53,7 @@ function doRequest(handlerFunc) {
 			return;
 		}
 
-		handlerResult = handlerFunc(req.body, req.user);
+		handlerResult = handlerFunc(req);
 
 		if (handlerResult.statusCode === 200) {
 			res.json({
