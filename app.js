@@ -21,15 +21,13 @@ var expressSession = require('express-session');
 var _ = require('underscore');
 var dropboxStrategy = require('passport-dropbox-oauth2').Strategy;
 
-var globals = require('./lib/globals')
-var qbws   = require('./lib/qbws');
-var v1ApiRouter = require('./routes_v1');
-var v2ApiRouter = require('./routes_v2');
-var User = _.find(require('./lib/models'), function(model) { return model.modelName === 'user'});
+const globals = require('./lib/globals')
+const qbws   = require('./lib/qbws');
+const v1ApiRouter = require('./routes_v1');
+const v2ApiRouter = require('./routes_v2');
+const User = _.find(require('./lib/models'), function(model) { return model.modelName === 'user'});
 
-
-
-var dbStrategyOptions = {
+const dbStrategyOptions = {
   apiVersion: '2',
   clientID: 'o2h3e5h6mytkwvg',
   clientSecret: 'n59fazsvvrs7708',
@@ -124,6 +122,8 @@ qbws.run(server);
 
 /* Returns the _id of a user in the databse with the matching dropboxUid.
  * if no match, returns null
+ *
+ * TODO: move to model
  */
 function getUserIdByDropboxId(dropboxUid) {
   //find in models array
