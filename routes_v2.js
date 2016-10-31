@@ -10,22 +10,58 @@ var passport = require('passport');
 var _ = require('underscore');
 
 var router = express.Router();
-var RequestProvider = require('./lib/requestProvider')
+var Controllers = require('./lib/Controllers')
 
 const TESTINGMODE = require('./lib/globals').testingMode;  //allows routes to be accessed without a session id (otherwise sends 401)
 
-const AUTHREDIRECTS = {
+const authRedirects = {
 	successRedirect: '/#!/dashboard',
     failureRedirect: '/#!/404'
 }
 
-router.get('/auth/dropbox', passport.authenticate('dropbox-oauth2'));
-router.get('/auth/dropbox/callback', passport.authenticate('dropbox-oauth2', AUTHREDIRECTS));
 
-router.get('/invoice/:id', doRequest(RequestProvider.getInvoice));
-router.get('/getownqueues', doRequest(RequestProvider.getOwnQueues));
-router.get('/getbusinessproperties', doRequest(RequestProvider.getBusinessProperties));
-router.post('/submitinvoice', doRequest(RequestProvider.submitInvoice));
+router.get('/auth/dropbox', passport.authenticate('dropbox-oauth2'));
+router.get('/auth/dropbox/callback', passport.authenticate('dropbox-oauth2', authRedirects));
+
+/**
+ * pre-response middleware:
+ *
+ * Verify valid SID - respond with 401 status code if not logged in
+ */
+router.use((req, res, next) => {
+	if (!req.user && !TESTINGMODE) {
+		res.sendStatus(401)
+	} else {
+		next();
+	}
+});
+
+
+router.get('/invoice/:id', Controllers.getInvoice);
+router.get('/getownqueues', Controllers.getOwnQueues);
+router.get('/getbusinessproperties', Controllers.getBusinessProperties);
+router.post('/submitinvoice', Controllers.submitInvoice);
+
+/**
+ * Error-handling middleware:
+ *
+ * Log error stack to console then respond with a 500 status code
+ */
+router.use((err, req, res, next) => {
+	if(err.stack) {
+		console.log(err.stack);
+	} else {
+		console.log(err);
+	}
+	
+	res.sendStatus(500);
+	next();
+});
+
+
+
+
+
 
 /**
  * @param  {function(body)} - only body of request is exposed to handler
@@ -45,8 +81,6 @@ router.post('/submitinvoice', doRequest(RequestProvider.submitInvoice));
  */
 function doRequest(handlerFunc) {
 	return (req, res) => {
-		var handlerResult;
-
 		//req.user==undefined means sid signature failed
 		if (!req.user && !TESTINGMODE) {
 			res.sendStatus(401);
@@ -54,27 +88,15 @@ function doRequest(handlerFunc) {
 		}
 
 		try {
-			handlerResult = handlerFunc(req);
-		} catch (error) {
+			handlerFunc(req, function(res) {
+				
+			});
+		}
+
+		catch (error) {
 			logError(handlerFunc.name, error)
 			res.sendStatus(500);
 			return;
-		}
-
-		if (!handlerResult) {
-			logError(handlerFunc.name, 'No response')
-			res.sendStatus(500);
-		} else if (handlerResult.statusCode === 200) {
-			res.json({
-				user: req.user || null,
-				data: handlerResult.data,
-				errors: handlerResult.errors
-			});
-		} else if (_.isEmpty(handlerResult.errors)) {
-			res.sendStatus(handlerResult.statusCode)
-		} else {
-			res.status(handlerResult.statusCode)
-			   .json({ errors: handlerResult.errors });
 		}
 	}
 }
