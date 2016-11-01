@@ -24,7 +24,9 @@ router.get('/auth/dropbox', passport.authenticate('dropbox-oauth2'));
 router.get('/auth/dropbox/callback', passport.authenticate('dropbox-oauth2', authRedirects));
 
 /**
- * TODO: Should the view for error handling for auth be rendered by Express or by Angular?
+ * Error-handling for auth routes
+ * 
+ * TODO: Should the view for error handling for auth routes be rendered by Express or by Angular?
  * TODO: Shouldn't always send 500 - sometimes its 4xx depending on what happened
  */
 router.use((err, req, res, next) => {
@@ -34,7 +36,7 @@ router.use((err, req, res, next) => {
 /**
  * pre-response middleware:
  *
- * Verify valid SID - respond with 401 status code if not logged in
+ * Verify valid SID - respond with 401 if not logged in
  */
 router.use((req, res, next) => {
 	if (!req.user && !TESTINGMODE) {
@@ -49,12 +51,14 @@ router.get('/invoice/:id', Controllers.getInvoice);
 router.get('/ownqueues', Controllers.getOwnQueues);
 router.get('/businessproperties', Controllers.getBusinessProperties);
 router.post('/submitinvoice', Controllers.submitInvoice);
-router.get('/invoice/file/:id', Controllers.getInvoiceFilestream);
+
 
 /**
- * Error-handling middleware:
+ * Error-handling for core api v2 routes:
  *
- * Log error stack to console then respond with a 500 status code
+ * Log error stack then respond with 500
+ *
+ * Don't expose error message to client
  */
 router.use((err, req, res, next) => {
 	if(err.stack) {
@@ -65,57 +69,6 @@ router.use((err, req, res, next) => {
 	
 	res.sendStatus(500); 
 });
-
-
-
-
-
-
-/**
- * @param  {function(body)} - only body of request is exposed to handler
- * @return {void}
- *
- * A handler responds with an object containing
- * 		statusCode {Number}
- * 		errors {array of Strings}
- * 		data {Object}
- *
- * doRequest always sends a response to the client containg
- * 		user {Object}
- * 		errors {array of Strings}
- * 		data {Object}
- *
- * TODO: Should this be middleware (i.e. router.use) instead?
- */
-function doRequest(handlerFunc) {
-	return (req, res) => {
-		//req.user==undefined means sid signature failed
-		if (!req.user && !TESTINGMODE) {
-			res.sendStatus(401);
-			return;
-		}
-
-		try {
-			handlerFunc(req, function(res) {
-				
-			});
-		}
-
-		catch (error) {
-			logError(handlerFunc.name, error)
-			res.sendStatus(500);
-			return;
-		}
-	}
-}
-
-function logError(funcName, errorMessage) {
-	if (TESTINGMODE) {
-		console.log('   Error: ' + funcName + ' returned:\n');
-		console.log('   ' + errorMessage + '\n');
-	}
-}
-
 
 
 
