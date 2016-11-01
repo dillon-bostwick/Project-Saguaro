@@ -38,9 +38,10 @@ router.use((req, res, next) => {
 
 
 router.get('/invoice/:id', Controllers.getInvoice);
-router.get('/getownqueues', Controllers.getOwnQueues);
-router.get('/getbusinessproperties', Controllers.getBusinessProperties);
+router.get('/ownqueues', Controllers.getOwnQueues);
+router.get('/businessproperties', Controllers.getBusinessProperties);
 router.post('/submitinvoice', Controllers.submitInvoice);
+router.get('/invoice/file/:id', Controllers.getInvoiceFilestream);
 
 /**
  * Error-handling middleware:
@@ -54,8 +55,7 @@ router.use((err, req, res, next) => {
 		console.log(err);
 	}
 	
-	res.sendStatus(500);
-	next();
+	res.sendStatus(500); 
 });
 
 
