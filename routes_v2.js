@@ -16,12 +16,20 @@ const TESTINGMODE = require('./lib/globals').testingMode;  //allows routes to be
 
 const authRedirects = {
 	successRedirect: '/#!/dashboard',
-    failureRedirect: '/#!/404'
+    failureRedirect: '/#!/404' // TODO
 }
 
 
 router.get('/auth/dropbox', passport.authenticate('dropbox-oauth2'));
 router.get('/auth/dropbox/callback', passport.authenticate('dropbox-oauth2', authRedirects));
+
+/**
+ * TODO: Should the view for error handling for auth be rendered by Express or by Angular?
+ * TODO: Shouldn't always send 500 - sometimes its 4xx depending on what happened
+ */
+router.use((err, req, res, next) => {
+	res.status(500).send(err)
+});
 
 /**
  * pre-response middleware:

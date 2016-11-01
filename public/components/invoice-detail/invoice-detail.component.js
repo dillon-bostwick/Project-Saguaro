@@ -12,6 +12,19 @@ angular.
             ////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////
 
+            self.File = {
+                data: 'https://dl.dropboxusercontent.com/apitl/1/AAD7Q5u42FvrToUY8RdEBXLE8wCwRfAeY_N9lozKj8zzDEPii_zd7inY6DM6Mamn6vj1GKnJv6-gA2nEtqE1nThpSB0s4A21tp5xUJEaqJnKHom4jab8M8Gl3Ju7i7mEIsdOUnNMLlcVTq6Wj9EdeiuIG12-xWN5H2ig7u_UDX27rZMf2ENcnirYxGK_rbjNDhRDUpSJbhMPnKyc_28K9nctUgA7i9KvMRXYHLx3PVAjQQ',
+                type: 'application/pdf'
+            }
+
+            /////
+            ///
+            ///
+            ///
+            ///
+            ///
+            ///
+
             // External requests:
             self.Vendors = api.Vendor.query();
             self.Hoods = api.Hood.query();
@@ -216,10 +229,6 @@ angular.
                 .reduce(function(a, b) {
                     return Number(a) + Number(b);
                 }, 0);
-            }
-
-            self.downloadFile = function() {
-                $window.open(self.File.data)
             }
 
             ////////////////////////////////////////////////////////////////////
