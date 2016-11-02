@@ -31,7 +31,7 @@ const dbStrategyOptions = {
   apiVersion: '2',
   clientID: 'o2h3e5h6mytkwvg',
   clientSecret: 'n59fazsvvrs7708',
-  callbackURL: process.env.PORT ? globals.herokuCallback : globals.localCallback
+  callbackURL: globals.authCallbackUrl
 }
 
 ////////////////////////////////////
@@ -86,7 +86,8 @@ passport.deserializeUser(function(user, done) {
   done(null, user);
 });
 
-//Declaring app after Oauth setup - see https://github.com/passport/express-4.x-twitter-example/blob/master/server.js
+//Declaring app after Oauth setup - see https:github.com/passport/express-4.x
+//-twitter-example/blob/master/server.js
 var app = express();
 
 app.set('port', (process.env.PORT || globals.localPort));
@@ -111,9 +112,8 @@ app.use('/api/v2', v2ApiRouter);
 //SERVER LINK TO QBWS///////////////
 ////////////////////////////////////
 
-//qbws takes care of linking the server to the soap at '/wsdl'...
-//The server must get passed to run so that qbws knows
-//where to listen
+//qbws takes care of linking the server to the soap at '/wsdl'... The server
+//must get passed to run so that qbws knows where to listen
 
 var server = http.createServer(app);
 qbws.run(server);
