@@ -11,6 +11,7 @@ var _ = require('underscore');
 
 var router = express.Router();
 var Controllers = require('./lib/Controllers')
+var utils = require('./lib/utils')
 
 const TESTINGMODE = require('./lib/globals').testingMode;  //allows routes to be accessed without a session id (otherwise sends 401)
 
@@ -49,7 +50,7 @@ router.use((req, res, next) => {
 
 router.get('/invoice/:id', Controllers.getInvoice);
 router.get('/ownqueues', Controllers.getOwnQueues);
-router.get('/businessproperties', Controllers.getBusinessProperties);
+router.get('/refreshdropzone', Controllers.refreshDropzone)
 router.post('/submitinvoice', Controllers.submitInvoice);
 
 
