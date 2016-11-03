@@ -8,6 +8,7 @@
 var express = require('express');
 var passport = require('passport');
 var _ = require('underscore');
+var bunyanLogger = require('express-bunyan-logger');
 
 var router = express.Router();
 var Controllers = require('./lib/Controllers')
@@ -19,7 +20,6 @@ const authRedirects = {
 	successRedirect: '/#!/dashboard',
     failureRedirect: '/#!/404' // TODO
 }
-
 
 router.get('/auth/dropbox', passport.authenticate('dropbox-oauth2'));
 router.get('/auth/dropbox/callback', passport.authenticate('dropbox-oauth2', authRedirects));
@@ -65,7 +65,7 @@ router.use((err, req, res, next) => {
 	if(err.stack) {
 		console.log(err.stack);
 	} else {
-		console.log(err);
+		console.log(err || 'Error-handling middleware called with no error');
 	}
 	
 	res.sendStatus(500); 
