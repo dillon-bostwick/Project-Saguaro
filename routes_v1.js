@@ -2,7 +2,8 @@
  * - https://github.com/jaredhanson/passport-dropbox as middleware (second argument) for get/post/put methods
  * to ensure all backend validation
  *
- * Even if you do deprecate this API, still have to ensure login above
+ * Even if you do deprecate this API, still have to ensure login above.
+ * But maybe keep for some 1:1 mapping purposes
  */
 
 var express = require('express');

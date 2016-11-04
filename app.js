@@ -46,8 +46,8 @@ var db = mongoose.connection;
 
 db.on("error", console.error.bind(console, "Connection to MongoDB failed"));
 
-db.once("open", function(callback) {
-  console.log("Connection to MongoDB successful, running on " + globals.mongoPort);
+db.once("open", (callback) => {
+  console.log("Connection to MongoDB on " + globals.mongoPort);
 });
 
 ////////////////////////////////////
