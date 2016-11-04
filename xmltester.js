@@ -20,6 +20,12 @@ inputXML = builder.create('QBXML', { version: '1.0'})
                                         .text('second expense code')
                                     .up()
                                 .up()
+                                .ele('Amount')
+                                    .text('100')
+                                .up()
+                                .ele('Memo')
+                                    .text('memo for a line item')
+                                .up()
                             .up()
 
 module.exports = inputXML.end();
