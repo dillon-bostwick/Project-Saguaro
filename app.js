@@ -25,7 +25,7 @@ const globals = require('./lib/globals')
 const qbws   = require('./lib/qbws');
 const v1ApiRouter = require('./routes_v1');
 const v2ApiRouter = require('./routes_v2');
-const User = _.find(require('./lib/models'), function(model) { return model.modelName === 'user'});
+const User = require('./lib/models').User
 
 const dbStrategyOptions = {
   apiVersion: '2',
