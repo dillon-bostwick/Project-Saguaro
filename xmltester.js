@@ -2,7 +2,7 @@ var builder = require('xmlbuilder');
 
 inputXML = builder.create('QBXML', { version: '1.0'})
                      .instruction('qbxml', 'version="13.0"')
-                     .ele('QBXLMMsgsRq', { onError: 'stopOnError' })
+                     .ele('QBXMLMsgsRq', { onError: 'continueOnError' })
                         .ele('BillAddRq', { requestID: '3' })
                             .ele('BillAdd')
                                 .ele('VendorRef')
