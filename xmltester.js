@@ -1,3 +1,13 @@
+/**
+ * https://developer-static.intuit.com/qbsdk-current/common/newosr/index.html
+ *
+ * Notes re qbXML:
+ *     - Node order matters
+ *     - OSR syntax is not 1:1, so you have to find other examples
+ *     - The validator is deprecated so debugging is guessing
+ */
+
+
 var builder = require('xmlbuilder');
 
 inputXML = builder.create('QBXML', { version: '1.0'})
@@ -9,6 +19,12 @@ inputXML = builder.create('QBXML', { version: '1.0'})
                                     .ele('FullName')
                                         .text('Marsi Bostwick ~ NT')
                                     .up()
+                                .up()
+                                .ele('RefNumber')
+                                    .text('123')
+                                .up()
+                                .ele('Memo')
+                                    .text('Created by Saguaro')
                                 .up()
                                 // .ele('RefNumber')
                                 //     .text('abc123')
