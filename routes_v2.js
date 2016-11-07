@@ -49,7 +49,6 @@ router.use((req, res, next) => {
 
 
 router.get('/invoice/:id', Controllers.getInvoice);
-router.get('/ownqueues', Controllers.getOwnQueues);
 router.get('/refreshdropzone', Controllers.refreshDropzone)
 router.post('/submitinvoice', Controllers.submitInvoice);
 

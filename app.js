@@ -21,6 +21,8 @@ var expressSession = require('express-session');
 var _ = require('underscore');
 var dropboxStrategy = require('passport-dropbox-oauth2').Strategy;
 
+var models = require('./lib/models');
+
 const globals = require('./lib/globals')
 const qbws   = require('./lib/qbws');
 const v1ApiRouter = require('./routes_v1');
