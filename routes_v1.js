@@ -11,7 +11,7 @@ var _ = require('underscore');
 var mongoose = require('mongoose');
 var passport = require('passport');
 var ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
-var models = require('./lib/models');
+var models = require('./lib/Models');
 
 var router = express.Router();
 
