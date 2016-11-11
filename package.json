@@ -14,6 +14,7 @@
     "express-session": "latest",
     "connect-ensure-login": "latest",
     "dropbox": "latest",
-    "passport-dropbox-oauth2": "latest"
+    "passport-dropbox-oauth2": "latest",
+    "js-money":"0.6.1"
   }
 }
