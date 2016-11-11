@@ -106,8 +106,8 @@ angular.
                 var hoods =   _.pluck(invoice.lineItems, '_hood').filter(Boolean);
                 var expenses = _.pluck(invoice.lineItems, '_expense').filter(Boolean);
 
-                // Dereference from ids to names
-                hoods = _.map(hoods, function(id) {return self.getElementById(id, 'shortHand', 'Hoods'); });
+                // populate ids -> names
+                hoods = _.map(hoods, function(id) { return self.getElementById(id, 'shortHand', 'Hoods'); });
                 expenses = _.map(expenses, function(id) { return self.getNameById(id, 'Expenses'); });
 
                 return  [
