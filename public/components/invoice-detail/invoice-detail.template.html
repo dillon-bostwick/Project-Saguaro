@@ -1,423 +1,437 @@
 <div ng-include="'navbar.partial.html'"></div>
 
-<h2 ng-if="$ctrl.isNew"><i>Create</i> an invoice</h2>
-<h2 ng-if="$ctrl.canReview"><i>Review</i> an invoice</h2>
-<h2 ng-if="!$ctrl.canEdit"><i>Read</i> an invoice</h2>
-
-<!-- History -->
-<div class="well well-lg" ng-if="!$ctrl.isNew">
-	<h3>Invoice History:</h3>
-	<table class="table table-hover">
-		<thead>
-			<tr>
-				<th>Date</th>
-				<th>Description</th>
-				<th>User</th>
-				<th>Comment</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr ng-repeat="action in $ctrl.Invoice.actions">
-				<td>{{action.date | date : 'MMM d, y h:mm a'}}</td>
-				<td>{{action.desc}}</td>
-				<td>{{$ctrl.getNameById(action._user, 'Users')}}</td>
-				<td>{{action.comment || 'N/A'}}</td>
-			</tr>
-		</tbody>
-	</table>
+<div class="row">
+	<div class="col-md-12 span12">
+		<h2 ng-if="$ctrl.isNew"><i>Create</i> an invoice</h2>
+		<h2 ng-if="$ctrl.canReview"><i>Review</i> an invoice</h2>
+		<h2 ng-if="!$ctrl.canEdit"><i>Read</i> an invoice</h2>
+	</div>
 </div>
 
-<!-- File view
-	TODO: Note very hacky way to tell whether the file is a pdf (i.e. first letter 'a') or an image (i.e. first letter 'i') - this is because Angular watcher doesn't like running the prototypal match() function against the full substring. Find an unhacky refactor asap -->
-<div class="well well-lg">
+<div class="row">
 
-	<img ng-if="$ctrl.File && $ctrl.File.type[0] === 'i'"
-		 ng-src="{{$ctrl.File.data}}"
-		 alt="{{$ctrl.File.name}}">
+	<div class="col-sm-6">
 
- 	<!-- <object ng-if="$ctrl.File && $ctrl.File.type === 'application/pdf'"
- 			ng-attr-data="{{$ctrl.File.data}}"
- 			type="application/pdf">
- 				Trouble rendering pdf
-	</object> -->
+		<!-- if bs-modfiable is true, form changes tracked with AIM -->
+		<form name="Form" bs-modifiable="{{$ctrl.canReview && $ctrl.enableAim}}" novalidate>
+			<div class="col-sm-6 well well-lg">
+				<div class="row">
 
-	<embed
- 			type="application/pdf"
- 			src="$ctrl.File.data"
- 			width="100%" height="100%"
- 			pluginspage="http://www.adobe.com/products/acrobat/readstep2.html">
+					<h3>Details</h3>
 
-	<!-- </object> -->
+					<table class="table table-hover">
+						<thead>
+							<tr>
+								<th>File upload (pdf or image)</th>
+								<th>Service date</th>
+								<th>Vendor</th>
+								<th>Invoice #</th>
+							</tr>
+						</thead>
 
-</div>
+						<tbody>
+							<tr>
+								<!-- File uploader -->
+								<td>
+									<input
+										ng-if="$ctrl.canEdit" 
+										type="file"
+										ng-file-model="$ctrl.File"
+										name="File Upload"
+										accept="image/*,application/pdf"
+								</td>
+
+								<!-- TODO: date picker -->
+								<td>
+									<p class="input-group">
+			      						<input
+			      							uib-datepicker-popup="MM/dd/yyyy"
+			      							ng-if="$ctrl.canEdit"
+			      							name="Service Date"
+			          						type="text"
+			          						class="form-control"
+			          						ng-model="$ctrl.Invoice.serviceDate"
+			          						is-open="$ctrl.openDate"
+			          						datepicker-options="$ctrl.datePickerOptions"
+			          						close-text="Close"/>
+
+			     					 	<span class="input-group-btn">
+			        						<button
+			        							type="button"
+			        							class="btn btn-default"
+			        							ng-click="$ctrl.openDate = true">
+
+			        							<i class="glyphicon glyphicon-calendar"></i>
+			        						</button>
+			      						</span>
+			    					</p>
+								</td>
+
+								<!-- Vendor picker -->
+								<!-- TODO: Doesn't filter based of active - always show all -->
+								<td>
+									<select
+										ng-if="$ctrl.canEdit"
+										name="Vendor"
+										ng-model="$ctrl.Invoice._vendor"
+										ng-options="vendor._id
+											as vendor.name
+											for vendor
+											in $ctrl.Vendors">
+									</select>
+								</td>
+
+								<!-- invoice id -->
+								<td>
+									<input
+										ng-if="$ctrl.canEdit"
+										name="Invoice #"
+										type="text"
+										ng-model="$ctrl.Invoice.invNum"/>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="well well-lg">
+					<h3>Line Items:</h3>
+
+					<table class="table table-hover">
+						<!-- Headers -->
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>Category</th>
+								<th>Hood</th>
+								<th>Lot</th>
+								<th>Activities</th>
+								<th>Amount</th>
+								<th>Description</th>
+							</tr>
+						</thead>
+
+						<!-- Each line item -->
+						<tbody>
+							<tr ng-repeat="lineItem in $ctrl.Invoice.lineItems">
+								<td><b>{{$index + 1}}</b></td>
+
+								<!-- Switch the line item type if can edit -->
+								<td ng-if="$ctrl.canEdit" >
+									<div class="btn-group">
+										<label class="btn btn-primary"
+												name="Line Item #{{$index + 1}}: Type"
+												uib-btn-radio="'CIP'"
+												ng-model="lineItem.category"
+												ng-change="$ctrl.loadNewLineItem(lineItem)">
+											CIP
+										</label>
+
+										<label class="btn btn-primary"
+												name="Line Item #{{$index + 1}}: Type"
+												uib-btn-radio="'EXPENSE'"
+												ng-model="lineItem.category"
+												ng-change="$ctrl.loadNewLineItem(lineItem)">
+											Expense 
+										</label>
+
+										<label class="btn btn-primary"
+												name="Line Item #{{$index + 1}}: Type"
+												uib-btn-radio="'WARRANTY'"
+												ng-model="lineItem.category"
+												ng-change="$ctrl.loadNewLineItem(lineItem)">
+											Warranty
+										</label>
+									</div>
+								</td>
+
+								<!-- Expense -->
+								<td ng-if="lineItem.category === 'EXPENSE'" colspan="3">
+									<label>Expense:</label>
+									<select
+										name="Line Item #{{$index + 1}}: Expense"
+										ng-model="lineItem._expense"
+										ng-options="expense._id as expense.name for expense in $ctrl.Expenses"
+									></select>
+								</td>
+
+								<!-- Hood -->
+								<td ng-if="lineItem.category !== 'EXPENSE'">
+									<select
+										name="Line Item #{{$index + 1}}: Hood"
+										ng-model = "lineItem._hood"
+										ng-options = "hood._id
+											as hood.name
+											for hood
+											in $ctrl.Hoods">
+									</select>
+								</td>
 
 
-<!-- if bs-modfiable is true, form changes tracked with AIM -->
-<form name="Form" bs-modifiable="{{$ctrl.canReview && $ctrl.enableAim}}" novalidate>
-	<div class="well well-lg">
-		<h3>Details</h3>
+								<!-- Lot -->
+								<td ng-if="lineItem.category !== 'EXPENSE'">
+									<select
+										name="Line Item #{{$index + 1}}: Lot"
+										ng-if = "lineItem.category !== 'EXPENSE' && lineItem._hood !== ''",
+										ng-model = "lineItem.subHood",
+										ng-options = "subHoodOption for subHoodOption in $ctrl.getSubHoodOptions(lineItem)",
+										ng-change = "lineItem._activities = [];">
+									</select>
+								</td>
 
-		<table class="table table-hover">
-			<thead>
-				<tr>
-					<th>File upload (pdf or image)</th>
-					<th>Service date</th>
-					<th>Vendor</th>
-					<th>Invoice #</th>
-				</tr>
-			</thead>
+								<!-- filler in case warranty -->
+								<td ng-if="lineItem.category === 'WARRANTY'"></td>
 
-			<tbody>
-				<tr>
-					<!-- File uploader -->
-					<td>
-						<input
-							ng-if="$ctrl.canEdit" 
-							type="file"
-							ng-file-model="$ctrl.File"
-							name="File Upload"
-							accept="image/*,application/pdf"
-					</td>
+								<!-- Activities -->
+								<td ng-if="lineItem.category === 'CIP'">
+									<!-- Existing -->
+									<div ng-if="lineItem.category === 'CIP' &&
+									            lineItem.subHood !== '' && lineItem.subHood != null">
+										<button 
+											class="btn btn-secondary btn-sm"
+											ng-click="$ctrl.addActivity(lineItem)">
+											Add Activity
+										</button>
 
-					<!-- TODO: date picker -->
-					<td>
-						<p class="input-group">
-      						<input
-      							uib-datepicker-popup="MM/dd/yyyy"
-      							ng-if="$ctrl.canEdit"
-      							name="Service Date"
-          						type="text"
-          						class="form-control"
-          						ng-model="$ctrl.Invoice.serviceDate"
-          						is-open="$ctrl.openDate"
-          						datepicker-options="$ctrl.datePickerOptions"
-          						close-text="Close"/>
+										<!-- Existing activities -->
+										<div ng-repeat="_activity in lineItem._activities track by $index">
+										<!-- http://www.codelord.net/2014/05/10/understanding-angulars-magic-dont-bind-to-primitives/ -->
 
-     					 	<span class="input-group-btn">
-        						<button
-        							type="button"
-        							class="btn btn-default"
-        							ng-click="$ctrl.openDate = true">
+											<!-- code-->
+											<select 
+												name="Line Item #{{$parent.$index + 1}}: Activity #{{$index + 1}}"
+												ng-model="lineItem._activities[$index]"
+												ng-options="option._id 
+													as option.code 
+													for option
+													in $ctrl.getActivityOptions(lineItem, $index)">
+											</select>
 
-        							<i class="glyphicon glyphicon-calendar"></i>
-        						</button>
-      						</span>
-    					</p>
-					</td>
+											<!-- desc -->					
+											<select
+												name="Line Item #{{$parent.$index + 1}}: Activity #{{$index + 1}}"
+												ng-model="lineItem._activities[$index]"
+												ng-options="option._id
+													as option.desc
+													for option
+													in $ctrl.sortByDesc($ctrl.getActivityOptions(lineItem))">
+										</select>
 
-					<!-- Vendor picker -->
-					<!-- TODO: Doesn't filter based of active - always show all -->
-					<td>
-						<select
-							ng-if="$ctrl.canEdit"
-							name="Vendor"
-							ng-model="$ctrl.Invoice._vendor"
-							ng-options="vendor._id
-								as vendor.name
-								for vendor
-								in $ctrl.Vendors">
-						</select>
-					</td>
+											<button
+												class="btn btn-danger btn-sm"
+												ng-click="lineItem._activities.splice($index, 1);">
+												&times;
+											</button>
+										</div>
+									</div>
+								</td>
 
-					<!-- invoice id -->
-					<td>
-						<input
-							ng-if="$ctrl.canEdit"
-							name="Invoice #"
-							type="text"
-							ng-model="$ctrl.Invoice.invNum"/>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+								<!-- Amount -->
+								<td>
+									$<input
+										name="Line Item #{{$index + 1}}: Amount"
+										type="Text"
+										ng-model="lineItem.amount"
+										ng-change="$ctrl.updateAmount();"/>
+
+									<button ng-click="$ctrl.evaluateAmount(lineItem)"
+											ng-if="lineItem.amount[1] === '+'">
+										Evaluate
+									</button>
+								</td>
+
+								<td>
+									<input
+										name="Line Item #{{$index + 1}}: Description"
+										type="text"
+										ng-model="lineItem.desc"/>
+								</td>
+
+								<!-- Delete button -->
+								<td>
+									<button
+										class="btn btn-danger btn-sm"
+										ng-disabled="$ctrl.Invoice.lineItems.length === 1"
+										ng-click="$ctrl.Invoice.lineItems.splice($index, 1);">
+										&times;
+									</button>
+								</td>
+							</tr>
+
+							<!-- Adding a new line item -->
+							<tr ng-if="$ctrl.canEdit">
+								<td colspan="8">
+									<button class="btn btn-block btn-secondary"
+											ng-click="$ctrl.addLineItem()">
+										Add Line Item
+									</button>
+								</td>
+							</tr>
+
+							<!-- Extra line for total amount -->
+							<tr>
+								<td colspan="5" align="right"><b>Total:</b></td>
+								<td>{{($ctrl.Invoice.amount | currency) || 'Check line items'}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</form>
 	</div>
 
-	<div class="well well-lg">
-		<h3>Line Items:</h3>
+	<div class="col-sm-6">
+		 <div class="well well-lg"> 
+			<img ng-if="$ctrl.File && $ctrl.File.type[0] === 'i'"
+				 ng-src="{{$ctrl.File.data}}"
+				 alt="{{$ctrl.File.name}}">
 
+		 	<!-- <object ng-if="$ctrl.File && $ctrl.File.type === 'application/pdf'"
+		 			ng-attr-data="{{$ctrl.File.data}}"
+		 			type="application/pdf">
+		 				Trouble rendering pdf
+			</object> -->
+
+			<embed
+		 			type="application/pdf"
+		 			src="$ctrl.File.data"
+		 			width="100%" height="100%"
+		 			pluginspage="http://www.adobe.com/products/acrobat/readstep2.html">
+
+		</div>
+	</div>
+</div>
+
+<!-- History --> <!-- TODO: Make collapsable -->
+
+<div class="row">
+	<div class="well well-lg" ng-if="!$ctrl.isNew">
+		<h3>Invoice History:</h3>
 		<table class="table table-hover">
-			<!-- Headers -->
 			<thead>
 				<tr>
-					<th>#</th>
-					<th>Category</th>
-					<th>Hood</th>
-					<th>Lot</th>
-					<th>Activities</th>
-					<th>Amount</th>
+					<th>Date</th>
 					<th>Description</th>
+					<th>User</th>
+					<th>Comment</th>
 				</tr>
 			</thead>
-
-			<!-- Each line item -->
 			<tbody>
-				<tr ng-repeat="lineItem in $ctrl.Invoice.lineItems">
-					<td><b>{{$index + 1}}</b></td>
-
-					<!-- Switch the line item type if can edit -->
-					<td ng-if="$ctrl.canEdit" >
-						<div class="btn-group">
-							<label class="btn btn-primary"
-									name="Line Item #{{$index + 1}}: Type"
-									uib-btn-radio="'CIP'"
-									ng-model="lineItem.category"
-									ng-change="$ctrl.loadNewLineItem(lineItem)">
-								CIP
-							</label>
-
-							<label class="btn btn-primary"
-									name="Line Item #{{$index + 1}}: Type"
-									uib-btn-radio="'EXPENSE'"
-									ng-model="lineItem.category"
-									ng-change="$ctrl.loadNewLineItem(lineItem)">
-								Expense 
-							</label>
-
-							<label class="btn btn-primary"
-									name="Line Item #{{$index + 1}}: Type"
-									uib-btn-radio="'WARRANTY'"
-									ng-model="lineItem.category"
-									ng-change="$ctrl.loadNewLineItem(lineItem)">
-								Warranty
-							</label>
-						</div>
-					</td>
-
-					<!-- Expense -->
-					<td ng-if="lineItem.category === 'EXPENSE'" colspan="3">
-						<label>Expense:</label>
-						<select
-							name="Line Item #{{$index + 1}}: Expense"
-							ng-model="lineItem._expense"
-							ng-options="expense._id as expense.name for expense in $ctrl.Expenses"
-						></select>
-					</td>
-
-					<!-- Hood -->
-					<td ng-if="lineItem.category !== 'EXPENSE'">
-						<select
-							name="Line Item #{{$index + 1}}: Hood"
-							ng-model = "lineItem._hood"
-							ng-options = "hood._id
-								as hood.name
-								for hood
-								in $ctrl.Hoods">
-						</select>
-					</td>
-
-
-					<!-- Lot -->
-					<td ng-if="lineItem.category !== 'EXPENSE'">
-						<select
-							name="Line Item #{{$index + 1}}: Lot"
-							ng-if = "lineItem.category !== 'EXPENSE' && lineItem._hood !== ''",
-							ng-model = "lineItem.subHood",
-							ng-options = "subHoodOption for subHoodOption in $ctrl.getSubHoodOptions(lineItem)",
-							ng-change = "lineItem._activities = [];">
-						</select>
-					</td>
-
-					<!-- filler in case warranty -->
-					<td ng-if="lineItem.category === 'WARRANTY'"></td>
-
-					<!-- Activities -->
-					<td ng-if="lineItem.category === 'CIP'">
-						<!-- Existing -->
-						<div ng-if="lineItem.category === 'CIP' &&
-						            lineItem.subHood !== '' && lineItem.subHood != null">
-							<button 
-								class="btn btn-secondary btn-sm"
-								ng-click="$ctrl.addActivity(lineItem)">
-								Add Activity
-							</button>
-
-							<!-- Existing activities -->
-							<div ng-repeat="_activity in lineItem._activities track by $index">
-							<!-- http://www.codelord.net/2014/05/10/understanding-angulars-magic-dont-bind-to-primitives/ -->
-
-								<!-- code-->
-								<select 
-									name="Line Item #{{$parent.$index + 1}}: Activity #{{$index + 1}}"
-									ng-model="lineItem._activities[$index]"
-									ng-options="option._id 
-										as option.code 
-										for option
-										in $ctrl.getActivityOptions(lineItem, $index)">
-								</select>
-
-								<!-- desc -->					
-								<select
-									name="Line Item #{{$parent.$index + 1}}: Activity #{{$index + 1}}"
-									ng-model="lineItem._activities[$index]"
-									ng-options="option._id
-										as option.desc
-										for option
-										in $ctrl.sortByDesc($ctrl.getActivityOptions(lineItem))">
-							</select>
-
-								<button
-									class="btn btn-danger btn-sm"
-									ng-click="lineItem._activities.splice($index, 1);">
-									&times;
-								</button>
-							</div>
-						</div>
-					</td>
-
-					<!-- Amount -->
-					<td>
-						$<input
-							name="Line Item #{{$index + 1}}: Amount"
-							type="Text"
-							ng-model="lineItem.amount"
-							ng-change="$ctrl.updateAmount();"/>
-
-						<button ng-click="$ctrl.evaluateAmount(lineItem)"
-								ng-if="lineItem.amount[1] === '+'">
-							Evaluate
-						</button>
-					</td>
-
-					<td>
-						<input
-							name="Line Item #{{$index + 1}}: Description"
-							type="text"
-							ng-model="lineItem.desc"/>
-					</td>
-
-					<!-- Delete button -->
-					<td>
-						<button
-							class="btn btn-danger btn-sm"
-							ng-disabled="$ctrl.Invoice.lineItems.length === 1"
-							ng-click="$ctrl.Invoice.lineItems.splice($index, 1);">
-							&times;
-						</button>
-					</td>
-				</tr>
-
-				<!-- Adding a new line item -->
-				<tr ng-if="$ctrl.canEdit">
-					<td colspan="8">
-						<button class="btn btn-block btn-secondary"
-								ng-click="$ctrl.addLineItem()">
-							Add Line Item
-						</button>
-					</td>
-				</tr>
-
-				<!-- Extra line for total amount -->
-				<tr>
-					<td colspan="5" align="right"><b>Total:</b></td>
-					<td>{{($ctrl.Invoice.amount | currency) || 'Check line items'}}</td>
+				<tr ng-repeat="action in $ctrl.Invoice.actions">
+					<td>{{action.date | date : 'MMM d, y h:mm a'}}</td>
+					<td>{{action.desc}}</td>
+					<td>{{$ctrl.getNameById(action._user, 'Users')}}</td>
+					<td>{{action.comment || 'N/A'}}</td>
 				</tr>
 			</tbody>
 		</table>
-	</div>
-</form>
-
-
-
-
-<!-- if new, just leave a comment -->
-<div ng-if="$ctrl.isNew" class="well well-lg">
-	<p>Leave a comment as before submitting:</p><br>
-	<textarea rows="4" cols="80" ng-model="$ctrl.Invoice.actions[0].comment"></textarea>
+	</div>	
 </div>
 
-<!-- if the form was changed and it is not new, must explain all changes -->
-<div ng-if="$ctrl.canReview && Form.modified" class="well well-lg">
-	<h3>Explain your changes:</h3>
+<div class="row">
 
-	<table class="table table-hover">
-		<thead>
-			<tr>
-				<th>Field</th>
-				<th>Leave a comment:</th>
-			</tr>
-		</thead>
-
-		<tbody>
-			<tr ng-repeat="change in Form.modifiedModels">
-				<td>{{change.$name}}</td>
-
-				<td>
-					<textarea rows="4" cols="50" ng-model="$ctrl.changeComments[$index]"></textarea>
-				</td>
-			</tr>
-		</tbody>
-	</table>
-
-	<div>
-		<button
-			ng-click="Form.reset()">
-			Reset all changes
-		</button>
+	<!-- if new, just leave a comment -->
+	<div ng-if="$ctrl.isNew" class="well well-lg">
+		<p>Leave a comment as before submitting:</p><br>
+		<textarea rows="4" cols="80" ng-model="$ctrl.Invoice.actions[0].comment"></textarea>
 	</div>
-</div>
 
-<!-- submit button if new -->
-<div ng-if="$ctrl.canEdit" class="well well-lg">
-	<div ng-if="$ctrl.canReview">
-		<p>Leave a general comment before submitting:</p>
-		<textarea rows="4" cols="80" ng-model="$ctrl.generalComment"></textarea>
+	<!-- if the form was changed and it is not new, must explain all changes -->
+	<div ng-if="$ctrl.canReview && Form.modified" class="well well-lg">
+		<h3>Explain your changes:</h3>
+
+		<table class="table table-hover">
+			<thead>
+				<tr>
+					<th>Field</th>
+					<th>Leave a comment:</th>
+				</tr>
+			</thead>
+
+			<tbody>
+				<tr ng-repeat="change in Form.modifiedModels">
+					<td>{{change.$name}}</td>
+
+					<td>
+						<textarea rows="4" cols="50" ng-model="$ctrl.changeComments[$index]"></textarea>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<div>
+			<button
+				ng-click="Form.reset()">
+				Reset all changes
+			</button>
+		</div>
 	</div>
-	
-	<div class="well">
-		<div ng-if="$ctrl.isNew || ($ctrl.canReview && $ctrl.CurrentUser._invoiceQueue.length > 1)">
-			{{$ctrl.isNew ? 'Add another?' : 'Review next invoice?'}}
 
-			<input
-				type="checkbox"
-				ng-model="$ctrl.addAnother">
+	<!-- submit button if new -->
+	<div ng-if="$ctrl.canEdit" class="well well-lg">
+		<div ng-if="$ctrl.canReview">
+			<p>Leave a general comment before submitting:</p>
+			<textarea rows="4" cols="80" ng-model="$ctrl.generalComment"></textarea>
+		</div>
+		
+		<div class="well">
+			<div ng-if="$ctrl.isNew || ($ctrl.canReview && $ctrl.CurrentUser._invoiceQueue.length > 1)">
+				{{$ctrl.isNew ? 'Add another?' : 'Review next invoice?'}}
+
+				<input
+					type="checkbox"
+					ng-model="$ctrl.addAnother">
+			</div>
+
+			<p ng-if="!($ctrl.isNew || ($ctrl.canReview && $ctrl.CurrentUser._invoiceQueue.length > 1))">
+				<b>This is the last invoice left in your queue!</b>
+			</p>
 		</div>
 
-		<p ng-if="!($ctrl.isNew || ($ctrl.canReview && $ctrl.CurrentUser._invoiceQueue.length > 1))">
-			<b>This is the last invoice left in your queue!</b>
-		</p>
-	</div>
-
-	<button
-		uib-btn-checkbox
-		ng-if="$ctrl.canReview"
-		type="button"
-		class="btn btn-primary btn-lg btn-danger"
-		ng-model="$ctrl.hideDeleteConfirm">
-		Delete
-	</button>
-
-	<button
-		ng-if="$ctrl.canReview"
-		class="btn btn-primary btn-lg bt-info"
-		ng-click="$ctrl.hold()">
-		Hold
-	</button>
-
-	<button
-		class="btn btn-primary btn-lg btn-success"
-		ng-click="$ctrl.submit()">
-		{{$ctrl.isNew ? 'Submit' : 'Approve'}}
-	</button>
-
-	<div uib-collapse="$ctrl.hideDeleteConfirm" class="well well-lg">
 		<button
+			uib-btn-checkbox
+			ng-if="$ctrl.canReview"
+			type="button"
 			class="btn btn-primary btn-lg btn-danger"
-			ng-click="$ctrl.deleteInvoice()">
-			Delete forever
+			ng-model="$ctrl.hideDeleteConfirm">
+			Delete
 		</button>
 
 		<button
-			class="btn btn-primary btn-lg btn-danger"
-			ng-click="alert(TODO)">
-			Send to archives
+			ng-if="$ctrl.canReview"
+			class="btn btn-primary btn-lg bt-info"
+			ng-click="$ctrl.hold()">
+			Hold
 		</button>
+
+		<button
+			class="btn btn-primary btn-lg btn-success"
+			ng-click="$ctrl.submit()">
+			{{$ctrl.isNew ? 'Submit' : 'Approve'}}
+		</button>
+
+		<div uib-collapse="$ctrl.hideDeleteConfirm" class="well well-lg">
+			<button
+				class="btn btn-primary btn-lg btn-danger"
+				ng-click="$ctrl.deleteInvoice()">
+				Delete forever
+			</button>
+
+			<button
+				class="btn btn-primary btn-lg btn-danger"
+				ng-click="alert(TODO)">
+				Send to archives
+			</button>
+		</div>
 	</div>
+
+	<a class="btn btn-primary btn-lg" href='/#!/dashboard'>
+	    Go back
+	</a>
+
 </div>
-
-<a class="btn btn-primary btn-lg" href='/#!/dashboard'>
-    Go back
-</a>
-
 
 
 

@@ -155,7 +155,6 @@ angular.
             /* Returns an array of invoice objects that correspond to 
              * all the invoice ids in the _invoiceQueue of CurrentUser.
              */
-             //TODO: NOT TESTED!
            function getUserQueue(CurrentUser, Invoices) {
                 return _.filter(Invoices, function(Invoice) {
                     return _.contains(CurrentUser._invoiceQueue, Invoice._id)
