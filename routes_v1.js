@@ -10,12 +10,13 @@ var express = require('express');
 var _ = require('underscore');
 var mongoose = require('mongoose');
 var passport = require('passport');
-var ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
 var models = {}; //
 
 var router = express.Router();
 
-var userModel = _.find(models, function(model) { return model.modelName === 'user' })
+// What we want:
+//  same logged in pre-hook and error-handling middleware as v2
+//  CRUD for vendors, hoods, expenses, activities
 
 ////////////////////////////////////////////////////////////////////////
 
