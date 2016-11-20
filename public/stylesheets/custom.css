@@ -1,6 +1,16 @@
+/* personal things and misc. hacks I added: */
+
 .span12 {text-align: center}
 
-/* AIM  */
+.centered {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+}
+
+
+
+/* AIM:  */
 input.ng-valid.aim-modified {
     background-color: deepskyblue;
     background: deepskyblue;

@@ -1,3 +1,22 @@
+<div class="well well-lg"> 
+	<img ng-if="$ctrl.File && $ctrl.File.type[0] === 'i'"
+		 ng-src="{{$ctrl.File.data}}"
+		 alt="{{$ctrl.File.name}}">
+
+ 	<!-- <object ng-if="$ctrl.File && $ctrl.File.type === 'application/pdf'"
+ 			ng-attr-data="{{$ctrl.File.data}}"
+ 			type="application/pdf">
+ 				Trouble rendering pdf
+	</object> -->
+
+	<embed
+ 			type="application/pdf"
+ 			src="$ctrl.File.data"
+ 			width="100%" height="100%"
+ 			pluginspage="http://www.adobe.com/products/acrobat/readstep2.html">
+
+</div>
+
 
 <!-- saving for later: a how-to for pdfs -->
 

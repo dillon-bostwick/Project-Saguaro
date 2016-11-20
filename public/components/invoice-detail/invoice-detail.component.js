@@ -89,7 +89,6 @@ angular.
              * bind to the view (which obviously Angular knows when to update).
              */
             self.CurrentUser.$promise.then(function(currentUser) {
-
                 // Whether is in the current user's queue:
                 self.canReview = _.contains(currentUser._invoiceQueue, $routeParams.id);
                 // Whether it can be edited at all:
