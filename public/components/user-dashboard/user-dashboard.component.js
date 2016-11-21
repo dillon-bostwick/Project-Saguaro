@@ -50,46 +50,31 @@ angular.
             ////////////////////////////////////////////////////////////////////
 
             // External requests:
-            self.Vendors = api.Vendor.query();
-            self.Hoods = api.Hood.query();
-            self.Expenses = api.Expense.query();
-            self.Activities = api.Activity.query();
-            self.Invoices = api.Invoice.query();
-            self.CurrentUser = api.CurrentUser.get();
+            self.Vendors = api.crudResources.Vendor.query();
+            self.Hoods = api.crudResources.Hood.query();
+            self.Expenses = api.crudResources.Expense.query();
+            self.Activities = api.crudResources.Activity.query();
+            api.controls.getCurrentUser().then((res) => self.CurrentUser);
+            self.invList = api.controls.getOwnQueues();
 
-            //Must be one of [QUEUE, TEAM, ARCHIVE] - QUEUE by default
-            self.view = 'QUEUE';
-            self.invList = []; //Gets initially filled by $q promise below
-            self.currentFilters = [];
+            self.view = 'QUEUE'; //Must be one of [QUEUE, TEAM, ARCHIVE] - QUEUE by default
             self.currentSorter = self.SORTOPTIONS[0].value;
 
             //Alerter based on query string
             self.alertMessage = $location.search().alert || '';
-            self.isLoading = false;
-
-            /* Wait for the CurrentUser and Invoices to both load before
-             * initiating the first queue view. When the page loads it always
-             * starts as getUserQueue (i.e. self.view == 'QUEUE')
-             */
-            $q.all([
-                self.CurrentUser.$promise,
-                self.Invoices.$promise
-            ]).then(function(data) {
-                self.invList = getUserQueue(self.CurrentUser, self.Invoices);
-            })
 
             ////////////////////////////////////////////////////////////////////
 
             self.updateInvList = function() {
                 switch(self.view) {
                     case 'QUEUE':
-                        self.invList = getUserQueue(self.CurrentUser, self.Invoices);
+                        self.invList = api.controls.getOwnQueues();
                         break;
                     case 'TEAM':
-                        self.invList = getAllUserQueues(self);
+                        alert('team view function is not ready');
                         break;
                     case 'ARCHIVE':
-                        alert('Archive function is not ready!') //TODO
+                        alert('Archive function is not ready!');
                         break;
                     default:
                         throw new Error;
@@ -99,14 +84,12 @@ angular.
             /* Given an invoice, return a single string that gives relevant info
              * and a summary of all line items
              */
-
-             //TODO: not putting too much effort into this because it will change later
             self.getDetailStr = function(invoice) {
                 // Get lists of ids excluding empty strings
                 var hoods =   _.pluck(invoice.lineItems, '_hood').filter(Boolean);
                 var expenses = _.pluck(invoice.lineItems, '_expense').filter(Boolean);
 
-                // populate ids -> names
+                // populate ids -> names /// TODO: populate on backend first
                 hoods = _.map(hoods, function(id) { return self.getElementById(id, 'shortHand', 'Hoods'); });
                 expenses = _.map(expenses, function(id) { return self.getNameById(id, 'Expenses'); });
 
@@ -149,33 +132,5 @@ angular.
                 
                 return doc || null;
             }
-
-            ////////////////////////////////////////////////////////////////////
-
-            /* Returns an array of invoice objects that correspond to 
-             * all the invoice ids in the _invoiceQueue of CurrentUser.
-             */
-           function getUserQueue(CurrentUser, Invoices) {
-                return _.filter(Invoices, function(Invoice) {
-                    return _.contains(CurrentUser._invoiceQueue, Invoice._id)
-                });
-            }
-
-            function getAllUserQueues(self) {
-                //TODO stub
-                return foo;
-            }
-
-
-
-
-
-
-
-
-
-
-
-
 		}
     });

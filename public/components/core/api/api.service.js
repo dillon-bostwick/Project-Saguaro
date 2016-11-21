@@ -9,23 +9,50 @@
 
 angular.
     module('core.api').
-    factory('api', ['$resource', function($resource) {
-        var collNames = [
-            'Invoice',
+    factory('api', ['$resource', '$http', function($resource, $http) {
+        var urlPrefix = 'api/v2/';
+
+        var crudModelNames = [
             'Vendor',
-            'User',
             'Activity',
             'Expense',
-            'Hood',
-            'Group',
-            'CurrentUser'
+            'Hood'
         ]
 
-        //returns an object literal with full $resource for each collection
-        return _.object(collNames, _.map(collNames, function(collName) {
-            return $resource('/api/v1/' + collName + '/:id', { id: '@_id' },
+        //returns object with $resource for each model
+        var crudables = _.object(crudModelNames, _.map(crudModelNames, function(modelName) {
+            return $resource(urlPrefix + modelName + '/:id',
+            { id: '@_id' },
             {
                 update: { method: 'PUT' }
             })
         }));
+
+        var customs = {
+            getCurrentUser: () => {
+                return $http.get(urlPrefix + 'currentuser');
+            },
+
+            getInvoice: (id) => {
+                return $http.get(urlPrefix + 'invoice/' + id);
+            },
+
+            getOwnQueues: () => {
+                return $http.get(urlPrefix + 'ownqueues');
+            },
+
+            refreshDropzone: () => {
+                return $http.get(urlPrefix + 'refreshdropzone');
+            },
+
+            submitInvoice: (invoice, hold, override) => {
+                return $http.post(urlPrefix + 'submitinvoice', {
+                    invoice: invoice,
+                    hold: hold,
+                    override: override
+                })
+            }
+        }
+
+        return { crudResources: crudables, controls: customs };
     }])

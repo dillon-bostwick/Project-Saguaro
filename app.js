@@ -25,7 +25,6 @@ var models = require('./lib/models');
 
 const globals = require('./lib/globals')
 const qbws   = require('./lib/qbws');
-const v1ApiRouter = require('./routes_v1');
 const v2ApiRouter = require('./routes_v2');
 const User = require('./lib/models').User
 
@@ -106,7 +105,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(passport.initialize());
 app.use(passport.session());
-app.use('/api/v1', v1ApiRouter);
 app.use('/api/v2', v2ApiRouter);
 
 

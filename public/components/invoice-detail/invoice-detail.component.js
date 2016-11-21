@@ -17,21 +17,12 @@ angular.
                 type: 'application/pdf'
             }
 
-            /////
-            ///
-            ///
-            ///
-            ///
-            ///
-            ///
-
             // External requests:
-            self.Vendors = api.Vendor.query();
-            self.Hoods = api.Hood.query();
-            self.Expenses = api.Expense.query();
-            self.Activities = api.Activity.query();
-            self.Users = api.User.query();
-            self.CurrentUser = api.CurrentUser.get()
+            self.Vendors = api.crudResources.Vendor.query();
+            self.Hoods = api.crudResources.Hood.query();
+            self.Expenses = api.crudResources.Expense.query();
+            self.Activities = api.crudResources.Activity.query();
+            self.CurrentUser = api.controls.getCurrentUser();
 
             //Used for adding new changes to Invoice.actions when it is being
             //edited:
@@ -60,8 +51,7 @@ angular.
             };
 
             // Either Invoice is retrived from DB or it gets a starter template:
-            self.Invoice = self.isNew
-                ? new api.Invoice({
+            self.Invoice = {
                     serviceDate: new Date,
                     invNum: '',
                     _vendor: '',
@@ -74,8 +64,7 @@ angular.
                         _user: undefined // Wait for CurrentUser promise resolution to fill
                     }],
                     filePath: null
-                })
-                : api.Invoice.get({ id: $routeParams.id });
+                };
 
             ////////////////////////////////////////////////////////////////////
             //PROMISES
@@ -88,18 +77,18 @@ angular.
              * the returned data from the promise, while the latter is used to
              * bind to the view (which obviously Angular knows when to update).
              */
-            self.CurrentUser.$promise.then(function(currentUser) {
-                // Whether is in the current user's queue:
-                self.canReview = _.contains(currentUser._invoiceQueue, $routeParams.id);
-                // Whether it can be edited at all:
-                self.canEdit = self.isNew || self.canReview;
-                // See self.Invoice declaration for this:
-                if (self.isNew) {
-                    self.Invoice.actions[0]._user = currentUser._id;
-                }
+            // self.CurrentUser.$promise.then(function(currentUser) {
+            //     // Whether is in the current user's queue:
+            //     self.canReview = _.contains(currentUser._invoiceQueue, $routeParams.id);
+            //     // Whether it can be edited at all:
+            //     self.canEdit = self.isNew || self.canReview;
+            //     // See self.Invoice declaration for this:
+            //     if (self.isNew) {
+            //         self.Invoice.actions[0]._user = currentUser._id;
+            //     }
 
-                return currentUser;
-            });
+            //     return currentUser;
+            // });
 
             //Set pristine after the invoice loads, so that AIM doesn't
             //recognize the invoice load from api is a Form change
@@ -134,7 +123,7 @@ angular.
                 });
             }
 
-            //Instead of predeclaring (this gets ran on pageload but waits
+            //(this gets ran on pageload but waits
             //for the addLineItem definition)
             if (self.isNew) { self.addLineItem(); }
 
@@ -232,50 +221,16 @@ angular.
 
             ////////////////////////////////////////////////////////////////////
 
-
-
-
-
-            //Move everything below to either server or to core:
-
-
-
-
-
-
-            // BOTTOM OF FORM BUTTONS
-
-            /* When a new invoice is submitted, many actions occur:
-             * Gets pushed to the queues of pipeline receivers
-             * If new, run submitNewInvoice which pushes it to Invoices
-             * if existing, run submitExistingInvoice which:
-             *   - Makes the changes pristine
-             *   - Adds changes to Invoice.actions in proper format
-             *   - Update the invoice in Invoiecs
-             *
-             * paramater:
-             *   Boolean another: if false, returns to dashboard, otherwise,
-             *   adds new invoices or loads next invoice in user queue
-             */
             self.submit = function() {
-                var _receivers = ['64374526']; //TODO: this needs logic
-
-                pushInvoiceToReceivers(_receivers, self.Invoice._id, self.Users);
-
-                self.isNew ? submitNewInvoice(self, self.addAnother)
-                           : submitExistingInvoice(self, self.addAnother, false)
+                
             }
 
             self.hold = function () {
-                submitExistingInvoice(self, true, false);
+                
             }
 
             self.deleteInvoice = function() {
-                self.Invoice.$delete();
 
-                //TODO: Delete from personal queue as well
-
-                $window.location.href = '/#!/dashboard';
             }
 
             ////////////////////////////////////////////////////////////////////
@@ -303,82 +258,20 @@ angular.
                 return doc ? doc[element] : null;
             }
 
-            ////////////////////////////////////////////////////////////////////
-            //HELPER METHODS
 
-            /* Given a list of receivers (array of ids),
-             * one invoice (id)
-             * and a list of all users in the model (array of ids)
-             * each receiver gets the invoice pushed to the back of their
-             * personal invoice queue.
-             */
-            function pushInvoiceToReceivers(_receivers, _invoice, _users) {
-                var receiverModel;
 
-                _.each(_receivers, function(_receiver) {
-                    receiverModel = _.find(_users, function(user) {
-                        return user._id === _receiver;
-                    });
 
-                    receiverModel._invoiceQueue.push(_invoice);
-                    receiverModel.$update();
-                });
-            }
 
-            function submitNewInvoice(self, another) {
-                self.Invoice.$save(function() {
-                    if (another) {
-                        $window.location.reload();
-                    } else {
-                        $window.location.href = '/#!/dashboard'
-                    }
-                });
-            }
 
-            /* Parameters:
-             *   self: $ctrl
-             *   another: Boolean - add another vs go home
-             *   hold: Boolean - whether to list action as "APPROVED" vs "HOLD"
-             *
-             * Description:
-             *   Adds all modifiedModels to actions, sets pristine, adds a
-             *   action (approved or hold), updates in database, redirects
-             *   acording to another.
-             */
-            function submitExistingInvoice(self, another, hold) {
-                //If changes were made, push them to the invoice history at
-                //self.Invoice.actions
-                //TODO: TEST!
-                for (var i = 0; i < $scope.Form.modifiedModels.length; i++) {
-                    self.Invoice.actions.push({
-                        desc: 'CHANGED: ' + $scope.Form.modifiedModels[i].$name,
-                        comment: self.changeComments[i],
-                        date: new Date,
-                        _user: self.CurrentUser._id
-                    })
-                }
 
-                //Set to pristine - due to AIM nature, changes not confirmed
-                $scope.Form.$setPristine()
 
-                //Approval or hold action:
-                self.Invoice.actions.push({
-                    desc: hold ? 'HOLD' : 'APPROVED',
-                    comment: self.generalComment,
-                    date: new Date,
-                    _user: self.CurrentUser._id
-                })
 
-                //TODO: needs testing
-                self.Invoice.$update(function() {
-                    if (another) {
-                        //Stub - href next queue in user queue
-                    } else {
-                        console.log(self.Invoice.invNum);
-                        $window.location.href = '/#!/dashboard?' + $.param({ alert: 'Successfully updated invoice' });
-                    }
-                });
-            }
+
+
+
+
+
+
 
             function getFileType(path) {
                 var re = /(?:\.([^.]+))?$/;
